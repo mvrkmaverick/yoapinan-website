@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YoApinan CMS — จัดการเนื้อหาเว็บไซต์</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Serif+Thai:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <div class="side-brand">
+        <img src="logo.svg" alt="">
+        <div>YoApinan <small>CONTENT MANAGER</small></div>
+      </div>
+      <nav class="side-nav" id="sideNav"></nav>
+      <div class="side-foot">
+        แก้เนื้อหา → กด <b style="color:#3DD9A6">Publish</b> เพื่อขึ้นเว็บจริง<br>
+        <a href="index.html" target="_blank">เปิดเว็บไซต์ ↗</a>
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-ghost btn-icon menu-btn" id="menuBtn" aria-label="เมนู">☰</button>
+          <div>
+            <h1 id="viewTitle">แดชบอร์ด</h1>
+            <div class="status" id="status">พร้อมใช้งาน</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" id="btnPreview">👁 ดูตัวอย่าง</button>
+          <button class="btn btn-ghost" id="btnSaveDraft">💾 บันทึกร่าง</button>
+          <button class="btn btn-accent" id="btnPublish">🚀 Publish</button>
+        </div>
+      </div>
+      <div class="content" id="view"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="modalTitle">แก้ไข</h3><button class="btn btn-ghost btn-icon" id="modalClose">✕</button></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot" id="modalFoot"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="content.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
