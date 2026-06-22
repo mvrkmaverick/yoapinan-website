@@ -585,5 +585,44 @@
     if (d && d.at) refreshStatus("โหลดร่างล่าสุด " + new Date(d.at).toLocaleString("th-TH"));
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+  /* ---------- passcode gate (deterrent; real lock = GitHub token) ---------- */
+  var ADMIN_HASH = "77e39da95a4c3ec995b89b5c03e6af9345f140c384d25d72850e7dc756adba0d";
+  async function sha256hex(str) {
+    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  }
+  function gateThen(cb) {
+    // skip on local file preview / no WebCrypto (own machine) — gate is for the public https page
+    if (location.protocol === "file:" || !(window.crypto && crypto.subtle)) return cb();
+    if (sessionStorage.getItem("ya_admin_ok") === "1") return cb();
+    renderLock(cb);
+  }
+  function renderLock(cb) {
+    var ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;z-index:9999;background:#0B1320;display:flex;align-items:center;justify-content:center;padding:24px;font-family:var(--font)";
+    ov.innerHTML =
+      '<div style="width:100%;max-width:360px;text-align:center;color:#E8ECF1">' +
+        '<img src="logo.svg" alt="" style="width:46px;height:46px;margin:0 auto 16px;border-radius:10px" onerror="this.style.display=\'none\'">' +
+        '<div style="font-family:var(--font);font-weight:700;font-size:1.15rem;margin-bottom:4px;color:#fff">YoApinan CMS</div>' +
+        '<div style="color:#9CA9B4;font-size:.9rem;margin-bottom:20px">ใส่รหัสผ่านเพื่อเข้าจัดการเนื้อหา</div>' +
+        '<input id="lockPass" type="password" placeholder="รหัสผ่าน" autocomplete="current-password" style="width:100%;padding:.7rem .9rem;border-radius:10px;border:1px solid #2A3A4D;background:#111C2C;color:#fff;font-size:1rem;outline:none;box-sizing:border-box">' +
+        '<div id="lockErr" style="color:#E2766B;font-size:.85rem;min-height:1.3em;margin:8px 0"></div>' +
+        '<button id="lockBtn" style="width:100%;padding:.78rem;border-radius:10px;border:none;background:#C9A86A;color:#0B1320;font-weight:700;font-size:1rem;cursor:pointer">เข้าสู่ระบบ</button>' +
+      "</div>";
+    document.body.appendChild(ov);
+    var inp = ov.querySelector("#lockPass"), err = ov.querySelector("#lockErr"), btn = ov.querySelector("#lockBtn");
+    setTimeout(function () { inp.focus(); }, 60);
+    async function tryUnlock() {
+      btn.disabled = true; err.textContent = "";
+      try {
+        if (await sha256hex(inp.value) === ADMIN_HASH) { sessionStorage.setItem("ya_admin_ok", "1"); ov.remove(); cb(); return; }
+      } catch (e) {}
+      btn.disabled = false; err.textContent = "รหัสผ่านไม่ถูกต้อง"; inp.select();
+    }
+    btn.addEventListener("click", tryUnlock);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { gateThen(boot); });
+  else gateThen(boot);
 })();
