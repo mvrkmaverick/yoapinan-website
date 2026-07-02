@@ -83,9 +83,9 @@ strong,b{font-weight:600;color:var(--ink-2)}
 
 /* ---- Layout ----------------------------------------------------------- */
 .container{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:26px}
-.section{padding-block:clamp(58px,8vw,108px)}
-.section--tight{padding-block:clamp(40px,5vw,64px)}
-.section-head{max-width:760px;margin-bottom:clamp(30px,4vw,52px)}
+.section{padding-block:clamp(40px,5.5vw,72px)}
+.section--tight{padding-block:clamp(26px,4vw,44px)}
+.section-head{max-width:760px;margin-bottom:clamp(20px,3vw,36px)}
 .section-head .lead{margin-top:14px}
 .center{text-align:center}
 .center.section-head{margin-inline:auto}
@@ -159,7 +159,7 @@ body.menu-open .nav-toggle span::after{top:0;transform:rotate(-45deg)}
   mask-image:radial-gradient(120% 90% at 70% 0%,#000 40%,transparent 85%);
 }
 .hero-grid-lines{position:absolute;inset:0;z-index:-1;opacity:.7;pointer-events:none}
-.hero-inner{padding-block:clamp(72px,11vw,140px);display:grid;gap:32px;max-width:940px}
+.hero-inner{padding-block:clamp(56px,9vw,112px);display:grid;gap:30px;max-width:940px}
 .hero .eyebrow{color:#C9A86A}
 .hero .eyebrow::before{background:#C9A86A}
 .hero h1{color:#fff;font-weight:500}
@@ -237,7 +237,7 @@ body.menu-open .nav-toggle span::after{top:0;transform:rotate(-45deg)}
 .cta-band p{color:#BFCAD5;max-width:620px;margin:16px auto 30px}
 
 /* ---- Page hero (interior) -------------------------------------------- */
-.page-hero{padding-block:clamp(52px,7vw,92px) clamp(20px,3vw,32px)}
+.page-hero{padding-block:clamp(30px,4.5vw,52px) clamp(14px,2vw,24px)}
 .page-hero .eyebrow{margin-bottom:20px}
 .page-hero p{max-width:760px;margin-top:18px}
 .page-hero .divider{margin-top:clamp(30px,4vw,46px)}
@@ -383,3 +383,16 @@ body.menu-open .nav-toggle span::after{top:0;transform:rotate(-45deg)}
 .tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
 .tr-dark .tr-card{background:var(--navy-2);border-color:var(--navy-3)}
 .tr-dark .tr-label{color:#C9A86A}
+
+/* ---- Floating LINE button (mobile only) ------------------------------- */
+.line-fab{display:none}
+@media (max-width:860px){
+  .nav-cta .btn--line{display:none}
+  .line-fab{
+    display:inline-flex;align-items:center;gap:.45rem;position:fixed;right:14px;bottom:14px;z-index:80;
+    background:var(--line-green);color:#fff;font-family:var(--font-body);font-weight:700;font-size:.98rem;
+    padding:.85rem 1.15rem;border-radius:var(--r-pill);box-shadow:0 10px 26px rgba(6,199,85,.45);
+  }
+  .line-fab .ic{width:22px;height:22px}
+  .line-fab:active{transform:scale(.97)}
+}

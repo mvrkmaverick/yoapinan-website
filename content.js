@@ -65,7 +65,8 @@ window.SITE_CONTENT = {
     "navLabel": "Track Record",
     "eyebrow": "Verified · Darwinex · I.5979",
     "title": "Verified Track Record",
-    "sub": "ผลการเทรดจริงของกลยุทธ์ MVRK Capital (I.5979) — ตรวจสอบและอัปเดตแบบเรียลไทม์โดย Darwinex ไม่ใช่ผลย้อนหลังที่ปรับแต่งเอง",
+    "sub": "ผลการเทรดจริงของกลยุทธ์ MVRKAlpha — ตรวจสอบและอัปเดตแบบเรียลไทม์โดย Darwinex",
+    "about": "Darwinex คือแพลตฟอร์ม/โบรกเกอร์จากสหราชอาณาจักร ที่ทำหน้าที่ตรวจสอบและเผยแพร่ผลงานการเทรดของเทรดเดอร์อย่างเป็นกลาง (verified track record) — ตัวเลขทุกตัวมาจากการเทรดจริง อัปเดตอัตโนมัติ และตรวจย้อนหลังได้ ไม่ใช่ผลที่เจ้าของกรอกหรือปรับแต่งเอง",
     "widgetTheme": "light",
     "profileUrl": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetSummary&utm_content=mvrkcapital",
     "profileLabel": "ดูโปรไฟล์เต็มบน Darwinex",
@@ -74,7 +75,7 @@ window.SITE_CONTENT = {
       { "label": "สรุปบัญชี", "img": "https://prodx-widgets.s3-eu-west-1.amazonaws.com/I.5979-widgets-account-summary-account-all-bg-transparent-m-en.png", "href": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetSummary&utm_content=mvrkcapital" },
       { "label": "ผลตอบแทน", "img": "https://prodx-widgets.s3-eu-west-1.amazonaws.com/I.5979-widgets-account-return-account-all-bg-transparent-0-en.png", "href": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetReturn&utm_content=mvrkcapital" }
     ],
-    "note": "ผลการดำเนินงานในอดีตไม่ได้เป็นเครื่องยืนยันผลตอบแทนในอนาคต การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลก่อนตัดสินใจ · ข้อมูล track record จัดทำและอัปเดตโดย Darwinex",
+    "note": "ข้อมูลทั้งหมดจัดทำและอัปเดตอัตโนมัติโดย Darwinex — กดที่การ์ดหรือปุ่ม “ดูโปรไฟล์เต็มบน Darwinex” เพื่อดูสถิติฉบับเต็ม เช่น ผลตอบแทน, Drawdown, จำนวนเทรด และระดับความเสี่ยง",
     "homeTeaserTitle": "ผลการเทรดจริง ที่ตรวจสอบได้"
   },
 

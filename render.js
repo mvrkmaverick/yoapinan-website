@@ -126,7 +126,7 @@
         '<div class="reveal"><span class="badge-pill">Verified · Darwinex</span>' +
           '<h2 style="margin-top:14px">' + YA.esc(tr.homeTeaserTitle || "ผลการเทรดจริง ที่ตรวจสอบได้") + "</h2>" +
           '<p class="lead" style="margin-top:12px">' + YA.esc(tr.sub || "") + "</p>" +
-          '<a class="btn btn--primary" style="margin-top:22px" href="maverickmanagement.html">ดู Track Record ทั้งหมด ' + YA.ICON.arrow + "</a>" +
+          '<a class="btn btn--primary" style="margin-top:22px" href="mvrkmanagement.html">ดู Track Record ทั้งหมด ' + YA.ICON.arrow + "</a>" +
         "</div>" +
         '<a class="media reveal" href="' + YA.attr(tr.profileUrl || "#") + '" target="_blank" rel="noopener" style="display:block;background:#fff">' +
           '<img src="' + YA.attr(tw0.img) + '" alt="' + YA.attr(tw0.label || "") + '" loading="lazy" style="width:100%;height:100%;object-fit:contain;background:#fff;padding:18px">' +
@@ -334,7 +334,9 @@
       '<section class="page-hero"><div class="container">' +
         '<span class="eyebrow">' + YA.esc(t.eyebrow || "Verified · Darwinex") + "</span>" +
         "<h1 style='margin-top:14px'>" + YA.esc(t.title || "Track Record") + "</h1>" +
-        "<p class='lead'>" + YA.esc(t.sub || "") + "</p><hr class='divider'>" +
+        "<p class='lead'>" + YA.esc(t.sub || "") + "</p>" +
+        (t.about ? "<p style='margin-top:12px;max-width:740px'>" + YA.esc(t.about) + "</p>" : "") +
+        "<hr class='divider'>" +
       "</div></section>" +
       '<section class="section section--tight"><div class="container">' +
         '<div class="tr-wrap' + (t.widgetTheme === "dark" ? " tr-dark" : "") + '">' + big +

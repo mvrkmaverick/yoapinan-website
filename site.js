@@ -116,7 +116,7 @@
     { key: "home", label: "Home", href: "index.html" },
     { key: "market-ideas", label: "Market Ideas", href: "market-ideas.html" },
     { key: "field-notes", label: "Field Notes", href: "field-notes.html" },
-    { key: "track-record", label: "Track Record", href: "maverickmanagement.html" },
+    { key: "track-record", label: "Track Record", href: "mvrkmanagement.html" },
     { key: "about", label: "เกี่ยวกับผม", href: "about.html" },
     { key: "course", label: "คอร์สเรียน", href: "course.html" }
   ];
@@ -149,6 +149,14 @@
       "</div>";
     var host = document.querySelector("[data-site-header]");
     if (host) { host.className = "site-header"; host.innerHTML = html; }
+    if (!document.querySelector(".line-fab")) {
+      var fab = document.createElement("a");
+      fab.className = "line-fab";
+      fab.setAttribute("data-line", "");
+      fab.setAttribute("aria-label", "แชททาง LINE");
+      fab.innerHTML = ICON.line + "<span>LINE</span>";
+      document.body.appendChild(fab);
+    }
   }
 
   function renderFooter() {
