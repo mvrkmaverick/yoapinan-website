@@ -59,6 +59,25 @@ window.SITE_CONTENT = {
     "intro": "มุมมองต่อธุรกิจในโลกจริง ผ่านการสังเกต วิเคราะห์ และเชื่อมโยงจากสิ่งที่เกิดขึ้นในสนามการค้า โดยอิงหลักคิดที่เป็นระบบ และมองจากมุมของคนทำงานจริง ไม่ใช่แค่ตามทฤษฎีหรือเทรนด์ยอดนิยม เพื่อเปิดมุมคิดใหม่ที่ใช้งานได้"
   },
 
+  /* ---- Track Record (Darwinex widgets) -------------------------------- */
+  /* widgetTheme: "light" (การ์ดพื้นสว่าง) หรือ "dark" (พื้นเข้ม) ถ้าตัวหนังสือ widget จางให้เปลี่ยนเป็น dark */
+  "trackRecord": {
+    "navLabel": "Track Record",
+    "eyebrow": "Verified · Darwinex · I.5979",
+    "title": "Verified Track Record",
+    "sub": "ผลการเทรดจริงของกลยุทธ์ MVRK Capital (I.5979) — ตรวจสอบและอัปเดตแบบเรียลไทม์โดย Darwinex ไม่ใช่ผลย้อนหลังที่ปรับแต่งเอง",
+    "widgetTheme": "light",
+    "profileUrl": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetSummary&utm_content=mvrkcapital",
+    "profileLabel": "ดูโปรไฟล์เต็มบน Darwinex",
+    "widgets": [
+      { "label": "ผลตอบแทนสะสม (Equity Curve)", "img": "https://prodx-widgets.s3-eu-west-1.amazonaws.com/I.5979-widgets-account-chart-account-all-bg-transparent-l-en.png", "href": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetChart&utm_content=mvrkcapital" },
+      { "label": "สรุปบัญชี", "img": "https://prodx-widgets.s3-eu-west-1.amazonaws.com/I.5979-widgets-account-summary-account-all-bg-transparent-m-en.png", "href": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetSummary&utm_content=mvrkcapital" },
+      { "label": "ผลตอบแทน", "img": "https://prodx-widgets.s3-eu-west-1.amazonaws.com/I.5979-widgets-account-return-account-all-bg-transparent-0-en.png", "href": "https://www.darwinex.com/account/I.5979?utm_source=WidgetStrategy&utm_medium=Referral&utm_campaign=WidgetReturn&utm_content=mvrkcapital" }
+    ],
+    "note": "ผลการดำเนินงานในอดีตไม่ได้เป็นเครื่องยืนยันผลตอบแทนในอนาคต การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลก่อนตัดสินใจ · ข้อมูล track record จัดทำและอัปเดตโดย Darwinex",
+    "homeTeaserTitle": "ผลการเทรดจริง ที่ตรวจสอบได้"
+  },
+
   /* ---- บทความทั้งหมด (เพิ่ม/แก้ใน Admin) -------------------------------- */
   /* category: "market-ideas" หรือ "field-notes"
      cover: ใส่ URL รูป หรือ null (จะแสดงพื้นหลังไล่สีสวย ๆ แทน)

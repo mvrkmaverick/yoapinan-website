@@ -116,6 +116,7 @@
     { key: "home", label: "Home", href: "index.html" },
     { key: "market-ideas", label: "Market Ideas", href: "market-ideas.html" },
     { key: "field-notes", label: "Field Notes", href: "field-notes.html" },
+    { key: "track-record", label: "Track Record", href: "maverickmanagement.html" },
     { key: "about", label: "เกี่ยวกับผม", href: "about.html" },
     { key: "course", label: "คอร์สเรียน", href: "course.html" }
   ];

@@ -371,3 +371,15 @@ body.menu-open .nav-toggle span::after{top:0;transform:rotate(-45deg)}
 .disclaimer-box{background:var(--bg-2);border:1px solid var(--line);border-left:2px solid var(--brass);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:18px 20px;font-size:.85rem;color:var(--ink-soft);line-height:1.72}
 .hr-soft{height:1px;background:var(--line);border:0;max-width:var(--maxw);margin-inline:auto}
 .skip-link{position:absolute;left:-9999px}
+
+/* ---- Track Record (Darwinex widgets) ---------------------------------- */
+.tr-wrap{max-width:940px;margin-inline:auto}
+.tr-card{display:flex;flex-direction:column;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;text-align:center;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s}
+.tr-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--line-2)}
+.tr-card img{width:100%;height:auto;max-width:540px}
+.tr-card.tr-big{margin-bottom:20px}
+.tr-card.tr-big img{max-width:800px}
+.tr-label{font-family:var(--font-body);font-weight:600;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2)}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.tr-dark .tr-card{background:var(--navy-2);border-color:var(--navy-3)}
+.tr-dark .tr-label{color:#C9A86A}
