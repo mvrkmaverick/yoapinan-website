@@ -1446,7 +1446,7 @@ const Replay = {
       ["MA50 vs 200", sgn(gap, 1) + "%", gap < 0 ? PAL.dip : PAL.ma200],
       ["MACD", sgn(m.macd[i], 2), m.macd[i] > 0 ? PAL.buy : PAL.stop],
       ["STOCH RSI", fmt(m.stK[i], 0), m.stK[i] < 20 ? PAL.vdu : m.stK[i] > 80 ? PAL.tgt : PAL.txt],
-      ["VOL/DOWN", fmt(vr, 2) + "×" + (m.pp[i] ? " PP" : ""), m.pp[i] ? PAL.buy : PAL.mut],
+      ["VOL/DOWN", (m.maxDownVol[i] > 0 ? fmt(vr, 2) + "×" : "ไม่มีวันลง") + (m.pp[i] ? " PP" : ""), m.pp[i] ? PAL.buy : PAL.mut],
       retr !== null ? ["(ii) RETRACE", (retr * 100).toFixed(0) + "%", retr >= 0.618 ? PAL.buy : PAL.mut] : ["vs W1 HIGH", isFinite(W1) ? sgn((m.c[i] / W1 - 1) * 100, 1) + "%" : "—", isFinite(W1) && m.c[i] > W1 ? PAL.add : PAL.txt],
     ];
     const sg = $("#sigs"); if (!sg.children.length) sig.forEach(() => { const d = document.createElement("div"); d.className = "sig"; d.innerHTML = `<div class="k"></div><div class="v"></div>`; sg.appendChild(d); });
@@ -1658,7 +1658,7 @@ const Dojo = {
         const c = e.cyc; if ((this.ppAsked[c] || 0) >= 2) return null;
         const sl = S.II * 0.99, R = m.c[i] - sl; if (R < 2 * m.atr[i]) return null;
         this.ppAsked[c] = (this.ppAsked[c] || 0) + 1;
-        return { q: "คุณไม่มีของ · Pocket Pivot หลัง (ii) ที่ผ่านเกณฑ์ — ทำอะไร?", facts: [`(ii) ${fmt(S.II)}`, `vol ${fmt(m.v[i] / m.maxDownVol[i], 1)}× down-vol สูงสุด 10 วัน`, `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`],
+        return { q: "คุณไม่มีของ · Pocket Pivot หลัง (ii) ที่ผ่านเกณฑ์ — ทำอะไร?", facts: [`(ii) ${fmt(S.II)}`, m.maxDownVol[i] > 0 ? `vol ${fmt(m.v[i] / m.maxDownVol[i], 1)}× down-vol สูงสุด 10 วัน` : "10 วันไม่มีแท่งลง", `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`],
           opts: [O("เข้าเต็มไม้ · SL ใต้ (ii)", "ok", () => B.open(i, 1, sl, R)), O("เข้าครึ่งไม้ · SL ใต้ (ii)", "acc", () => B.open(i, 0.5, sl, R)), O("ไม่เข้า", "acc"), O("เข้าเต็มไม้ ไม่ตั้ง SL", "bad", () => B.open(i, 1, 1e-6, R))],
           why: "PP หลัง (ii) ที่ผ่านเกณฑ์ = จุดเข้าได้แม้พลาดไม้แรก · มี PP → เต็มไม้ · SL ใต้ (ii)" };
       }
