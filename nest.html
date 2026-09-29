@@ -171,6 +171,7 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:va
 .ag2{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px;padding-left:24px}
 .mc2{background:rgba(127,140,160,.1);border-radius:6px;padding:3px 5px;text-align:center}.mc2 span{display:block;font-size:10.5px;color:var(--mut)}.mc2 b{font-family:var(--mono);font-size:13px;color:var(--txt)}
 .mc2.on{outline:1.5px solid var(--gold);background:rgba(255,209,102,.14)}
+.dlast{margin-top:12px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.04);border-left:3px solid var(--mut);font-size:12px;line-height:1.55}
 .ag3{font-size:11.5px;color:var(--mut);padding-left:24px;margin-top:4px}
 .opn{font-size:11px!important}
 details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;margin-bottom:8px}details.rnd summary{cursor:pointer;font-weight:800;font-size:13px}
@@ -376,7 +377,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
           <div class="note" id="dPos" style="margin-top:10px;font-family:var(--mono)">ไม่มี position</div>
           <div class="note" id="dSys" style="margin-top:4px">SYSTEM P&amp;L: เฉลยตอนจบตลาด</div></div>
         <div class="card" style="padding:10px 16px"><div class="row" style="align-items:center;gap:8px;margin-bottom:6px"><span class="note">ความถี่คำถาม</span><select class="sel" id="dFreq"><option value="key">จุดสำคัญ</option><option value="normal" selected>ปกติ (ถามตลอดทาง)</option><option value="dense">ถี่มาก</option></select></div><div class="toggle" id="hardT" style="margin-top:0"><span class="sw"></span>HARD · ซ่อนทุกอย่าง + ไม่มีตัวช่วย + คำถามหลอก + จับเวลา 15 วิ</div><div class="note" id="dLife" style="margin-top:8px"></div></div>
-        <div class="card q" id="dq" style="flex:1;overflow:auto"><h3>DECISION</h3><div id="dqBody" class="fb">กด ▶ แล้วรอจุดตัดสินใจแรก…</div></div>
+        <div class="card q" id="dq" style="flex:1;overflow:auto"><h3 style="display:flex;align-items:center;gap:6px">DECISION<span style="flex:1"></span><button class="chip" id="dUndo" title="ย้อนคำตอบล่าสุด (Ctrl/⌘+Z)" disabled>↶ ย้อน</button><button class="chip" id="dRedo" title="ทำซ้ำ (Ctrl/⌘+Shift+Z)" disabled>↷ ทำซ้ำ</button></h3><div class="toggle" id="dPauseT" style="margin:0 0 8px"><span class="sw"></span>หยุดอ่านเฉลยก่อนไปต่อ (ปิด = กดแล้วไปเลย)</div><div id="dqBody" class="fb">กด ▶ แล้วรอจุดตัดสินใจแรก…</div></div>
       </div>
     </aside>
   </section>
@@ -2061,7 +2062,7 @@ const Dojo = {
   exit() { ["#bBack", "#bFwd", "#bNext", "#bRestart"].forEach(q => $(q).disabled = false); $("#brain").classList.remove("hidden"); $("#dojo").classList.add("hidden"); $("#dojoStart").classList.add("hidden"); this.waiting = false; clearInterval(this.timer); },
   onLoad() {
     this.waiting = false; this.cur = null; this.mk = { ok: 0, acc: 0, t: 0, streak: 0, best: 0, real: { ok: 0, acc: 0, t: 0 }, fake: { ok: 0, acc: 0, t: 0 } }; this.rd = { ok: 0, t: 0 }; this.ppAsked = {}; clearInterval(this.timer);
-    Book.reset(Replay.m, Replay.run); this.buildQueue(); this.done = false;
+    Book.reset(Replay.m, Replay.run); this.buildQueue(); this.done = false; this.hist = []; this.redoS = []; this.lastFb = ""; this.syncUR();
     $("#dqBody").innerHTML = "กด ▶ แล้วรอจุดตัดสินใจแรก… ตัดสินใจเองทุกไม้ ผลกำไรขาดทุนของคุณคิดจริงตามกราฟ<br><br>ให้คะแนน 3 ระดับ: <b style='color:var(--buy)'>✓ ตรงระบบ</b> · <b style='color:var(--gold)'>≈ ไม่ผิดกฎ</b> · <b style='color:var(--stop)'>✕ ผิดกฎ</b>"; this.paint();
   },
   buildQueue() { if (this.M || this.legacy) return this.buildLegacy(); return this.buildCheckpoints(); },
@@ -2324,13 +2325,15 @@ const Dojo = {
   },
   ask(q) {
     this.cur = q; Book.stepTo(q.i);
+    const snap = this.snap(q);
     const d = this.build(q);
     if (!d) { q.answered = true; return; }
+    this.hist = this.hist || []; this.hist.push(snap); if (this.hist.length > 400) this.hist.shift(); this.curD = d; this.syncUR();
     this.waiting = true; Replay.playing = false; Replay.syncPlay(); Replay.t = q.i + 1;
     Sound.tone([440, 554], 0.2, "triangle", 0.05);
     d.opts = this.shuffle(d.opts); this.__lastOk = d.opts.findIndex(o => o.g === "ok"); this.__lastAcc = d.opts.findIndex(o => o.g === "acc");
     const facts = this.hard ? "" : `<div class="facts">${d.facts.map(f => `<span class="fact">${f}</span>`).join("")}</div>`;
-    $("#dqBody").innerHTML = `<h4>${d.q}</h4>${facts}<div class="opts">${d.opts.map((o, j) => `<button class="opt" data-j="${j}"><span>${o.t}</span><span class="gtag"></span></button>`).join("")}</div><div class="fb" id="dfb"></div>${this.hard ? '<div class="note" id="dTimer" style="margin-top:8px"></div>' : ""}`;
+    $("#dqBody").innerHTML = `<h4>${d.q}</h4>${facts}<div class="opts">${d.opts.map((o, j) => `<button class="opt" data-j="${j}"><span>${o.t}</span><span class="gtag"></span></button>`).join("")}</div><div class="fb" id="dfb"></div>${this.hard ? '<div class="note" id="dTimer" style="margin-top:8px"></div>' : ""}${this.lastFb ? `<div class="dlast">ข้อที่แล้ว · ${this.lastFb}</div>` : ""}`;
     $$("#dqBody .opt").forEach(b => b.onclick = () => this.answer(q, d, +b.dataset.j));
     clearInterval(this.timer);
     if (this.hard) { let left = 15; const tick = () => { const el = $("#dTimer"); if (el) el.textContent = `⏱ ${left} วินาที`; if (left-- <= 0) { clearInterval(this.timer); this.answer(q, d, -1); } }; tick(); this.timer = setInterval(tick, 1000); }
@@ -2339,6 +2342,7 @@ const Dojo = {
   answer(q, d, j) {
     if (q.answered) return; clearInterval(this.timer);
     const choice = d.opts[j], g = choice ? choice.g : "bad"; q.answered = true;
+    { const top = this.hist && this.hist[this.hist.length - 1]; if (top && top.q === q) top.choice = choice ? choice.t : null; if (!this.redoing) this.redoS = []; }
     if (d.read) { this.rd.t++; if (g === "ok") this.rd.ok++; } else {
     this.mk.t++; if (g === "ok") this.mk.ok++; if (g === "acc") this.mk.acc++;
     { const sysO = d.opts.find(o => o.g === "ok"), waitO = d.opts.find(o => /^(WAIT|HOLD)/.test(o.t)), bk = sysO && /^(WAIT|HOLD)/.test(sysO.t) ? "fake" : (waitO && waitO.g !== "bad" ? "opt" : "real"), K = this.mk[bk] || (this.mk[bk] = { ok: 0, acc: 0, t: 0 }); K.t++; if (g === "ok") K.ok++; if (g === "acc") K.acc++; }
@@ -2355,15 +2359,54 @@ const Dojo = {
     const sysT = d.opts.find(o => o.g === "ok").t, G = GRADE[g];
     const head = j < 0 ? `<b style="color:${PAL.stop}">⏱ หมดเวลา = ✕</b>` : `<b style="color:${PAL[G.c]}">${G.s} ${G.t}</b>`;
     const pendingSame = this.queue.some(x => !x.answered && x.i === q.i);
-    $("#dfb").innerHTML = `${head}${g === "ok" ? "" : ` · ระบบ: <b>${sysT}</b>`}<br>${d.why}<br><button class="bigbtn" style="margin-top:12px;padding:9px 18px;font-size:12px" id="dCont">${pendingSame ? "คำถามต่อ ▶" : "ต่อ ▶"}</button>`;
+    const fbHtml = `${head}${g === "ok" ? "" : ` · ระบบ: <b>${sysT}</b>`} · คุณเลือก: ${choice ? choice.t : "—"}<br>${d.why}`;
+    this.lastFb = `<span class="note">${d.q}</span><br>${fbHtml}`;
     if (q.e && !Replay.firedSet.has(q.e) && !this.queue.some(x => x.e === q.e && !x.answered)) { Replay.firedSet.add(q.e); Replay.onEvent(q.e, false); }
-    this.paint(); Replay.dirty = true;
-    $("#dCont").onclick = () => {
-      this.waiting = false; const nq = this.nextQ();
-      let nq2 = nq; while (nq2 && nq2.i === q.i) { this.ask(nq2); if (this.waiting) return; nq2 = this.nextQ(); }
-      if (Math.floor(Replay.t) >= Replay.m.N - 1) { this.finish(); return; }
-      Replay.playing = true; Replay.syncPlay(); $("#dqBody").innerHTML = "กำลังเล่น… รอจุดตัดสินใจถัดไป";
-    };
+    this.paint(); Replay.dirty = true; this.syncUR();
+    if (this.pause) {
+      $("#dfb").innerHTML = `${fbHtml}<br><button class="bigbtn" style="margin-top:12px;padding:9px 18px;font-size:12px" id="dCont">${pendingSame ? "คำถามต่อ ▶" : "ต่อ ▶"}</button>`;
+      $("#dCont").onclick = () => this.cont(q);
+    } else this.cont(q);
+  },
+  cont(q) {
+    this.waiting = false; const nq = this.nextQ();
+    let nq2 = nq; while (nq2 && nq2.i === q.i) { this.ask(nq2); if (this.waiting) return; nq2 = this.nextQ(); }
+    if (Math.floor(Replay.t) >= Replay.m.N - 1) { this.finish(); return; }
+    Replay.playing = true; Replay.syncPlay(); $("#dqBody").innerHTML = `กำลังเล่น… รอจุดตัดสินใจถัดไป${this.lastFb ? `<div class="dlast">ข้อที่แล้ว · ${this.lastFb}</div>` : ""}`;
+  },
+  // ---------- undo / redo: full state snapshot taken right before each question ----------
+  snap(q) {
+    const B = Book, R = Replay, cl = (x) => (typeof structuredClone === "function" ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
+    return { q, answered: this.queue.map(x => x.answered), book: cl({ pos: B.pos, real: B.real, marks: B.marks, slHist: B.slHist, stepped: B.stepped, trades: B.trades, tlog: B.tlog }), rpath: B.rpath.slice(),
+      mk: cl(this.mk), rd: cl(this.rd), life: cl(this.life), ppAsked: cl(this.ppAsked), done: this.done, lastFb: this.lastFb,
+      t: R.t, fired: R.fired, firedSet: new Set(R.firedSet), log: $("#log") ? $("#log").innerHTML : "" };
+  },
+  restore(S) {
+    const B = Book, R = Replay, cl = (x) => (typeof structuredClone === "function" ? structuredClone(x) : JSON.parse(JSON.stringify(x)));
+    Object.assign(B, cl(S.book)); B.rpath = S.rpath.slice();
+    this.queue.forEach((x, k) => x.answered = S.answered[k]);
+    this.mk = cl(S.mk); this.rd = cl(S.rd); this.life = cl(S.life); this.saveLife(); this.ppAsked = cl(S.ppAsked); this.done = S.done; this.lastFb = S.lastFb;
+    R.t = S.t; R.fired = S.fired; R.firedSet = new Set(S.firedSet); if ($("#log")) $("#log").innerHTML = S.log;
+    const ec = $("#endcard"); if (ec) ec.classList.remove("show");
+    clearInterval(this.timer); this.waiting = false; R.playing = false; R.syncPlay();
+  },
+  undo() {
+    if (!this.hist || !this.hist.length) return;
+    const top = this.hist[this.hist.length - 1];
+    if (!top.q.answered) this.hist.pop();            // currently showing an unanswered question → step back to the one before
+    const S = this.hist.pop(); if (!S) { this.syncUR(); return; }
+    this.redoS.push(S); this.restore(S); this.ask(S.q); this.syncUR(); Replay.dirty = true;
+  },
+  redo() {
+    const S = this.redoS && this.redoS.pop(); if (!S) return;
+    if (this.cur !== S.q || !this.curD || this.cur.answered) { this.redoS = []; this.syncUR(); return; }
+    const j = S.choice ? this.curD.opts.findIndex(o => o.t === S.choice) : -1;
+    this.redoing = true; try { this.answer(this.cur, this.curD, j); } finally { this.redoing = false; }
+    this.syncUR();
+  },
+  syncUR() {
+    const u = $("#dUndo"), r = $("#dRedo"); if (!u || !r) return;
+    const canU = this.hist && this.hist.some(h => h.q.answered); u.disabled = !canU; r.disabled = !(this.redoS && this.redoS.length);
   },
   pcts() {
     const R = this.mk.real || { t: 0 }, F = this.mk.fake || { t: 0 }, rate = (K, a) => K.t ? (K.ok + (a ? K.acc : 0)) / K.t : null;
@@ -3196,6 +3239,11 @@ function boot() {
   window.addEventListener("error", (e) => console.error("NEST error:", e.message, e.lineno));
 
 }
+$("#dUndo").onclick = () => Dojo.undo(); $("#dRedo").onclick = () => Dojo.redo();
+try { Dojo.pause = localStorage.getItem("nest-dojo-pause") === "1"; } catch (e) {}
+$("#dPauseT").classList.toggle("on", !!Dojo.pause);
+$("#dPauseT").onclick = () => { Dojo.pause = !Dojo.pause; $("#dPauseT").classList.toggle("on", Dojo.pause); try { localStorage.setItem("nest-dojo-pause", Dojo.pause ? "1" : "0"); } catch (e) {} };
+document.addEventListener("keydown", (e) => { if (Replay.mode !== "dojo" || !(e.metaKey || e.ctrlKey) || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return; const k = e.key.toLowerCase(); if (k === "z" && !e.shiftKey) { e.preventDefault(); Dojo.undo(); } else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); Dojo.redo(); } });
 boot();
 </script>
 </body>
