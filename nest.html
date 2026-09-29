@@ -15,8 +15,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2305070b'/%3E%3Cpath d='M10 46 L22 22 L30 38 L38 28 L46 34 L54 12' fill='none' stroke='%23ffd166' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#05070b; --bg2:#0a0e15; --panel:rgba(14,18,26,.82); --panel2:rgba(20,26,37,.9); --line:#1a2230; --line2:#253042;
-  --txt:#e9eef6; --mut:#8a95a6; --dim:#4b5668;
+  --bg:#05070b; --bg2:#0a0e15; --panel:rgba(34,41,54,.94); --panel2:#2a3242; --line:#1a2230; --line2:#253042;
+  --txt:#f3f6fb; --mut:#d2d9e4; --dim:#a9b3c3;
   --gold:#ffd166; --buy:#3dff8f; --add:#ff5fd2; --tgt:#ffb347; --stop:#ff5468; --ma50:#4c8dff; --ma200:#1fc9a8; --dip:#9b7bff; --vdu:#3ee7ff; --up:#1fd1a5; --dn:#ff5468; --grid:rgba(120,140,170,.07);
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI","Sukhumvit Set","Noto Sans Thai",sans-serif;
   --mono:"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
@@ -140,7 +140,8 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
 .fb{margin-top:12px;font-size:13px;line-height:1.55;color:var(--mut)}
 .fb b{color:var(--txt)}
 /* ai lab */
-#v-ailab{grid-template-columns:1fr 410px;gap:14px;padding:14px}
+.note{color:var(--mut)}
+#v-ailab{grid-template-columns:1fr 470px;gap:14px;padding:14px}
 .labl{display:grid;grid-template-rows:auto 1fr 250px;gap:10px;min-height:0;min-width:0}
 .alhud{position:absolute;left:14px;top:10px;pointer-events:none}.alhud .note{max-width:560px}
 .alsel{position:absolute;left:14px;bottom:12px;right:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line2);font-size:12.5px}
@@ -163,7 +164,18 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:va
 .nbh{font-weight:800;font-size:13px;display:flex;gap:8px;align-items:baseline}.nba{margin-left:auto;font-size:10.5px;color:var(--nc);font-weight:800;text-align:right}
 .nbr{font-size:12px;color:var(--mut);line-height:1.5;margin-top:3px}.nbr b{color:var(--txt);font-weight:700;margin-right:4px}
 #acctPop{position:fixed;right:18px;top:64px;z-index:45}
-#alMind.hidden{display:none!important}
+#alMind.hidden,#alRes.hidden{display:none!important}
+.agrow{display:block!important;padding:9px 8px!important}
+.ag1{display:flex;align-items:center;gap:8px}.ag1 .rk{font-family:var(--mono);font-size:12px;color:var(--mut);width:16px}
+.agn{font-size:15px;white-space:nowrap}.agm{margin-left:auto;font-family:var(--mono);font-size:15px;font-weight:800;white-space:nowrap}.agm small{font-size:12px;opacity:.9}
+.ag2{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px;padding-left:24px}
+.mc2{background:rgba(127,140,160,.1);border-radius:6px;padding:3px 5px;text-align:center}.mc2 span{display:block;font-size:10.5px;color:var(--mut)}.mc2 b{font-family:var(--mono);font-size:13px;color:var(--txt)}
+.ag3{font-size:11.5px;color:var(--mut);padding-left:24px;margin-top:4px}
+.opn{font-size:11px!important}
+details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;margin-bottom:8px}details.rnd summary{cursor:pointer;font-weight:800;font-size:13px}
+#alRounds.hidden{display:none!important}
+.rsh{font-size:13px;margin:10px 0 6px;color:var(--txt)}
+.rsop{border-left:3px solid var(--rc);padding:6px 10px;margin-bottom:6px;border-radius:0 8px 8px 0;background:rgba(127,140,160,.08);font-size:12.5px;line-height:1.5;color:var(--txt)}
 #alMindList{flex:1;min-height:140px}
 .alfeedc{overflow:hidden}
 .labl.big{grid-template-rows:auto 0.75fr 1.25fr}
@@ -374,10 +386,13 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:va
       <div class="panelc" id="alWrap"><canvas id="al3d"></canvas>
         <div class="alhud"><div class="mkt" id="alInfo">—</div><div class="note">แต่ละแผ่น = หุ้น 1 ตัว · แผ่นทอง = เวลาที่กำลังเดิน · จุดสี = AI ที่ถืออยู่ · ลากหมุน · scroll ซูม · คลิกแผ่นเพื่อดู</div></div>
         <div id="alSel" class="hidden alsel"><span id="alSelT"></span> <button class="chip" id="alOpen">เปิดใน REPLAY ↗</button></div>
-        <div id="alSum" class="hidden alsum"><div class="ocard"><h2>จบรอบ</h2><table class="mini" id="alSumT"></table><div id="alSumL"></div><div class="row" style="margin-top:12px"><button class="bigbtn" id="alSumNext" style="padding:10px 18px;font-size:12px">รอบถัดไป ⟳</button><button class="ghost" id="alSumNote">สมุดทดลอง Claude</button></div><div class="note" style="margin-top:8px">เริ่มรอบถัดไปอัตโนมัติใน 14 วิ</div></div></div>
+        <div id="rsDone" class="hidden alsum" style="z-index:4"><div class="ocard" style="max-height:92%;overflow:auto;max-width:900px"><h2>AI วิจัยครบตามจำนวนรอบแล้ว</h2><div id="rsDoneBody"></div><div class="row" style="margin-top:12px"><button class="bigbtn" id="rsClose" style="padding:10px 18px;font-size:12px">ปิด ✕</button></div></div></div>
+        <div id="alSum" class="hidden alsum"><div class="ocard"><h2>จบรอบ</h2><table class="mini" id="alSumT"></table><div id="alSumL"></div><div class="row" style="margin-top:12px"><button class="bigbtn" id="alSumNext" style="padding:10px 18px;font-size:12px">รอบถัดไป ⟳</button><button class="ghost" id="alSumNote">สมุดทดลอง Claude</button></div><div class="row" style="margin-top:8px;align-items:center"><button class="ghost" id="alSumClose">ปิด ✕</button><span class="note">ปิดเองใน 6 วิ แล้วเริ่มรอบถัดไป · ดูย้อนหลังได้ที่ปุ่ม "ผลจบรอบ 📊"</span></div></div></div>
       </div>
-      <div class="card alfeedc"><h3>AI เถียงกัน · ตรวจ · ค้าน<span class="sp"></span><button class="chip on" id="alTabFeed">สด</button><button class="chip" id="alTabMind">ความคิด AI 🧠</button><button class="chip" id="alTabNote">สมุดทดลอง Claude</button><button class="chip" id="alBig" title="ขยายแผงนี้">⤢</button></h3>
+      <div class="card alfeedc"><h3>AI เถียงกัน · ตรวจ · ค้าน<span class="sp"></span><button class="chip on" id="alTabFeed">สด</button><button class="chip" id="alTabMind">ความคิด AI 🧠</button><button class="chip" id="alTabRounds">ผลจบรอบ 📊</button><button class="chip" id="alTabRes">ข้อเสนอ AI 🔬</button><button class="chip" id="alTabNote">สมุดทดลอง Claude</button><button class="chip" id="alBig" title="ขยายแผงนี้">⤢</button></h3>
         <div class="log" id="alFeed"></div><div class="log hidden" id="alNote"></div>
+        <div class="log hidden" id="alRounds"></div>
+        <div class="hidden" id="alRes" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="row" style="align-items:center;margin-bottom:6px"><button class="chip" id="rsGo">▶ เริ่มวิจัยต่อเนื่อง</button><select class="sel" id="rsLimit"><option value="10">10 รอบ</option><option value="30" selected>30 รอบ</option><option value="100">100 รอบ</option><option value="0">ไม่จำกัด</option></select><button class="chip" id="rsCopy">คัดลอกรายงาน</button><button class="chip" id="rsReset">ล้างผล</button><span class="note" id="rsStat" style="margin-left:6px"></span></div><div class="log" id="rsBody" style="min-height:140px"></div></div>
         <div class="hidden" id="alMind" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="scen" id="alMindCtl" style="margin-bottom:6px"></div><div class="note" id="alMindHead" style="margin-bottom:6px"></div><div class="log" id="alMindList"></div></div>
         <div class="note" style="margin-top:4px">ข้อความสร้างจากตัวเลขจริงของการจำลองด้วยกฎที่ Claude เขียน (ไม่ใช่ AI คุยกันสด) · สมุดทดลอง = สิ่งที่ Claude ทดสอบจริง</div></div>
     </div>
@@ -2631,7 +2646,7 @@ const NOTEBOOK = [
 
 const AILab = {
   world: "mixed", K: 8, speed: 1, playing: false, view: "3d", rd: null, roundNo: 0, t: 232,
-  yaw: 0.55, pitch: 0.42, dist: 3.6, tv: { yaw: 0.55, pitch: 0.42 }, auto: true, autoNext: true, fed: 0, bubbles: [], flashes: [], cum: {}, sel: -1, drag: null, busy: false, lastBoard: 0, decPtr: null, feedMode: "feed", sortBy: "calmar", follow: 2, mindBad: false, mindN: 0, pend: [], tally: null,
+  yaw: 0.55, pitch: 0.42, dist: 3.6, tv: { yaw: 0.55, pitch: 0.42 }, auto: true, autoNext: true, hist: [], fed: 0, bubbles: [], flashes: [], cum: {}, sel: -1, drag: null, busy: false, lastBoard: 0, decPtr: null, feedMode: "feed", sortBy: "calmar", follow: 2, mindBad: false, mindN: 0, pend: [], tally: null,
   init() {
     const ctl = $("#alCtl");
     const W = [["normal", "โลกปกติ"], ["harsh", "โลกโหด"], ["random", "สุ่มล้วน"], ["mixed", "ผสม 3 โลก"]];
@@ -2647,7 +2662,7 @@ const AILab = {
     $("#alSpd").onchange = (e) => { this.speed = +e.target.value; };
     $("#alPlay").onclick = () => { this.playing = !this.playing; $("#alPlay").textContent = this.playing ? "❚❚" : "▶"; };
     $("#alNew").onclick = () => this.newRound();
-    $("#alTabFeed").onclick = () => this.setFeed("feed"); $("#alTabNote").onclick = () => this.setFeed("note"); $("#alTabMind").onclick = () => this.setFeed("mind");
+    $("#alTabFeed").onclick = () => this.setFeed("feed"); $("#alTabNote").onclick = () => this.setFeed("note"); $("#alTabMind").onclick = () => this.setFeed("mind"); $("#alTabRes").onclick = () => this.setFeed("res"); $("#alTabRounds").onclick = () => this.setFeed("rounds"); this.renderRounds(); $("#alSumClose").onclick = () => $("#alSum").classList.add("hidden");
     $("#alBig").onclick = () => { this.bigManual = !$(".labl").classList.contains("big"); $(".labl").classList.toggle("big", this.bigManual); $("#alBig").classList.toggle("on", this.bigManual); };
     $("#alMindCtl").innerHTML = LABCORE.PERSONAS.map((P, a) => `<button class="chip" data-a="${a}"><span class="dot" style="--c:${P.col}"></span>${P.name}</button>`).join("") + `<span class="sp"></span><label class="toggle" id="alBadT" style="margin-top:0"><span class="sw"></span>เฉพาะตอนเห็นต่าง/แหกกฎ</label>`;
     $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.onclick = () => this.setFollow(+b.dataset.a));
@@ -2667,7 +2682,7 @@ const AILab = {
   },
   wcol(w) { return { normal: "var(--gold)", harsh: "var(--stop)", random: "var(--mut)", mixed: "var(--add)" }[w]; },
   wcolP(w) { return { normal: PAL.gold, harsh: PAL.stop, random: PAL.mut, mixed: PAL.add }[w] || PAL.gold; },
-  setFeed(m) { this.feedMode = m; $("#alFeed").classList.toggle("hidden", m !== "feed"); $("#alNote").classList.toggle("hidden", m !== "note"); $("#alMind").classList.toggle("hidden", m !== "mind"); $("#alTabFeed").classList.toggle("on", m === "feed"); $("#alTabNote").classList.toggle("on", m === "note"); $("#alTabMind").classList.toggle("on", m === "mind"); $(".labl").classList.toggle("big", m === "mind" || !!this.bigManual); $("#alBig").classList.toggle("on", m === "mind" || !!this.bigManual); },
+  setFeed(m) { this.feedMode = m; $("#alFeed").classList.toggle("hidden", m !== "feed"); $("#alNote").classList.toggle("hidden", m !== "note"); $("#alMind").classList.toggle("hidden", m !== "mind"); $("#alRes").classList.toggle("hidden", m !== "res"); $("#alTabRes").classList.toggle("on", m === "res"); $("#alRounds").classList.toggle("hidden", m !== "rounds"); $("#alTabRounds").classList.toggle("on", m === "rounds"); $("#alTabFeed").classList.toggle("on", m === "feed"); $("#alTabNote").classList.toggle("on", m === "note"); $("#alTabMind").classList.toggle("on", m === "mind"); $(".labl").classList.toggle("big", m === "mind" || m === "res" || m === "rounds" || !!this.bigManual); $("#alBig").classList.toggle("on", m === "mind" || m === "res" || m === "rounds" || !!this.bigManual); },
   QT: { TRAP_NO_NEST: "สัญญาณหลอก (ไม่มี nest)", TRAP_SHALLOW: "สัญญาณหลอก ((ii) ตื้น)", TRAP_STALE: "สัญญาณเหนือ TP1 เดิม", BUY: "จุดซื้อ", BUY_SL: "วาง SL", SCALE_IN: "เติมไม้", VCP_ADD: "เบรก VCP", SL_LIFT: "ยก SL", HEAT: "ติดลบระหว่างทาง", TP1_TRIG: "ถึง TP1", TP2_TRIG: "ถึง TP2", TP3_TRIG: "ถึง TP3", TP1_REST: "SL ของไม้ที่เหลือ", TP1_EXIT: "trailing TP1 ชน", TP2_EXIT: "trailing TP2 ชน", TP3_EXIT: "trailing TP3 ชน", STOP: "หลุด SL ระบบ", STOP_PROFIT: "หลุด SL ระบบ", GAP_STOP: "gap ทะลุ SL", INVALID: "Wave 2 เกิน 100%", NONEST_BREAKOUT: "ทะลุโดยไม่มี nest", PP_DAY: "Pocket Pivot", DECOY: "ระหว่างทาง" },
   setFollow(a) {
     this.follow = a; $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.classList.toggle("on", +b.dataset.a === a));
@@ -2790,8 +2805,15 @@ const AILab = {
     $("#alSumT").innerHTML = `<tr><th></th><th>AI</th><th>กำไร/ขาดทุน</th><th>CAGR</th><th>MaxDD</th><th>Calmar</th><th>Sharpe</th><th>@VaR 6.5%</th><th>PF</th><th>กฎ</th></tr>` + fin.map((f, j) => `<tr><td>${j + 1}</td><td><span class="dot2" style="background:${f.A.P.col}"></span>${f.A.P.name}</td><td style="color:${f.pnl >= 0 ? PAL.buy : PAL.stop}">${fmtPnl(f.pnl)} (${f.ret >= 0 ? "+" : ""}${f.ret.toFixed(0)}%)</td><td>${f.rs ? f2(f.rs.cagr, 1) + "%" : "—"}</td><td>${f.rs ? f2(f.rs.dd, 1) + "%" : "—"}</td><td><b>${f.rs ? f2(f.rs.calmar, 2) : "—"}</b></td><td>${f.rs ? f2(f.rs.sharpe, 2) : "—"}</td><td>${f.rs && f.rs.norm ? (f.rs.norm.cagr >= 0 ? "+" : "") + f.rs.norm.cagr.toFixed(1) + "%/ปี · DD " + f.rs.norm.dd.toFixed(0) + "%" : "—"}</td><td>${pfT(f.pf)}</td><td>${f.disc.toFixed(0)}%</td></tr>`).join("") + `<tr><td colspan="10" class="note" style="font-family:inherit">เรียงตาม Calmar (CAGR ÷ MaxDD) · @VaR 6.5% = ปรับทุกตัวให้เสี่ยงเท่ากันแบบ Darwinex (VaR 95% รายเดือน 6.5% คิดจากช่วงที่ถือของ) แล้วดูผลตอบแทนต่อปี</td></tr>`;
     const lines = rd.msgs.filter(m => m.tag === "summary" || (m.tag === "skeptic" && m.t >= rd.maxN - 1)).map(m => `<div class="fb"><b style="color:${LABCORE.OBS[m.who].col}">${LABCORE.OBS[m.who].name}</b> ${m.text}</div>`).join("");
     $("#alSumL").innerHTML = lines + `<div class="note" style="margin-top:6px">หุ้น ${rd.upN}/${rd.mk.length} ตัวจบสูงกว่าตอนเริ่ม · ซื้อถือ 100% เฉลี่ย ${rd.bhAvg >= 0 ? "+" : ""}${rd.bhAvg.toFixed(0)}% ต่อหุ้น (ไม่ใช่การเสี่ยงแบบ 1%/ไม้ เทียบกันตรงๆ ไม่ได้)</div>`;
+    this.hist.unshift({ no: this.roundNo, world: this.world, html: `<table class="mini">${$("#alSumT").innerHTML}</table>${$("#alSumL").innerHTML}` }); if (this.hist.length > 30) this.hist.pop();
+    this.renderRounds();
+    if (Research.on) { this.newRound(); return; }
     $("#alSum").classList.remove("hidden");
-    if (this.autoNext) { clearTimeout(this._an); this._an = setTimeout(() => { if (this.finished && $("#v-ailab").classList.contains("on") && !$("#alSum").classList.contains("hidden") && this.autoNext) { $("#alSum").classList.add("hidden"); this.newRound(); } }, 14000); }
+    if (this.autoNext) { clearTimeout(this._an); this._an = setTimeout(() => { if (this.finished && !$("#alSum").classList.contains("hidden")) { $("#alSum").classList.add("hidden"); if ($("#v-ailab").classList.contains("on")) this.newRound(); } }, 6000); }
+  },
+  renderRounds() {
+    const WN = { normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม", mixed: "ผสม 3 โลก" };
+    $("#alRounds").innerHTML = this.hist.length ? this.hist.map((h, j) => `<details class="rnd"${j === 0 ? " open" : ""}><summary>รอบ ${h.no} · ${WN[h.world] || h.world}${j === 0 ? " (ล่าสุด)" : ""}</summary>${h.html}</details>`).join("") : `<div class="note">ยังไม่มีรอบที่จบ — ผลสรุปของทุกรอบจะเก็บไว้ที่นี่ (ล่าสุดอยู่บนสุด)</div>`;
   },
   board() {
     const rd = this.rd, t = Math.floor(this.t), cap = ACCT.capital;
@@ -2804,8 +2826,12 @@ const AILab = {
     rows.sort((a, b) => key(b) - key(a));
     const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : (v === Infinity ? "∞" : "—");
     const pfT = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
-    $("#alBoard").innerHTML = rows.map((r, j) => { const c = this.cum[r.A.P.k];
-      return `<div class="agrow" data-a="${r.A.idx}" title="คลิกเพื่อดูความคิดของ ${r.A.P.name}" style="cursor:pointer${r.A.idx === this.follow ? `;background:${hexA(r.A.P.col, 0.08)}` : ""}"><div class="rk">${j + 1}</div><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><div class="an"><b>${r.A.P.name}</b>${r.openN ? ` <span class="opn">ถือ ${r.openN}</span>` : ""}<small>${r.A.P.th}</small></div><div class="av"><b style="color:${r.pnl >= 0 ? PAL.buy : PAL.stop}">${fmtPnl(r.pnl)}</b><small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}% · DD ${r.dd.toFixed(1)}% · Calmar ${r.rs ? f2(r.rs.calmar, 2) : "—"} · @VaR6.5 ${r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—"}</small><small>PF ${pfT(r.pf)} · Sharpe ${r.rs ? f2(r.rs.sharpe, 2) : "—"} · กฎ ${r.disc.toFixed(0)}%${c ? ` · สะสม ${c.n} รอบ ${c.ret / c.n >= 0 ? "+" : ""}${(c.ret / c.n).toFixed(1)}%/รอบ` : ""}</small></div></div>`; }).join("");
+    $("#alBoard").innerHTML = rows.map((r, j) => { const c = this.cum[r.A.P.k], pc = (v) => v >= 0 ? PAL.buy : PAL.stop;
+      const cell = (k, v, col) => `<div class="mc2"><span>${k}</span><b${col ? ` style="color:${col}"` : ""}>${v}</b></div>`;
+      return `<div class="agrow" data-a="${r.A.idx}" title="${r.A.P.th} — คลิกเพื่อดูความคิด" style="cursor:pointer${r.A.idx === this.follow ? `;background:${hexA(r.A.P.col, 0.12)}` : ""}">
+        <div class="ag1"><span class="rk">${j + 1}</span><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><b class="agn">${r.A.P.name}</b>${r.openN ? `<span class="opn">ถือ ${r.openN}</span>` : ""}<span class="agm" style="color:${pc(r.pnl)}">${fmtPnl(r.pnl)} <small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}%</small></span></div>
+        <div class="ag2">${cell("Calmar", r.rs ? f2(r.rs.calmar, 2) : "—")}${cell("MaxDD", r.dd.toFixed(1) + "%")}${cell("@VaR6.5", r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—", r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : null)}${cell("PF", pfT(r.pf))}${cell("Sharpe", r.rs ? f2(r.rs.sharpe, 2) : "—")}${cell("ตามกฎ", r.disc.toFixed(0) + "%")}</div>
+        ${c ? `<div class="ag3">สะสม ${c.n} รอบ · เฉลี่ย ${c.ret / c.n >= 0 ? "+" : ""}${(c.ret / c.n).toFixed(1)}%/รอบ</div>` : ""}</div>`; }).join("");
   },
   // ---------- 3D ----------
   proj(x, y, z, P) {
@@ -2912,6 +2938,91 @@ const AILab = {
     $("#worldSel").value = x.world; setTab("replay"); Replay.setMarket(x.m); $("#mktId").textContent = `MARKET #${x.seed} · จาก AI LAB`;
   },
 };
+/* ============================================================
+   RESEARCH — AI keeps running rounds, accumulates evidence, proposes opinions on the system
+============================================================ */
+const Research = {
+  on: false, limit: 30, busy: false, D: null, worlds: ["normal", "harsh", "random"],
+  load() { try { this.D = JSON.parse(localStorage.getItem("nest-research") || "null"); } catch (e) { this.D = null; } if (!this.D || this.D.v !== 1) this.D = { v: 1, rounds: 0, byW: {}, dev: {} }; },
+  save() { try { localStorage.setItem("nest-research", JSON.stringify(this.D)); } catch (e) {} },
+  init() {
+    this.load();
+    $("#rsGo").onclick = () => this.toggle();
+    $("#rsReset").onclick = () => { if (confirm("ล้างผลวิจัยสะสมทั้งหมด?")) { this.D = { v: 1, rounds: 0, byW: {}, dev: {} }; this.save(); this.render(); } };
+    $("#rsLimit").onchange = (e) => { this.limit = +e.target.value; };
+    $("#rsCopy").onclick = () => { const t = $("#rsBody").innerText; if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => { $("#rsCopy").textContent = "คัดลอกแล้ว ✓"; setTimeout(() => $("#rsCopy").textContent = "คัดลอกรายงาน", 1500); }); };
+    $("#rsClose").onclick = () => $("#rsDone").classList.add("hidden");
+    this.render();
+  },
+  toggle() { this.on = !this.on; this.startN = this.D.rounds; $("#rsGo").textContent = this.on ? "❚❚ หยุดวิจัย" : "▶ เริ่มวิจัยต่อเนื่อง"; $("#rsGo").classList.toggle("on", this.on); if (this.on) this.step(); },
+  push(a, x, cap) { a.push(x); if (a.length > (cap || 400)) a.shift(); },
+  step() {
+    if (!this.on || this.busy) return;
+    if (this.limit > 0 && this.D.rounds - this.startN >= this.limit) { this.stop(true); return; }
+    this.busy = true; const w = this.worlds[this.D.rounds % 3];
+    $("#rsStat").textContent = `กำลังรันรอบที่ ${this.D.rounds + 1} (${{ normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม" }[w]})…`;
+    setTimeout(() => {
+      try {
+        const seed = 700000 + this.D.rounds * 13 + { normal: 0, harsh: 3, random: 7 }[w];
+        const rd = LABCORE.round({ K: 8, world: w, seed, capital: ACCT.capital, rpt: ACCT.rpt }, NEST, Dojo, Book);
+        const W = this.D.byW[w] = this.D.byW[w] || { rounds: 0, p: {} }; W.rounds++;
+        rd.agents.forEach(A => { const rs = NEST.riskStats(Array.from(A.eqR.subarray(232, rd.maxN)), ACCT); if (!rs) return; const P = W.p[A.P.k] = W.p[A.P.k] || { cal: [], cagr: [], dd: [], nc: [], ret: [] };
+          this.push(P.cal, isFinite(rs.calmar) ? rs.calmar : 0); this.push(P.cagr, rs.cagr); this.push(P.dd, rs.dd); this.push(P.ret, rs.ret); if (rs.norm) this.push(P.nc, rs.norm.cagr); });
+        // counterfactual sample: what did breaking each rule cost?
+        const pool = []; rd.agents.forEach(A => { if (A.P.k === "SENSEI" || A.P.k === "MONKEY") return; A.res.forEach((r, k) => r.dec.forEach(dc => { if (dc.g !== "ok") pool.push({ A, k, dc }); })); });
+        for (let j = pool.length - 1; j > 0; j--) { const q = Math.floor(Math.random() * (j + 1)); [pool[j], pool[q]] = [pool[q], pool[j]]; }
+        pool.slice(0, 45).forEach(({ A, k, dc }) => {
+          const x = rd.mk[k], own = A.res[k].trades.reduce((s, t) => s + t.R, 0), cf = LABCORE.counterfactual(x.M, A.P, Dojo, Book, NEST, dc), d = own - cf;
+          const key = dc.type.replace(/\d/, "k") + "|" + dc.t.replace(/\d+(\.\d+)?/g, "#") + "|" + dc.sys.replace(/\d+(\.\d+)?/g, "#");
+          const K = this.D.dev[key] = this.D.dev[key] || {}; const Z = K[w] = K[w] || { n: 0, s: 0, s2: 0, h: 0, u: 0, ds: [], who: {} };
+          Z.n++; Z.s += d; Z.s2 += d * d; if (d > 0.05) Z.h++; else if (d < -0.05) Z.u++; this.push(Z.ds, +d.toFixed(3), 300); Z.who[A.P.name] = (Z.who[A.P.name] || 0) + 1;
+        });
+        this.D.rounds++; this.save(); this.render();
+      } catch (err) { console.error("research round error", err); }
+      this.busy = false; if (this.on) setTimeout(() => this.step(), 250);
+    }, 30);
+  },
+  stop(done) { this.on = false; $("#rsGo").textContent = "▶ เริ่มวิจัยต่อเนื่อง"; $("#rsGo").classList.remove("on"); $("#rsStat").textContent = `หยุดแล้ว · สะสม ${this.D.rounds} รอบ`; if (done) { $("#rsDoneBody").innerHTML = $("#rsBody").innerHTML; $("#rsDone").classList.remove("hidden"); } },
+  med(a) { const b = a.filter(isFinite).slice().sort((x, y) => x - y); return b.length ? b[b.length >> 1] : NaN; },
+  avg(a) { return a.length ? a.reduce((s, x) => s + x, 0) / a.length : NaN; },
+  opinions() {
+    const out = [], D = this.D, WN = { normal: "ปกติ", harsh: "โหด", random: "สุ่ม" };
+    for (const [key, K] of Object.entries(D.dev)) {
+      const [type, opt, sys] = key.split("|"); const ws = Object.entries(K).filter(([w, Z]) => Z.n >= 12);
+      if (!ws.length) continue;
+      const st = ws.map(([w, Z]) => { const m = Z.s / Z.n, sd = Math.sqrt(Math.max(0, Z.s2 / Z.n - m * m)), ci = 1.96 * sd / Math.sqrt(Z.n); return { w, n: Z.n, m, lo: m - ci, hi: m + ci, md: this.med(Z.ds), hurt: Z.u / Z.n, help: Z.h / Z.n, same: 1 - (Z.u + Z.h) / Z.n, who: Object.keys(Z.who).join(", ") }; });
+      const tot = st.reduce((s, x) => s + x.n, 0), allHurt = st.every(x => x.hi < 0 || (x.hurt >= 0.6 && x.md < 0)), allHelp = st.length >= 2 && st.every(x => x.lo > 0 && x.help >= 0.5), lottery = st.some(x => x.m > 0 && x.md < 0 && x.hurt > x.help), flat = st.every(x => Math.abs(x.m) < 0.1 && x.same >= 0.45);
+      const kind = allHelp ? "rethink" : lottery ? "lottery" : allHurt ? "keep" : flat ? "detail" : "mixed";
+      const ev = st.map(x => `${WN[x.w]}: n ${x.n} · เสีย ${(x.hurt * 100).toFixed(0)}% ได้ ${(x.help * 100).toFixed(0)}% · เฉลี่ย ${x.m >= 0 ? "+" : ""}${x.m.toFixed(2)}R [${x.lo.toFixed(2)}, ${x.hi.toFixed(2)}] · ค่ากลาง ${x.md >= 0 ? "+" : ""}${x.md.toFixed(2)}R`).join("<br>");
+      out.push({ kind, type, opt, sys, tot, ev, who: st[0].who, score: kind === "keep" ? -Math.min(...st.map(x => x.m)) : kind === "rethink" ? Math.min(...st.map(x => x.lo)) : tot / 100 });
+    }
+    return out.sort((a, b) => b.score - a.score);
+  },
+  render() {
+    const D = this.D, WN = { normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม" }, f = (v, d) => isFinite(v) ? v.toFixed(d) : "—";
+    $("#rsStat").textContent = this.on ? $("#rsStat").textContent : `สะสม ${D.rounds} รอบ (รอบละ 8 หุ้น · 9 AI)`;
+    if (!D.rounds) { $("#rsBody").innerHTML = `<div class="note">ยังไม่มีข้อมูล — กด "เริ่มวิจัยต่อเนื่อง" แล้ว AI จะรันรอบใหม่ไปเรื่อยๆ (สลับโลกปกติ/โหด/สุ่ม) เก็บหลักฐาน แล้วสรุปความเห็นต่อระบบของคุณ · ผลสะสมเก็บไว้ในเครื่องนี้ เปิดใหม่ก็รันต่อได้</div>`; return; }
+    const names = Object.fromEntries(LABCORE.PERSONAS.map(P => [P.k, P.name]));
+    let html = `<h4 class="rsh">1 · ใครเก่งจริงเมื่อปรับความเสี่ยง (Calmar ค่ากลาง · @VaR 6.5%/ปี เฉลี่ย)</h4><table class="mini"><tr><th>AI</th>${this.worlds.map(w => `<th>${WN[w]} (${D.byW[w] ? D.byW[w].rounds : 0})</th>`).join("")}</tr>`;
+    LABCORE.PERSONAS.forEach(P => { html += `<tr><td>${P.name}</td>${this.worlds.map(w => { const X = D.byW[w] && D.byW[w].p[P.k]; return `<td>${X ? `Calmar ${f(this.med(X.cal), 2)} · ${f(this.avg(X.nc), 1)}%/ปี` : "—"}</td>`; }).join("")}</tr>`; });
+    html += `</table>`;
+    const ops = this.opinions(), grp = (k) => ops.filter(o => o.kind === k);
+    const card = (o, tone) => `<div class="rsop" style="--rc:var(--${tone})"><div><b>${AILab.QT[o.type.replace("k", "1")] || o.type}</b> · กฎ: "${o.sys}" · ถ้าแหกเป็น "<b>${o.opt}</b>" <span class="note">(${o.who})</span></div><div class="note">${o.ev}</div></div>`;
+    const sec = (title, arr, tone, empty) => `<h4 class="rsh">${title}</h4>` + (arr.length ? arr.slice(0, 8).map(o => card(o, tone)).join("") : `<div class="note">${empty}</div>`);
+    // system-level opinions
+    const sys = []; const S = (w) => D.byW[w] && D.byW[w].p.SENSEI;
+    if (S("harsh") && S("harsh").cal.length >= 5 && this.med(S("harsh").cal) <= 0.05) sys.push(`ในโลกโหด (ไม่มีทรงสำเร็จรูป) ระบบ Calmar ค่ากลาง ${f(this.med(S("harsh").cal), 2)} → ยังไม่เห็น edge ในตลาดที่ไม่เป็นเทรนด์ชัด · เสนอ: ทดสอบกับกราฟจริงของหุ้นที่คุณเทรด (CSV) และพิจารณาลด RPT ช่วงตลาดไซด์เวย์`);
+    if (S("normal") && S("normal").cal.length >= 5) { const sN = this.avg(S("normal").nc); LABCORE.PERSONAS.forEach(P => { const X = D.byW.normal.p[P.k]; if (P.k !== "SENSEI" && X && X.nc.length >= 5 && this.avg(X.nc) > sN * 1.1) sys.push(`${P.name} (${P.th}) ได้ผลต่อความเสี่ยงดีกว่าระบบในโลกปกติ (${f(this.avg(X.nc), 1)}% vs ${f(sN, 1)}%/ปี ที่ VaR เท่ากัน) → นิสัยนี้อาจมีอะไรให้เรียน · ดูหัวข้อ 3–4 ว่าจุดไหนที่เขาเห็นต่างแล้วได้`); }); }
+    const fo = D.byW.normal && D.byW.normal.p.FOMO, se = S("normal"); if (fo && se && this.avg(fo.ret) > this.avg(se.ret) && this.med(fo.cal) < this.med(se.cal)) sys.push(`FOMO กำไรดิบมากกว่าระบบ (${f(this.avg(fo.ret), 0)}% vs ${f(this.avg(se.ret), 0)}%) แต่ Calmar แพ้ (${f(this.med(fo.cal), 2)} vs ${f(this.med(se.cal), 2)}) → กำไรมาจากการเสี่ยงมากกว่า ไม่ใช่ edge`);
+    html += `<h4 class="rsh">2 · ความเห็นต่อระบบโดยรวม</h4>` + (sys.length ? sys.map(t => `<div class="rsop" style="--rc:var(--gold)">${t}</div>`).join("") : `<div class="note">ข้อมูลยังไม่พอ (ต้องการอย่างน้อย 5 รอบต่อโลก)</div>`);
+    html += sec("3 · กฎที่ควรยึดไว้ (แหกแล้วเสียทุกโลก)", grp("keep"), "buy", "ยังไม่มีข้อที่ชัดพอ");
+    html += sec("4 · กฎที่น่าทบทวน (แหกแล้วได้อย่างสม่ำเสมอ ≥ 2 โลก)", grp("rethink"), "stop", "ยังไม่พบ — แปลว่ายังไม่มีหลักฐานว่าควรเปลี่ยนกฎข้อไหน");
+    html += sec("5 · หลอกตา (เฉลี่ยบวก แต่ส่วนใหญ่เสีย = ได้เพราะไม้ฟลุค)", grp("lottery"), "add", "ยังไม่พบ");
+    html += sec("6 · รายละเอียดที่แทบไม่ต่าง (เลือกแบบไหนก็ได้)", grp("detail"), "vdu", "ยังไม่พบ");
+    html += `<div class="note" style="margin-top:8px">วิธีวัด: สุ่มจุดที่ AI เลือกต่างจากระบบ แล้วเล่นหุ้นนั้นซ้ำโดยให้ทำตามระบบเฉพาะจุดนั้น · [ช่วงในวงเล็บ] = ช่วงความเชื่อมั่น 95% ของค่าเฉลี่ย · ตลาดจำลอง ไม่ใช่ผลจริง · AI คิดด้วยโมเดลคะแนน ไม่ใช่ AI ภาษาสด</div>`;
+    $("#rsBody").innerHTML = html;
+  },
+};
 
 /* ============================================================
    TABS + LOOP
@@ -2944,7 +3055,7 @@ function loop() {
   requestAnimationFrame(loop);
 }
 function boot() {
-  Replay.init(); Lab.init(); Fractal.init(); Grader.init(); BG.init(); AILab.init(); acctUI();
+  Replay.init(); Lab.init(); Fractal.init(); Grader.init(); BG.init(); AILab.init(); Research.init(); acctUI();
   const H = Object.fromEntries(location.hash.replace(/^#/, "").split("&").filter(Boolean).map(kv => kv.split("=")));
   let sKey = (H.s || "textbook").replace(/^r:.*/, "random"); const seedH = +H.seed || 7;
   if (!NEST.TEMPLATES[sKey] && sKey !== "random") sKey = "textbook";
