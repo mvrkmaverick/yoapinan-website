@@ -164,6 +164,8 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:va
 .nbr{font-size:12px;color:var(--mut);line-height:1.5;margin-top:3px}.nbr b{color:var(--txt);font-weight:700;margin-right:4px}
 #acctPop{position:fixed;right:18px;top:64px;z-index:45}
 #alMind.hidden{display:none!important}
+#alMindList{flex:1;min-height:140px}
+.alfeedc{overflow:hidden}
 .labl.big{grid-template-rows:auto 0.75fr 1.25fr}
 .mc{border:1px solid var(--line2);border-left:3px solid var(--mc);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:rgba(127,140,160,.04);animation:slin .4s ease}
 .mch{font-size:12.5px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}.mch .mood{margin-left:auto;font-size:10.5px;color:var(--mut)}
@@ -2646,7 +2648,7 @@ const AILab = {
     $("#alPlay").onclick = () => { this.playing = !this.playing; $("#alPlay").textContent = this.playing ? "❚❚" : "▶"; };
     $("#alNew").onclick = () => this.newRound();
     $("#alTabFeed").onclick = () => this.setFeed("feed"); $("#alTabNote").onclick = () => this.setFeed("note"); $("#alTabMind").onclick = () => this.setFeed("mind");
-    $("#alBig").onclick = () => { $(".labl").classList.toggle("big"); $("#alBig").classList.toggle("on"); };
+    $("#alBig").onclick = () => { this.bigManual = !$(".labl").classList.contains("big"); $(".labl").classList.toggle("big", this.bigManual); $("#alBig").classList.toggle("on", this.bigManual); };
     $("#alMindCtl").innerHTML = LABCORE.PERSONAS.map((P, a) => `<button class="chip" data-a="${a}"><span class="dot" style="--c:${P.col}"></span>${P.name}</button>`).join("") + `<span class="sp"></span><label class="toggle" id="alBadT" style="margin-top:0"><span class="sw"></span>เฉพาะตอนเห็นต่าง/แหกกฎ</label>`;
     $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.onclick = () => this.setFollow(+b.dataset.a));
     $("#alBadT").onclick = () => { this.mindBad = !this.mindBad; $("#alBadT").classList.toggle("on", this.mindBad); this.setFollow(this.follow); };
@@ -2665,7 +2667,7 @@ const AILab = {
   },
   wcol(w) { return { normal: "var(--gold)", harsh: "var(--stop)", random: "var(--mut)", mixed: "var(--add)" }[w]; },
   wcolP(w) { return { normal: PAL.gold, harsh: PAL.stop, random: PAL.mut, mixed: PAL.add }[w] || PAL.gold; },
-  setFeed(m) { this.feedMode = m; $("#alFeed").classList.toggle("hidden", m !== "feed"); $("#alNote").classList.toggle("hidden", m !== "note"); $("#alMind").classList.toggle("hidden", m !== "mind"); $("#alTabFeed").classList.toggle("on", m === "feed"); $("#alTabNote").classList.toggle("on", m === "note"); $("#alTabMind").classList.toggle("on", m === "mind"); },
+  setFeed(m) { this.feedMode = m; $("#alFeed").classList.toggle("hidden", m !== "feed"); $("#alNote").classList.toggle("hidden", m !== "note"); $("#alMind").classList.toggle("hidden", m !== "mind"); $("#alTabFeed").classList.toggle("on", m === "feed"); $("#alTabNote").classList.toggle("on", m === "note"); $("#alTabMind").classList.toggle("on", m === "mind"); $(".labl").classList.toggle("big", m === "mind" || !!this.bigManual); $("#alBig").classList.toggle("on", m === "mind" || !!this.bigManual); },
   QT: { TRAP_NO_NEST: "สัญญาณหลอก (ไม่มี nest)", TRAP_SHALLOW: "สัญญาณหลอก ((ii) ตื้น)", TRAP_STALE: "สัญญาณเหนือ TP1 เดิม", BUY: "จุดซื้อ", BUY_SL: "วาง SL", SCALE_IN: "เติมไม้", VCP_ADD: "เบรก VCP", SL_LIFT: "ยก SL", HEAT: "ติดลบระหว่างทาง", TP1_TRIG: "ถึง TP1", TP2_TRIG: "ถึง TP2", TP3_TRIG: "ถึง TP3", TP1_REST: "SL ของไม้ที่เหลือ", TP1_EXIT: "trailing TP1 ชน", TP2_EXIT: "trailing TP2 ชน", TP3_EXIT: "trailing TP3 ชน", STOP: "หลุด SL ระบบ", STOP_PROFIT: "หลุด SL ระบบ", GAP_STOP: "gap ทะลุ SL", INVALID: "Wave 2 เกิน 100%", NONEST_BREAKOUT: "ทะลุโดยไม่มี nest", PP_DAY: "Pocket Pivot", DECOY: "ระหว่างทาง" },
   setFollow(a) {
     this.follow = a; $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.classList.toggle("on", +b.dataset.a === a));
