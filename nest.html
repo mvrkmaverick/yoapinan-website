@@ -1,0 +1,2069 @@
+<!doctype html>
+<html lang="th" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEST Cockpit · ฝึกระบบ Nested Wave 1-2 → Wave 3 | YoApinan</title>
+<meta name="description" content="จำลองตลาดแบบ interactive: ดูระบบ nested wave 1-2 → wave 3 ตัดสินใจทีละแท่ง ฝึกวินัยใน Dojo ทดสอบ 11 price patterns และ Monte Carlo — เพื่อการศึกษา">
+<meta property="og:title" content="NEST Cockpit · Nested Wave 1-2 → Wave 3">
+<meta property="og:description" content="เล่นตลาดจำลอง ตัดสินใจเอง คิดกำไรขาดทุนจริง เทียบกับระบบ · 13 price patterns · Dojo · Monte Carlo · Fractal">
+<meta property="og:image" content="https://www.yoapinan.com/nest-og.png">
+<meta property="og:url" content="https://www.yoapinan.com/nest.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#05070b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2305070b'/%3E%3Cpath d='M10 46 L22 22 L30 38 L38 28 L46 34 L54 12' fill='none' stroke='%23ffd166' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#05070b; --bg2:#0a0e15; --panel:rgba(14,18,26,.82); --panel2:rgba(20,26,37,.9); --line:#1a2230; --line2:#253042;
+  --txt:#e9eef6; --mut:#8a95a6; --dim:#4b5668;
+  --gold:#ffd166; --buy:#3dff8f; --add:#ff5fd2; --tgt:#ffb347; --stop:#ff5468; --ma50:#4c8dff; --ma200:#1fc9a8; --dip:#9b7bff; --vdu:#3ee7ff; --up:#1fd1a5; --dn:#ff5468; --grid:rgba(120,140,170,.07);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI","Sukhumvit Set","Noto Sans Thai",sans-serif;
+  --mono:"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[data-theme=light]{
+  --bg:#eef2f8; --bg2:#ffffff; --panel:rgba(255,255,255,.92); --panel2:#ffffff; --line:#e1e7f0; --line2:#d3dbe7;
+  --txt:#0f1623; --mut:#566173; --dim:#9aa5b5;
+  --gold:#c98a00; --buy:#07a653; --add:#cc2f9c; --tgt:#dd7400; --stop:#e02d42; --ma50:#2466ee; --ma200:#0a9a80; --dip:#7a5cff; --vdu:#0aaed0; --up:#0c9f7c; --dn:#e02d42; --grid:rgba(30,50,80,.06);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.hidden{display:none!important}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none}
+header{position:relative;z-index:5;height:58px;display:flex;align-items:center;gap:22px;padding:0 20px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px;white-space:nowrap}
+.brand .logo{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:conic-gradient(from 200deg,var(--gold),var(--add),var(--ma50),var(--buy),var(--gold));color:#000;font-size:13px;box-shadow:0 0 18px rgba(255,209,102,.35)}
+.brand small{font-weight:500;letter-spacing:.04em;color:var(--mut);font-size:12px}
+nav{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px}
+nav button{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--mut);transition:.2s}
+nav button:hover{color:var(--txt)}
+nav button.on{background:linear-gradient(180deg,rgba(255,209,102,.18),rgba(255,209,102,.06));color:var(--gold);box-shadow:inset 0 0 0 1px rgba(255,209,102,.35)}
+.hright{margin-left:auto;display:flex;gap:8px;align-items:center}
+.iconbtn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:14px;display:grid;place-items:center;transition:.2s}
+.iconbtn:hover{border-color:var(--line2);transform:translateY(-1px)}
+.iconbtn.on{color:var(--gold);border-color:rgba(255,209,102,.4)}
+main{position:relative;z-index:2;height:calc(100% - 58px)}
+.view{position:absolute;inset:0;display:none}
+.view.on{display:grid}
+/* ---------- chart view ---------- */
+#v-chart{grid-template-columns:1fr 392px;gap:14px;padding:14px}
+.stage{display:grid;grid-template-rows:auto 1fr auto;gap:10px;min-width:0;min-height:0}
+.scen{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:600;color:var(--mut);transition:.2s;white-space:nowrap}
+.chip:hover{color:var(--txt);border-color:var(--line2)}
+.chip.on{color:var(--txt);border-color:var(--c,var(--gold));box-shadow:0 0 0 1px var(--c,var(--gold)) inset,0 0 18px -6px var(--c,var(--gold))}
+.chip .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c,var(--gold));margin-right:7px;box-shadow:0 0 8px var(--c,var(--gold))}
+.scen .sp{flex:1}
+.mkt{font-family:var(--mono);font-size:11px;color:var(--dim)}
+.cwrap{position:relative;min-height:0;border-radius:16px;border:1px solid var(--line);background:radial-gradient(1200px 600px at 70% 0%,rgba(76,141,255,.06),transparent 60%),var(--bg2);overflow:hidden}
+.cwrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#toast{position:absolute;left:50%;top:22px;transform:translate(-50%,-30px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:14px;padding:12px 20px 12px 12px;border-radius:16px;background:var(--panel2);border:1px solid var(--tc,var(--gold));box-shadow:0 10px 40px -10px var(--tc,var(--gold)),0 0 0 1px rgba(0,0,0,.2);transition:transform .45s cubic-bezier(.2,1.4,.4,1),opacity .35s;backdrop-filter:blur(10px);max-width:80%}
+#toast.show{transform:translate(-50%,0);opacity:1}
+#toast .orb{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#000;background:radial-gradient(circle at 35% 30%,#fff 0,var(--tc) 45%,var(--tc) 100%);box-shadow:0 0 22px var(--tc);flex:none;font-size:17px}
+#toast .tt{font-weight:800;font-size:16px;letter-spacing:.02em}
+#toast .ts{font-size:12.5px;color:var(--mut);margin-top:2px}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,rgba(0,0,0,.35),rgba(0,0,0,.72));backdrop-filter:blur(3px);z-index:5}
+[data-theme=light] .overlay{background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.55),rgba(230,236,246,.9))}
+.ocard{text-align:center;max-width:560px;padding:34px 38px;border-radius:22px;background:var(--panel2);border:1px solid var(--line2);box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
+.ocard h2{font-size:30px;letter-spacing:.06em;margin-bottom:8px}
+.ocard p{color:var(--mut);line-height:1.6;font-size:14px;margin-bottom:22px}
+.bigbtn{padding:13px 28px;border-radius:14px;font-weight:800;letter-spacing:.1em;font-size:14px;color:#000;background:linear-gradient(135deg,var(--gold),#ffe29b);box-shadow:0 10px 30px -10px var(--gold);transition:.2s}
+.bigbtn:hover{transform:translateY(-2px) scale(1.02)}
+.transport{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+.tbtn{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:14px;border:1px solid transparent;transition:.15s;color:var(--mut)}
+.tbtn:hover{color:var(--txt);background:rgba(127,140,160,.1)}
+.tbtn.play{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffe6a6);color:#000;font-size:16px;box-shadow:0 6px 22px -8px var(--gold)}
+.tbtn:disabled{opacity:.3;pointer-events:none}
+#scrub{flex:1;height:44px;min-width:100px;cursor:pointer;border-radius:8px}
+.sel{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:12px;color:var(--txt);font-family:var(--mono)}
+.tlabel{font-family:var(--mono);font-size:11px;color:var(--mut);min-width:64px;text-align:right}
+/* side panel */
+.side{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden}
+.card{border-radius:16px;border:1px solid var(--line);background:var(--panel);padding:14px 16px;backdrop-filter:blur(8px)}
+.card h3{font-size:11px;letter-spacing:.2em;color:var(--mut);font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h3 .live{width:7px;height:7px;border-radius:50%;background:var(--buy);box-shadow:0 0 10px var(--buy);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.stages{position:relative;display:flex;flex-direction:column;gap:3px}
+.stg{position:relative;display:flex;gap:11px;align-items:flex-start;padding:5px 8px;border-radius:10px;transition:background .3s}
+.stg .n{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;border:1.5px solid var(--dim);color:var(--dim);transition:.35s;background:var(--bg2)}
+.stg .tx{font-size:12.5px;line-height:1.35;color:var(--dim);transition:.35s}
+.stg .tx small{display:none;font-size:11px;color:var(--mut);margin-top:2px}
+.stg.active .tx small,.stg.fail .tx small{display:block}
+.stg.done .n{background:var(--sc);border-color:var(--sc);color:#000;box-shadow:0 0 14px -2px var(--sc)}
+.stg.done .tx{color:var(--txt)}
+.stg.done .tx small{color:var(--mut)}
+.stg.active{background:rgba(255,209,102,.07)}
+.stg.active .n{border-color:var(--gold);color:var(--gold);animation:ring 1.3s infinite}
+.stg.active .tx{color:var(--txt)}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(255,209,102,.55)}100%{box-shadow:0 0 0 10px rgba(255,209,102,0)}}
+.stg.fail .n{background:var(--stop);border-color:var(--stop);color:#000}
+.stg.fail .tx{color:var(--stop)}
+.stg .when{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--dim);padding-top:4px}
+.sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sig{border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:rgba(127,140,160,.04)}
+.sig .k{font-size:9px;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mut);font-weight:700}
+.sig .v{font-family:var(--mono);font-size:12px;font-weight:700;margin-top:2px;transition:color .3s}
+.pos{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:end}
+.pos .big{grid-column:1/-1;display:flex;align-items:baseline;gap:10px}
+.pos .big .R{font-family:var(--mono);font-size:34px;font-weight:800;letter-spacing:-.02em;transition:color .3s}
+.pos .big .st{font-size:11px;font-weight:800;letter-spacing:.16em;padding:4px 8px;border-radius:7px;border:1px solid var(--line2);color:var(--mut)}
+.kv .k{font-size:10px;color:var(--mut);letter-spacing:.1em;font-weight:700}
+.kv .v{font-family:var(--mono);font-size:13px;font-weight:700}
+#rspark{width:100%;height:46px;grid-column:1/-1}
+.log{flex:1;min-height:80px;overflow:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px}
+.log::-webkit-scrollbar{width:6px}.log::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+.li{display:flex;gap:9px;font-size:12.5px;line-height:1.45;animation:slin .45s ease}
+.li .b{flex:none;font-family:var(--mono);font-size:10px;color:var(--dim);padding-top:2px;width:34px}
+.li .m{border-left:2px solid var(--lc,var(--line2));padding-left:9px}
+@keyframes slin{from{opacity:0;transform:translateX(12px)}}
+.logcard{flex:1;min-height:0;display:flex;flex-direction:column}
+/* dojo */
+.score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.score .v{font-family:var(--mono);font-size:26px;font-weight:800}
+.score .k{font-size:10px;letter-spacing:.14em;color:var(--mut);font-weight:700}
+.q h4{font-size:15px;line-height:1.45;margin-bottom:10px}
+.facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.fact{font-family:var(--mono);font-size:11px;padding:5px 8px;border-radius:8px;border:1px solid var(--line2);color:var(--txt);background:rgba(127,140,160,.06)}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;padding:11px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--panel2);font-size:13.5px;font-weight:600;transition:.18s}
+.opt:hover{border-color:var(--gold);transform:translateX(3px)}
+.opt.right{border-color:var(--buy);background:rgba(61,255,143,.1);color:var(--buy)}
+.opt.wrong{border-color:var(--stop);background:rgba(255,84,104,.1);color:var(--stop)}
+.opt:disabled{cursor:default}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.opt .gtag{font-size:11px;font-weight:800;white-space:nowrap;letter-spacing:.02em}
+.opt.acc{border-color:var(--gold);background:rgba(255,209,102,.1);color:var(--gold)}
+.opt.mine{box-shadow:0 0 0 2px currentColor inset}
+.fb{margin-top:12px;font-size:13px;line-height:1.55;color:var(--mut)}
+.fb b{color:var(--txt)}
+/* lab */
+#v-lab{grid-template-columns:1fr 380px;gap:14px;padding:14px}
+.labmain{display:grid;grid-template-rows:1fr 190px;gap:12px;min-height:0}
+.panelc{position:relative;border-radius:16px;border:1px solid var(--line);background:var(--bg2);overflow:hidden}
+.panelc canvas{position:absolute;inset:0;width:100%;height:100%}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;margin-bottom:10px}
+.ctl label{font-size:12px;color:var(--mut);font-weight:600}
+.ctl output{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--gold)}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--gold)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{border:1px solid var(--line);border-radius:12px;padding:10px}
+.stat .k{font-size:10px;letter-spacing:.12em;color:var(--mut);font-weight:700}
+.stat .v{font-family:var(--mono);font-size:20px;font-weight:800;margin-top:3px}
+.stat .s{font-size:11px;color:var(--dim);margin-top:2px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.note{font-size:11px;color:var(--dim);line-height:1.5}
+/* fractal */
+#v-fractal{display:none}
+#v-fractal.on{display:block}
+#frac{position:absolute;inset:0;width:100%;height:100%}
+.hud{position:absolute;pointer-events:none}
+.hud.tl{left:26px;top:22px}
+.hud.tl h2{font-size:26px;letter-spacing:.1em;font-weight:900}
+.hud.tl p{color:var(--mut);font-size:13px;margin-top:6px;max-width:460px;line-height:1.6}
+.ladder{position:absolute;right:26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.rung{display:flex;align-items:center;gap:10px;justify-content:flex-end;font-size:12px;color:var(--dim);transition:.4s;font-weight:700;letter-spacing:.06em}
+.rung .nt{font-family:var(--mono);font-size:11px;opacity:.8}
+.rung.on{color:var(--txt);transform:translateX(-8px)}
+.rung .bar{width:26px;height:3px;border-radius:2px;background:var(--dim);transition:.4s}
+.rung.on .bar{width:52px;background:var(--rc);box-shadow:0 0 10px var(--rc)}
+.fctl{position:absolute;left:26px;bottom:24px;display:flex;gap:8px;align-items:center}
+/* grader */
+#v-grader{grid-template-columns:1.1fr 1fr;gap:18px;padding:24px 28px;overflow:auto}
+.gl h2,.gr h2{font-size:13px;letter-spacing:.2em;color:var(--mut);margin-bottom:14px}
+.gitem{display:flex;gap:14px;align-items:center;padding:13px 16px;border-radius:14px;border:1px solid var(--line);background:var(--panel);margin-bottom:9px;cursor:pointer;transition:.2s;user-select:none}
+.gitem:hover{border-color:var(--line2)}
+.gitem .sw{flex:none;width:44px;height:26px;border-radius:13px;background:var(--line2);position:relative;transition:.25s}
+.gitem .sw::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:var(--mut);transition:.25s}
+.gitem.on .sw{background:rgba(61,255,143,.3)}
+.gitem.on .sw::after{left:21px;background:var(--buy);box-shadow:0 0 10px var(--buy)}
+.gitem .gt{font-size:14px;font-weight:600}
+.gitem .gs{font-size:12px;color:var(--mut);margin-top:2px}
+.gitem .gn{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;border:1.5px solid var(--dim);color:var(--mut)}
+.gitem.on .gn{border-color:var(--buy);color:var(--buy)}
+.verdict{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px;border-radius:22px;border:1px solid var(--line);background:var(--panel)}
+#dial{width:300px;height:300px}
+.vt{font-size:26px;font-weight:900;letter-spacing:.06em;text-align:center}
+.vs{font-size:13.5px;color:var(--mut);line-height:1.65;text-align:center;max-width:460px}
+.reasons{width:100%;display:flex;flex-direction:column;gap:6px}
+.reason{font-size:12.5px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);display:flex;gap:8px}
+/* splash */
+#splash{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);transition:opacity .8s}
+#splash.out{opacity:0;pointer-events:none}
+#splash .t{font-size:64px;font-weight:900;letter-spacing:.3em;background:linear-gradient(90deg,var(--gold),var(--add),var(--ma50),var(--buy));-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise 1.2s cubic-bezier(.2,1,.3,1)}
+#splash .s{text-align:center;color:var(--mut);letter-spacing:.4em;font-size:12px;margin-top:14px;animation:rise 1.6s cubic-bezier(.2,1,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(24px);letter-spacing:.8em}}
+.kbd{font-family:var(--mono);font-size:10px;color:var(--dim);border:1px solid var(--line2);border-radius:5px;padding:1px 5px;margin-left:4px}
+@media (max-height:1020px){.stg{padding:3px 8px}.stg .n{width:21px;height:21px;font-size:10px}.card{padding:10px 13px}.card h3{margin-bottom:7px}#rspark{height:30px}.pos .big .R{font-size:28px}.sig{padding:5px 8px}}
+.brand{text-decoration:none;color:inherit}
+.brand .by{font-weight:600;letter-spacing:.04em;color:var(--mut);font-size:11px;margin-left:2px}
+.scen{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;padding-bottom:2px}.scen::-webkit-scrollbar{display:none}
+.chip.csv{border-style:dashed}
+#endcard{position:absolute;right:18px;bottom:18px;width:360px;z-index:4;transform:translateY(20px);opacity:0;pointer-events:none;transition:.45s cubic-bezier(.2,1.2,.4,1)}
+#endcard.show{transform:none;opacity:1;pointer-events:auto}
+#endcard .ocard{padding:20px 22px;text-align:left}
+#endcard h2{font-size:18px;margin-bottom:6px}#endcard p{margin-bottom:14px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.ghost{padding:10px 16px;border-radius:12px;border:1px solid var(--line2);font-weight:700;font-size:13px}
+.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.about{max-width:680px;text-align:left}
+.about h3{font-size:13px;letter-spacing:.14em;color:var(--gold);margin:16px 0 6px}
+.about li{margin-left:18px;color:var(--mut);font-size:13.5px;line-height:1.7}
+.disc{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);cursor:pointer;user-select:none;margin-top:10px}
+.toggle .sw{width:36px;height:20px;border-radius:10px;background:var(--line2);position:relative;transition:.2s}
+.toggle .sw::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--mut);transition:.2s}
+.toggle.on .sw{background:rgba(255,84,104,.35)}.toggle.on .sw::after{left:18px;background:var(--stop)}
+@media (max-width:1100px){
+  html,body{overflow:auto;height:auto}
+  main{height:auto}
+  header{gap:10px;padding:0 10px;overflow-x:auto}
+  .brand small,.brand .by{display:none}
+  nav button{padding:7px 9px;font-size:11px;letter-spacing:.06em}
+  .view{position:relative;inset:auto}
+  #v-chart{grid-template-columns:1fr;padding:8px;gap:10px}
+  .stage{height:calc(100vh - 80px);min-height:520px}
+  .side{display:flex;overflow:visible}
+  .logcard{max-height:300px}
+  #v-lab{grid-template-columns:1fr;padding:8px}.labmain{height:78vh}
+  #v-grader{grid-template-columns:1fr;padding:14px}
+  #v-fractal{height:calc(100vh - 58px)}
+  .ladder{display:none}
+  #endcard{left:10px;right:10px;width:auto}
+  #bFit,#bCine,.tlabel{display:none}
+  .transport{gap:4px;padding:6px}
+  #toast{max-width:92%;padding:9px 14px 9px 9px}#toast .tt{font-size:13px}#toast .ts{font-size:11px}
+}
+</style>
+</head>
+<body>
+<canvas id="bgfx"></canvas>
+<div id="splash"><div><div class="t">NEST</div><div class="s">NESTED 1-2 → WAVE 3 · SYSTEM COCKPIT</div><div class="s" style="letter-spacing:.1em;font-size:11px;opacity:.7;margin-top:22px">ตลาดจำลองเพื่อการศึกษา · ไม่ใช่ผลเทรดจริง · ไม่ใช่คำแนะนำการลงทุน</div></div></div>
+<header>
+  <a class="brand" href="https://www.yoapinan.com/" title="กลับหน้า YoApinan.com"><span class="logo">◆</span>NEST COCKPIT <small>nested 1-2 → wave 3</small><span class="by">· by YoApinan.com</span></a>
+  <nav id="tabs">
+    <button data-tab="replay" class="on">REPLAY</button>
+    <button data-tab="dojo">DOJO</button>
+    <button data-tab="lab">MONTE CARLO</button>
+    <button data-tab="fractal">FRACTAL</button>
+    <button data-tab="grader">GRADER</button>
+  </nav>
+  <div class="hright">
+    <button class="iconbtn" id="aboutBtn" title="นี่คืออะไร / วิธีใช้">ⓘ</button>
+    <button class="iconbtn" id="soundBtn" title="เสียง">🔇</button>
+    <button class="iconbtn" id="themeBtn" title="สลับธีม">◐</button>
+  </div>
+</header>
+<div class="overlay hidden" id="about" style="position:fixed;z-index:40"><div class="ocard about">
+  <h2>NEST COCKPIT</h2>
+  <p style="margin-bottom:6px">เครื่องจำลองสำหรับฝึกระบบ <b>Nested Wave 1-2 → Wave 3</b>: MA50/MA200 นิยาม Wave 1 และ Wave 2 → รอ nest ใต้ยอด Wave 1 → (ii) ย่อ ≥ 61.8% ของขา (i) และ SL ห่าง ≥ 2 ATR → histogram พลิกบวก + MACD &gt; 0 → เข้า (PP = เต็ม · ไม่มี = ครึ่ง) · SL ใต้ (ii) ยกได้ครั้งเดียว แช่ไว้จนถึง TP1 · เป้า TP1/TP2/TP3 = 161.8/261.8/423.6% ของ 1-2 ชุดเล็กล่าสุด · ถึง TP1 ไม้ที่เหลือกันหน้าทุน · แต่ละ 1/3 เปิด trailing 2.5 ATR ของตัวเองเมื่อถึงระดับ</p>
+  <h3>5 โหมด</h3><ul>
+  <li><b>REPLAY</b> — ดู rule engine ตัดสินใจทีละแท่ง (ไม่เห็นอนาคต) บน 13 price patterns (ต่อกัน 2–3 รอบต่อตลาด) หรืออัปโหลด CSV ของหุ้นจริง</li>
+  <li><b>DOJO</b> — ตลาดหยุดทุกจุดตัดสินใจ (4 ตัวเลือก) · ให้คะแนน ✓ ตรงระบบ / ≈ ไม่ผิดกฎ / ✕ ผิดกฎ · กำไรขาดทุนของคุณคิดจริงตามกราฟ เทียบกับระบบตอนจบ</li>
+  <li><b>MONTE CARLO</b> — 1,000 อนาคตของพอร์ตจากสมมติฐาน win rate / R / RPT</li>
+  <li><b>FRACTAL</b> — ซูมเข้า nest ทีละ degree ให้เห็นว่าทุกระดับคือทรงเดียวกัน</li>
+  <li><b>GRADER</b> — เช็คหุ้นจริงกับ checklist ของระบบ</li></ul>
+  <h3>ปุ่มลัด</h3><ul><li>Space เล่น/หยุด · ← → ทีละแท่ง · N ข้ามไป event ถัดไป · scroll ซูม · ลากเพื่อเลื่อน · ดับเบิลคลิกกลับไปตามราคา</li></ul>
+  <div class="disc">ตลาดทั้งหมดในโหมด Replay/Dojo สร้างขึ้นด้วยคอมพิวเตอร์ (synthetic) เพื่ออธิบายกฎของระบบ ตัวเลข R ที่เห็นไม่ใช่ผลการเทรดจริงและไม่ได้บอกผลในอนาคต · เนื้อหาเพื่อการศึกษาเท่านั้น ไม่ใช่คำแนะนำการลงทุน · © <a href="https://www.yoapinan.com/" style="color:var(--gold)">YoApinan.com</a></div>
+  <div style="margin-top:16px;text-align:right"><button class="bigbtn" id="aboutClose" style="padding:10px 20px;font-size:12px">เข้าใจแล้ว</button></div>
+</div></div>
+<input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
+<main>
+  <!-- ===== REPLAY / DOJO ===== -->
+  <section id="v-chart" class="view on">
+    <div class="stage">
+      <div class="scen" id="scen"></div>
+      <div class="cwrap" id="cwrap">
+        <canvas id="chart"></canvas>
+        <div id="toast"><div class="orb">1</div><div><div class="tt">—</div><div class="ts">—</div></div></div>
+        <div id="endcard"><div class="ocard"><h2 id="ecT">—</h2><p id="ecP">—</p><div class="row"><button class="bigbtn" id="ecNext" style="padding:10px 18px;font-size:12px">ตลาดสุ่มถัดไป ⟳</button><button class="ghost" id="ecAgain">ดูซ้ำ</button><button class="ghost" id="ecShare">🔗 แชร์</button></div></div></div>
+        <div class="overlay hidden" id="dojoStart"><div class="ocard">
+          <h2>DOJO</h2>
+          <p>ตลาดจะเล่นไปเรื่อยๆ แล้วหยุดทุกจุดที่ต้องตัดสินใจ — เฉพาะที่เกี่ยวกับ position ของคุณ<br>ทุกคำตอบได้เกรด <b style="color:var(--buy)">✓ ตรงระบบ</b> · <b style="color:var(--gold)">≈ ไม่ผิดกฎ</b> · <b style="color:var(--stop)">✕ ผิดกฎ</b><br>DISCIPLINE = ✓ + ≈ · <b>ไม่มีการเห็นอนาคต</b></p>
+          <button class="bigbtn" id="dojoGo">เริ่มฝึก</button>
+        </div></div>
+      </div>
+      <div class="transport">
+        <button class="tbtn" id="bRestart" title="เริ่มใหม่">⏮</button>
+        <button class="tbtn" id="bBack" title="ถอย 1 แท่ง (←)">◀</button>
+        <button class="tbtn play" id="bPlay" title="เล่น/หยุด (space)">▶</button>
+        <button class="tbtn" id="bFwd" title="เดิน 1 แท่ง (→)">▶︎|</button>
+        <button class="tbtn" id="bNext" title="ข้ามไป event ถัดไป (N)">⏭</button>
+        <canvas id="scrub"></canvas>
+        <span class="tlabel" id="tlabel">bar —</span>
+        <select class="sel" id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select>
+        <button class="iconbtn on" id="bCine" title="Cinematic: ช้าลงตอนเกิด event">🎬</button>
+        <button class="iconbtn" id="bFit" title="ดูทั้งกราฟ">⤢</button>
+      </div>
+    </div>
+    <aside class="side" id="side">
+      <div id="brain" style="display:flex;flex-direction:column;gap:12px;min-height:0;flex:1">
+        <div class="card"><h3><span class="live"></span>SYSTEM BRAIN</h3><div class="stages" id="stages"></div></div>
+        <div class="card"><h3>LIVE SIGNALS</h3><div class="sigs" id="sigs"></div></div>
+        <div class="card"><h3>POSITION · R</h3><div class="pos" id="pos"></div></div>
+        <div class="card logcard"><h3>NARRATOR</h3><div class="log" id="log"></div></div>
+      </div>
+      <div id="dojo" class="hidden" style="display:flex;flex-direction:column;gap:12px;min-height:0;flex:1">
+        <div class="card"><h3>THIS MARKET · คุณ vs ระบบ</h3><div class="score">
+          <div><div class="v" id="dCorrect">0/0</div><div class="k">✓ ตรงระบบ</div><div class="note" id="dAcc" style="font-family:var(--mono);margin-top:2px"></div></div>
+          <div><div class="v" id="dPct">—</div><div class="k">DISCIPLINE ✓+≈</div></div>
+          <div><div class="v" id="dYouR">0.00R</div><div class="k">YOUR P&amp;L</div></div></div>
+          <div class="note" id="dPos" style="margin-top:10px;font-family:var(--mono)">ไม่มี position</div>
+          <div class="note" id="dSys" style="margin-top:4px">SYSTEM P&amp;L: เฉลยตอนจบตลาด</div></div>
+        <div class="card" style="padding:10px 16px"><div class="toggle" id="hardT" style="margin-top:0"><span class="sw"></span>HARD · ซ่อนทุกอย่าง + ไม่มีตัวช่วย + คำถามหลอก + จับเวลา 15 วิ</div><div class="note" id="dLife" style="margin-top:8px"></div></div>
+        <div class="card q" id="dq" style="flex:1;overflow:auto"><h3>DECISION</h3><div id="dqBody" class="fb">กด ▶ แล้วรอจุดตัดสินใจแรก…</div></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ===== MONTE CARLO ===== -->
+  <section id="v-lab" class="view">
+    <div class="labmain">
+      <div class="panelc"><canvas id="fan"></canvas></div>
+      <div class="panelc"><canvas id="ddh"></canvas></div>
+    </div>
+    <aside class="side" style="overflow:auto">
+      <div class="card"><h3>ASSUMPTIONS</h3>
+        <div class="presets" id="presets"></div>
+        <div id="ctls"></div>
+        <button class="bigbtn" id="runMC" style="width:100%;margin-top:4px">RUN 1,000 FUTURES</button>
+      </div>
+      <div class="card"><h3>RESULT</h3><div class="stats" id="mcStats"></div></div>
+      <div class="note">ตัวเลขเป็นสมมติฐานที่คุณใส่เอง ไม่ใช่ edge จริง · ใช้ดูว่า RPT, win rate และจำนวนไม้ต่อปี ทำให้ equity และ drawdown แกว่งได้แค่ไหน</div>
+    </aside>
+  </section>
+
+  <!-- ===== FRACTAL ===== -->
+  <section id="v-fractal" class="view">
+    <canvas id="frac"></canvas>
+    <div class="hud tl"><h2>NESTED · INFINITE</h2><p>ทุก degree คือทรงเดียวกัน: Wave 1 → Wave 2 ย่อลงแต่ไม่หลุดจุดเริ่ม → ข้างในคือ 1-2 ชุดเล็กที่เด้งไม่ผ่านยอด Wave 1 (nest) → ทะลุเมื่อทุกระดับพร้อมกัน</p></div>
+    <div class="ladder" id="ladder"></div>
+    <div class="fctl"><button class="chip on" id="fPlay">❚❚ หยุดซูม</button><button class="chip" id="fDir">ซูมออก</button><button class="chip on" id="fLbl">labels</button></div>
+  </section>
+
+  <!-- ===== GRADER ===== -->
+  <section id="v-grader" class="view">
+    <div class="gl">
+      <h2>SETUP GRADER · เช็คหุ้นจริงกับกฎ</h2>
+      <div class="presets" id="gPresets" style="margin-bottom:14px"></div>
+      <div id="gItems"></div>
+    </div>
+    <div class="gr">
+      <h2>VERDICT</h2>
+      <div class="verdict"><canvas id="dial"></canvas><div class="vt" id="vt">—</div><div class="vs" id="vs"></div><div class="reasons" id="reasons"></div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ================= NEST ENGINE v3 =================
+   procedural multi-block market generator + bar-by-bar rule engine (no look-ahead)
+   Rules:
+     Wave 1 = MA50 x above MA200 · Wave 2 = MA50 curls down · Nest = (i) fails under W1 high + (ii) higher low
+     BUY = MA50 curls back up + MACD > 0 (PP -> full, else half) · SL below (ii)
+     Scale-in (half -> full) = Stoch RSI %K crosses up 20 with MACD > 0
+     VCP add (+1/2) = breakout of the VCP pivot (last contraction high) on volume
+     Structural SL trails under each new pivot low; above cost after 1.5R
+     TP1/TP2/TP3 = 161.8 / 261.8 / 423.6 % : reaching a level arms a 2.5 ATR trail for that 1/3 only
+==================================================== */
+(function (root) {
+  "use strict";
+  function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function makeRng(seed) {
+    const u = mulberry32(seed >>> 0);
+    return { u, r: (a, b) => a + (b - a) * u(), i: (a, b) => Math.floor(a + (b - a + 1) * u()),
+      n: () => { let x = 0, y = 0; while (x === 0) x = u(); while (y === 0) y = u(); return Math.sqrt(-2 * Math.log(x)) * Math.cos(2 * Math.PI * y); },
+      pick: (arr) => arr[Math.floor(u() * arr.length)] };
+  }
+  // ---------- indicators ----------
+  function sma(a, n) { const out = new Array(a.length).fill(NaN); let s = 0; for (let i = 0; i < a.length; i++) { s += a[i]; if (i >= n) s -= a[i - n]; if (i >= n - 1) out[i] = s / n; } return out; }
+  function ema(a, n) { const k = 2 / (n + 1), out = new Array(a.length); out[0] = a[0]; for (let i = 1; i < a.length; i++) out[i] = a[i] * k + out[i - 1] * (1 - k); return out; }
+  function rsi(c, n) {
+    const out = new Array(c.length).fill(NaN); let g = 0, l = 0;
+    for (let i = 1; i < c.length; i++) {
+      const d = c[i] - c[i - 1], up = Math.max(d, 0), dn = Math.max(-d, 0);
+      if (i <= n) { g += up / n; l += dn / n; if (i === n) out[i] = 100 - 100 / (1 + g / Math.max(l, 1e-12)); }
+      else { g = (g * (n - 1) + up) / n; l = (l * (n - 1) + dn) / n; out[i] = 100 - 100 / (1 + g / Math.max(l, 1e-12)); }
+    }
+    return out;
+  }
+  function indicators(m) {
+    const { h, l, c, v } = m, N = c.length;
+    m.m10 = sma(c, 10); m.m50 = sma(c, 50); m.m200 = sma(c, 200);
+    const e12 = ema(c, 12), e26 = ema(c, 26);
+    m.macd = c.map((_, i) => e12[i] - e26[i]); m.sig = ema(m.macd, 9); m.hist = m.macd.map((x, i) => x - m.sig[i]);
+    const tr = c.map((_, i) => i === 0 ? h[i] - l[i] : Math.max(h[i] - l[i], Math.abs(h[i] - c[i - 1]), Math.abs(l[i] - c[i - 1])));
+    m.atr = sma(tr, 14); m.vma = sma(v, 50);
+    const r = rsi(c, 14), st = new Array(N).fill(NaN);
+    for (let i = 27; i < N; i++) { let mn = 1e9, mx = -1e9; for (let j = i - 13; j <= i; j++) { mn = Math.min(mn, r[j]); mx = Math.max(mx, r[j]); } st[i] = mx - mn < 1e-9 ? 50 : (r[i] - mn) / (mx - mn) * 100; }
+    const k = new Array(N).fill(NaN); for (let i = 29; i < N; i++) k[i] = (st[i] + st[i - 1] + st[i - 2]) / 3;
+    const d = new Array(N).fill(NaN); for (let i = 31; i < N; i++) d[i] = (k[i] + k[i - 1] + k[i - 2]) / 3;
+    m.stK = k; m.stD = d;
+    m.pp = new Array(N).fill(false); m.maxDownVol = new Array(N).fill(NaN);
+    for (let i = 11; i < N; i++) {
+      let md = 0; for (let j = i - 10; j < i; j++) if (c[j] < c[j - 1]) md = Math.max(md, v[j]);
+      m.maxDownVol[i] = md;
+      const ext = (c[i] / m.m10[i] - 1) * 100;
+      m.pp[i] = c[i] > c[i - 1] && v[i] > md && c[i] > m.m10[i] && ext <= 5 && (c[i] > m.m50[i] || m.m50[i] > m.m50[i - 5]);
+    }
+    return m;
+  }
+
+  // ---------- generator ----------
+  function bridge(anch, rng) {
+    const N = anch[anch.length - 1][0] + 1; const lc = new Array(N);
+    for (let k = 1; k < anch.length; k++) {
+      const [t0, p0] = anch[k - 1], [t1, p1, sg] = anch[k];
+      const y0 = Math.log(p0), y1 = Math.log(p1), L = t1 - t0;
+      const W = [0]; for (let j = 1; j <= L; j++) W.push(W[j - 1] + rng.n() * sg);
+      for (let j = 0; j <= L; j++) { const f = j / L; lc[t0 + j] = y0 + (y1 - y0) * f + W[j] - f * W[L]; }
+    }
+    return lc.map(Math.exp);
+  }
+  function ohlcFrom(c, rng, sig) {
+    const o = [], h = [], l = [];
+    for (let i = 0; i < c.length; i++) {
+      const s = sig[i], op = i === 0 ? c[0] : c[i - 1] * Math.exp(rng.n() * s * 0.45);
+      o.push(op); h.push(Math.max(op, c[i]) * Math.exp(Math.abs(rng.n()) * s * 0.95)); l.push(Math.min(op, c[i]) * Math.exp(-Math.abs(rng.n()) * s * 0.95));
+    }
+    return { o, h, l };
+  }
+
+  const TEMPLATES = {
+    textbook: { name: "Textbook nest", th: "Nest สมบูรณ์ → Wave 3", lesson: "ทรงที่ระบบรอ: nest ครบ → (ii) ย่อ ≥ 61.8% → histogram พลิกบวก + MACD > 0 → วิ่งผ่านเป้า" },
+    ondo: { name: "Nest above MA200", th: "Nest ที่ MA50 ไม่มุดใต้ MA200 (แบบ ONDO)", lesson: "MA ใช้นิยาม Wave 1/Wave 2 เท่านั้น — ไม่ต้องรอ MA50 มุดใต้ MA200 · ไกปืนคือ histogram พลิกบวก + MACD > 0" },
+    basehead: { name: "Base on the head", th: "ฐานนั่งบนหัว 1-2 ชุดแรก (แบบ 868)", lesson: "Wave 2 ยืนบนยอดของ 1-2 ชุดแรก = แนวรับจากรอบก่อน" },
+    double: { name: "Double nest", th: "Nest ซ้อน 2 ชั้น (แบบ Estun)", lesson: "ซื้อแล้วย่อซ้ำ แต่ low ยังยกสูง — SL ยกครั้งเดียวแล้วแช่ไว้จนถึง TP1 ไม่ไล่ทุก pivot" },
+    extended: { name: "Extended wave 3", th: "วิ่งถึง 423.6%", lesson: "ไม้ที่ 3 ถือยาวได้เพราะ trailing เริ่มเมื่อผ่าน 423.6% เท่านั้น" },
+    climax: { name: "Climax run", th: "วิ่งแรงจน blow-off (แบบ Estun)", lesson: "แต่ละ 1/3 มี trailing ของตัวเอง — ตลาดเป็นคนตัดสินว่าจะไปไกลแค่ไหน" },
+    stall: { name: "TP1 then stall", th: "ผ่าน TP1 แล้วแผ่ว", lesson: "ไม้ TP1 ออกตาม trailing ของมันเอง · ไม้ TP2/TP3 ไม่เคยถึงระดับ จึงออกที่ SL กันหน้าทุน" },
+    failed: { name: "Failed nest", th: "Nest ล้ม → โดน SL", lesson: "ขาดทุนตามแผน คือค่าตั๋วของระบบ ไม่ใช่ความผิดพลาด" },
+    shakeout: { name: "Shakeout", th: "โดน SL แล้ววิ่งทิ้ง", lesson: "เจ็บแต่ถูกระบบ: SL ทำหน้าที่ของมัน · ถ้าเกิด (ii) ใหม่ ≥ 61.8% + ไกปืน ค่อยเข้าใหม่" },
+    gap: { name: "Gap through SL", th: "Gap ทะลุ SL", lesson: "Gap ทำให้เสียเกิน 1R ได้ — ต้องคุมขนาดไม้ ไม่ใช่แค่วาง SL" },
+    nonest: { name: "No nest (V-shape)", th: "ไม่มี nest → ไม่เทรด", lesson: "พลาดไม้ที่ไม่ใช่ทรงของเรา = ระบบทำงานถูก" },
+    fakeout: { name: "Fake breakout", th: "ทะลุหลอกแบบ B-wave", lesson: "ทะลุยอดโดยไม่มี nest แล้วร่วง — no nest = no trade ช่วยไว้" },
+    deep2: { name: "Wave 2 > 100%", th: "Wave 2 ลึกเกิน → นับผิด", lesson: "Wave 2 หลุดจุดเริ่ม Wave 1 = ทรงจบ" },
+  };
+  const TYPES = Object.keys(TEMPLATES);
+
+  function build(blocks, rng) {
+    const A = []; let t = 0; const metas = [];
+    const push = (dt, p, sg) => { t += Math.max(1, Math.round(dt)); A.push([t, p, sg]); return t; };
+    const last = () => A[A.length - 1][1];
+    blocks.forEach((type, bi) => {
+      const vm = rng.r(1.25, 1.6); const P = (dt, p, sg) => push(dt, p, sg * vm);
+      const meta = { type, bi };
+      let B, L;
+      // ----- prefix: decline & base (resets MAs) -----
+      if (type === "basehead") {
+        B = bi === 0 ? 100 : last() * rng.r(0.62, 0.78);
+        if (bi === 0) { A.push([0, B * rng.r(1.45, 1.6), 0.012]); P(rng.r(70, 80), B * rng.r(0.6, 0.64), 0.013); }
+        else { P(rng.r(40, 55), last() * rng.r(0.78, 0.86), 0.013); P(rng.r(10, 16), last() * rng.r(1.06, 1.1), 0.012); P(rng.r(35, 50), B * rng.r(0.6, 0.64), 0.013); }
+        const H0 = B * rng.r(0.98, 1.02); P(rng.r(40, 48), H0, 0.012); meta.H0 = H0; meta.tHead = t;
+        P(rng.r(38, 45), B * rng.r(0.7, 0.74), 0.012); P(rng.r(35, 42), B * rng.r(0.73, 0.77), 0.009);
+        L = B * 0.75; meta.tBase0 = t;
+      } else {
+        B = bi === 0 ? 100 : last() * rng.r(0.55, 0.72);
+        if (bi === 0) { A.push([0, B * rng.r(1.7, 2.1), 0.012]); P(rng.r(95, 110), B * rng.r(1.3, 1.45), 0.013); P(rng.r(85, 95), B * rng.r(0.97, 1.0), 0.012); }
+        else { P(rng.r(40, 60), last() * rng.r(0.76, 0.86), 0.013); P(rng.r(10, 18), last() * rng.r(1.05, 1.1), 0.012); P(rng.r(40, 60), B, 0.013); }
+        P(rng.r(28, 42), B * rng.r(1.0, 1.03), 0.009); meta.tBase0 = t; L = B;
+      }
+      // ----- wave 1 -----
+      const m1 = type === "basehead" ? rng.r(2.0, 2.25) : rng.r(1.4, 1.85);
+      const W1H = L * m1;
+      if (rng.u() < 0.55) { P(rng.r(24, 32), L + (W1H - L) * rng.r(0.5, 0.62), 0.012); P(rng.r(6, 10), L + (W1H - L) * rng.r(0.36, 0.45), 0.012); P(rng.r(22, 30), W1H, 0.012); }
+      else { P(rng.r(16, 22), L + (W1H - L) * rng.r(0.35, 0.42), 0.012); P(rng.r(5, 8), L + (W1H - L) * rng.r(0.25, 0.3), 0.011); P(rng.r(14, 20), L + (W1H - L) * rng.r(0.7, 0.78), 0.012); P(rng.r(5, 8), L + (W1H - L) * rng.r(0.6, 0.66), 0.011); P(rng.r(12, 18), W1H, 0.012); }
+      Object.assign(meta, { W1H, W1L: L, tTop: t });
+      if (type === "deep2") {
+        P(rng.r(22, 30), W1H * rng.r(0.93, 0.97), 0.009);
+        const W2 = L * rng.r(0.84, 0.9);
+        P(rng.r(35, 50), L + (W1H - L) * rng.r(0.25, 0.35), 0.014); P(rng.r(12, 18), W1H * rng.r(0.78, 0.84), 0.013);
+        P(rng.r(25, 35), W2, 0.014); P(rng.r(20, 30), W2 * rng.r(1.25, 1.35), 0.013); P(rng.r(15, 25), W2 * rng.r(1.05, 1.12), 0.012);
+        P(rng.r(25, 35), W2 * rng.r(1.35, 1.5), 0.013); P(rng.r(25, 35), W2 * rng.r(1.15, 1.25), 0.012);
+        meta.W2 = W2; meta.tEnd = t; metas.push(meta); return;
+      }
+      // ----- hold & wave 2 -----
+      const hk = rng.u();
+      if (hk < 0.5) { P(rng.r(22, 32), W1H * rng.r(0.93, 0.97), 0.009); P(rng.r(6, 10), W1H * rng.r(0.965, 0.99), 0.008); }
+      else if (hk < 0.85) { P(rng.r(8, 12), W1H * rng.r(0.9, 0.93), 0.01); P(rng.r(8, 12), W1H * rng.r(0.965, 0.99), 0.009); }
+      const depth = type === "ondo" ? rng.r(0.4, 0.52) : type === "fakeout" ? rng.r(0.45, 0.6) : type === "basehead" ? null : rng.r(0.66, 0.84);
+      const W2 = type === "basehead" ? meta.H0 * rng.r(1.03, 1.08) : W1H - (W1H - L) * depth;
+      if (rng.u() < 0.6) P(rng.r(13, 18), W2, 0.015);
+      else { P(rng.r(9, 13), W1H - (W1H - W2) * rng.r(0.55, 0.65), 0.013); P(rng.r(4, 6), W1H - (W1H - W2) * rng.r(0.4, 0.48), 0.011); P(rng.r(9, 13), W2, 0.014); }
+      meta.W2 = W2; meta.tW2 = t;
+      const TP1 = W2 + 1.618 * (W1H - L), TP2 = W2 + 2.618 * (W1H - L), TP3 = W2 + 4.236 * (W1H - L);
+      Object.assign(meta, { TP1, TP2, TP3 });
+      if (type === "nonest" || type === "fakeout") {
+        P(rng.r(14, 22), W1H * rng.r(0.9, 0.93), 0.012); P(rng.r(3, 5), W1H * rng.r(0.885, 0.9), 0.009);
+        if (type === "fakeout") {
+          P(rng.r(10, 14), W1H * rng.r(1.04, 1.07), 0.012); P(rng.r(6, 9), W1H * rng.r(1.0, 1.02), 0.011); P(rng.r(5, 8), W1H * rng.r(1.05, 1.08), 0.011);
+          P(rng.r(22, 30), W2 * rng.r(0.98, 1.03), 0.016); P(rng.r(10, 14), W2 * 1.1, 0.014); P(rng.r(20, 28), L * rng.r(0.85, 0.92), 0.016); P(rng.r(20, 30), L * rng.r(0.95, 1.02), 0.013);
+        } else { P(rng.r(10, 14), W1H * rng.r(1.06, 1.1), 0.012); runTo(TP1 * rng.r(1.15, 1.35), rng.i(2, 3)); topAndDecline(); }
+        meta.tEnd = t; metas.push(meta); return;
+      }
+      // ----- nest -----
+      const Ni = W1H * (type === "ondo" ? rng.r(0.9, 0.96) : rng.r(0.84, 0.95));
+      P(rng.r(14, 24), Ni, 0.013);
+      const ii = W2 + (Ni - W2) * rng.r(0.08, 0.3);
+      if (rng.u() < 0.6) { P(rng.r(5, 8), W2 + (Ni - W2) * rng.r(0.55, 0.65), 0.011); P(rng.r(4, 7), W2 + (Ni - W2) * rng.r(0.68, 0.78), 0.01); }
+      P(rng.r(12, 18), ii, 0.012);
+      const nb = type === "ondo" ? rng.i(0, 1) : rng.i(1, 3);
+      for (let k = 0; k < nb; k++) { P(rng.r(5, 8), ii * rng.r(1.05, 1.08), 0.01); P(rng.r(4, 7), ii * rng.r(1.01, 1.03), 0.009); }
+      meta.ii = ii;
+      P(rng.r(8, 12), ii + (W1H - ii) * rng.r(0.4, 0.5), 0.011); P(rng.r(3, 5), ii + (W1H - ii) * rng.r(0.32, 0.38), 0.009);
+      meta.tNestEnd = t;
+      const w1s = Ni - W2; const sTP = [ii + 1.618 * w1s, ii + 2.618 * w1s, ii + 4.236 * w1s]; meta.sTP = sTP;
+      if (type === "failed") {
+        P(rng.r(10, 16), W1H * rng.r(0.88, 0.94), 0.011); P(rng.r(6, 9), W1H * rng.r(0.82, 0.86), 0.012); P(rng.r(6, 10), W1H * rng.r(0.86, 0.9), 0.011);
+        P(rng.r(14, 22), ii * rng.r(0.88, 0.93), 0.015); P(rng.r(20, 28), W2 * rng.r(0.88, 0.96), 0.014); P(rng.r(25, 35), W2 * rng.r(1.02, 1.1), 0.013); P(rng.r(20, 30), W2 * rng.r(0.95, 1.0), 0.012);
+        meta.tEnd = t; metas.push(meta); return;
+      }
+      if (type === "shakeout") {
+        P(rng.r(7, 11), W1H * rng.r(0.85, 0.89), 0.01); P(rng.r(10, 14), ii * rng.r(0.94, 0.96), 0.014); P(rng.r(3, 5), ii * rng.r(0.92, 0.945), 0.012);
+        P(rng.r(10, 14), W1H * rng.r(0.95, 0.98), 0.014); P(rng.r(5, 7), W1H * rng.r(0.92, 0.94), 0.01); P(rng.r(6, 9), W1H * rng.r(1.06, 1.1), 0.012);
+        runTo(TP1 * rng.r(1.1, 1.3), rng.i(2, 3)); topAndDecline(); meta.tEnd = t; metas.push(meta); return;
+      }
+      if (type === "gap") {
+        P(rng.r(6, 9), ii + (W1H - ii) * rng.r(0.48, 0.55), 0.01); P(rng.r(4, 6), ii + (W1H - ii) * rng.r(0.4, 0.45), 0.009);
+        P(1, ii * rng.r(0.85, 0.89), 0.004); meta.tGap = t;
+        P(rng.r(8, 12), ii * rng.r(0.9, 0.95), 0.013); P(rng.r(20, 28), W2 * rng.r(0.9, 0.97), 0.014); P(rng.r(25, 35), W2 * rng.r(1.0, 1.08), 0.013);
+        meta.tEnd = t; metas.push(meta); return;
+      }
+      if (type === "double") {
+        P(rng.r(10, 14), W1H * rng.r(0.9, 0.95), 0.01); P(rng.r(5, 7), W1H * rng.r(0.88, 0.9), 0.009); P(rng.r(5, 7), W1H * rng.r(0.91, 0.93), 0.008);
+        const ii2 = ii + (W1H - ii) * rng.r(0.47, 0.55); P(rng.r(12, 16), ii2, 0.009); meta.ii2 = ii2;
+        P(rng.r(6, 8), ii2 * 1.06, 0.009); P(rng.r(5, 7), ii2 * 1.03, 0.008); meta.tNest2 = t;
+      }
+      // ----- VCP or direct breakout -----
+      if (rng.u() < 0.8) {
+        meta.tVcp0 = t; const nC = rng.i(2, 4); let d = rng.r(0.1, 0.14);
+        for (let k = 0; k < nC; k++) { const hh = W1H * rng.r(0.95, 0.98); P(rng.r(6, 10), hh, 0.009 - k * 0.0012); P(rng.r(4, 8), hh * (1 - d), 0.008 - k * 0.0012); d *= rng.r(0.45, 0.6); }
+        meta.tVcp1 = t; P(rng.r(3, 5), W1H * rng.r(1.04, 1.07), 0.009);
+      } else P(rng.r(10, 16), W1H * rng.r(1.05, 1.08), 0.011);
+      meta.tBrk = t;
+      if (type === "stall") {
+        const top = Math.max(sTP[0] * rng.r(1.05, 1.09), W1H * 1.12); const cap = sTP[1] * 0.9;
+        runTo(Math.min(top, cap), 2);
+        P(rng.r(8, 12), last() * rng.r(0.93, 0.96), 0.01); P(rng.r(6, 10), Math.min(last() * rng.r(1.04, 1.07), cap), 0.01);
+        P(rng.r(16, 24), last() * rng.r(0.8, 0.86), 0.014); P(rng.r(20, 28), last() * rng.r(0.9, 0.97), 0.013);
+      } else if (type === "extended" || type === "climax") {
+        runTo(Math.max(sTP[2], W1H * 1.3) * rng.r(1.06, 1.14), rng.i(3, 4));
+        if (type === "climax") { const T3 = last(); P(rng.r(8, 12), T3 * rng.r(1.2, 1.32), 0.022); P(rng.r(6, 9), T3 * rng.r(0.95, 1.02), 0.03); P(rng.r(6, 10), T3 * rng.r(1.06, 1.14), 0.024); P(rng.r(14, 20), T3 * rng.r(0.8, 0.88), 0.024); }
+        else topAndDecline();
+      } else {
+        const a = Math.max(sTP[1] * 1.06, W1H * 1.15), b = Math.max(sTP[2] * 1.12, a * 1.1);
+        runTo(Math.exp(Math.log(a) + (Math.log(b) - Math.log(a)) * rng.u()), rng.i(2, 4));
+        topAndDecline();
+      }
+      meta.tEnd = t; metas.push(meta);
+
+      function runTo(top, legs) {
+        const start = last();
+        for (let j = 1; j <= legs; j++) {
+          const tg = Math.exp(Math.log(start) + (Math.log(top) - Math.log(start)) * (j / legs)) * (j < legs ? rng.r(0.99, 1.02) : 1);
+          P(rng.r(14, 24) * (1 + Math.log(top / start) * 0.4), tg, 0.011);
+          if (j < legs) P(rng.r(5, 9), tg * rng.r(0.91, 0.96), 0.011);
+        }
+      }
+      function topAndDecline() {
+        const top = last(), k = rng.u();
+        if (k < 0.4) { P(rng.r(6, 10), top * rng.r(0.95, 0.97), 0.011); P(rng.r(5, 8), top * rng.r(0.99, 1.02), 0.011); }
+        else if (k < 0.7) { P(rng.r(8, 12), top * rng.r(0.93, 0.96), 0.011); P(rng.r(8, 12), top * rng.r(0.97, 1.0), 0.01); }
+        P(rng.r(18, 28), top * rng.r(0.78, 0.86), 0.013); P(rng.r(10, 16), top * rng.r(0.84, 0.9), 0.012);
+      }
+    });
+    return { A, metas };
+  }
+
+  function validate(m, metas) {
+    const { h, l } = m;
+    const mx = (a, b) => Math.max(...h.slice(a, b)), mn = (a, b) => Math.min(...l.slice(a, b));
+    for (const meta of metas) {
+      const tp = meta.type, topI = meta.tTop;
+      const w1h = mx(topI - 12, topI + 1);
+      if (mx(meta.tBase0, topI - 12) > w1h * 0.985) return false;
+      if (tp === "deep2") continue;
+      const w2i = meta.tW2;
+      if (mx(topI + 1, w2i) > w1h) return false;
+      const w2 = mn(w2i - 3, w2i + 4);
+      if (tp === "nonest" || tp === "fakeout") { if (mn(w2i + 4, w2i + 30) <= w2) return false; continue; }
+      const ne = meta.tNestEnd;
+      if (mx(w2i, ne) > w1h * 0.975) return false;
+      if (mn(w2i + 5, ne + 8) <= w2 * 1.01) return false;
+      if (tp === "basehead" && (w2 < meta.H0 * 0.97 || w2 > meta.H0 * 1.12)) return false;
+      if (tp === "failed" || tp === "shakeout" || tp === "gap") continue;
+      if (tp === "double") { if (mx(ne, meta.tNest2) > w1h * 0.975) return false; if (mn(ne, meta.tNest2 + 4) < meta.ii * 1.03) return false; }
+      if (mx(meta.tNest2 || ne, meta.tBrk - 4) > w1h * 0.995) return false;
+      if (tp === "ondo") { for (let i = topI; i <= ne; i++) if (m.m50 && m.m50[i] < m.m200[i] * 1.01) return false; }
+    }
+    return true;
+  }
+
+  function genMarket(blocks, seed) {
+    for (let attempt = 0; attempt < 60; attempt++) {
+      const rng = makeRng(seed * 7919 + attempt * 104729 + 17);
+      const { A, metas } = build(blocks, rng);
+      const c = bridge(A, rng); const N = c.length;
+      const sig = new Array(N).fill(0.01);
+      for (let k = 1; k < A.length; k++) for (let i = A[k - 1][0]; i <= A[k][0]; i++) sig[i] = A[k][2];
+      const { o, h, l } = ohlcFrom(c, rng, sig);
+      metas.forEach(mt => { if (mt.tGap) { const g = mt.tGap; o[g] = c[g] * 1.012; h[g] = Math.max(o[g], c[g]) * 1.006; l[g] = Math.min(o[g], c[g]) * 0.992; } });
+      const seg = new Array(N).fill(1);
+      metas.forEach(mt => {
+        for (let i = mt.tBase0; i < mt.tTop; i++) seg[i] = 1.25;
+        if (mt.tNestEnd) for (let i = mt.tW2 + 18; i < (mt.tNest2 || mt.tNestEnd); i++) seg[i] = 0.75;
+        if (mt.tVcp0) for (let i = mt.tVcp0; i < mt.tVcp1; i++) seg[i] = 0.9 - 0.5 * (i - mt.tVcp0) / (mt.tVcp1 - mt.tVcp0);
+        if (mt.tBrk) for (let i = mt.tBrk - 3; i < Math.min(N, mt.tBrk + 40); i++) seg[i] = Math.max(seg[i], 1.3);
+        if (mt.tGap) seg[mt.tGap] = 3.2;
+      });
+      const v = []; for (let i = 0; i < N; i++) { const ret = i ? Math.abs(Math.log(c[i] / c[i - 1])) : 0; v.push(Math.max(0.25, 1 + 0.25 * rng.n() + ret * 18) * seg[i]); }
+      const m = { o, h, l, c, v, N, blocks, seed, metas, rngPP: rng.u() };
+      indicators(m);
+      if (!validate(m, metas)) continue;
+      m.attempt = attempt; return m;
+    }
+    return null;
+  }
+
+  const EXPECT = {
+    textbook: (t) => t.includes("TP2_TRIG") && !t.includes("NEST_BROKEN"),
+    ondo: (t, ev) => { const b = ev.find(e => e.type === "BUY"); return !!b && t.includes("TP1_TRIG") && !ev.some(e => e.type === "DIP" && e.i < b.i); },
+    basehead: (t) => t.includes("TP2_TRIG") && t.includes("HEAD_SUPPORT") && !t.includes("NEST_BROKEN"),
+    double: (t) => t.includes("TP1_TRIG") && !t.includes("NEST_BROKEN"),
+    extended: (t) => t.includes("TP3_TRIG") && !t.includes("NEST_BROKEN"),
+    climax: (t) => t.includes("TP3_TRIG") && !t.includes("NEST_BROKEN"),
+    stall: (t) => t.includes("TP1_TRIG") && !t.includes("TP2_TRIG"),
+    failed: (t) => t.includes("BUY") && t.includes("STOP") && !t.includes("TP1_TRIG"),
+    shakeout: (t) => t.includes("BUY") && t.includes("STOP") && t.includes("RUN_WITHOUT_YOU"),
+    gap: (t) => t.includes("GAP_STOP"),
+    nonest: (t) => t.includes("NONEST_BREAKOUT") && !t.includes("BUY") && !t.includes("NEST_I"),
+    fakeout: (t) => t.includes("NONEST_BREAKOUT") && t.includes("SAVED") && !t.includes("BUY"),
+    deep2: (t) => t.includes("INVALID") && !t.includes("BUY"),
+  };
+
+  // spec: first block type (or "random"); extra blocks are random continuations
+  function genScenario(first, seed, nBlocks) {
+    const rng0 = makeRng(seed * 31 + 7);
+    const pickT = () => TYPES[Math.floor(rng0.u() * TYPES.length)];
+    const f = first === "random" ? pickT() : first;
+    nBlocks = nBlocks || (2 + (rng0.u() < 0.45 ? 1 : 0));
+    const blocks = [f]; for (let k = 1; k < nBlocks; k++) { let tpe = pickT(); if (tpe === "basehead" && rng0.u() < 0.5) tpe = pickT(); blocks.push(tpe); }
+    for (let k = 0; k < 30; k++) {
+      const s = seed + k * 1000003;
+      const m = genMarket(blocks, s); if (!m) continue;
+      let r = runEngine(m);
+      const ev1 = r.ev.filter(e => e.cyc === 1), t1 = ev1.map(e => e.type);
+      if (!EXPECT[f](t1, ev1, m)) continue;
+      // director: pocket-pivot volume on most trigger bars
+      const prng = makeRng(s + 99);
+      r.ev.filter(e => e.type === "BUY").forEach(b => {
+        if (prng.u() < 0.6) for (let j = b.i; j >= b.i - 2; j--) {
+          const ext = (m.c[j] / m.m10[j] - 1) * 100;
+          if (m.c[j] > m.c[j - 1] && m.c[j] > m.m10[j] && ext <= 5) { m.v[j] = Math.max(m.v[j], 2.3 * m.vma[j], 1.2 * Math.max(...m.v.slice(j - 10, j))); break; }
+        }
+      });
+      indicators(m); r = runEngine(m);
+      const e2 = r.ev.filter(e => e.cyc === 1);
+      if (!EXPECT[f](e2.map(e => e.type), e2, m)) continue;
+      m.run = r; m.seedUsed = s; m.tpl = f; return m;
+    }
+    const m = genMarket([f], seed) || genMarket(["textbook"], seed); m.run = runEngine(m); m.tpl = f; return m;
+  }
+
+  // ---------- rule engine ----------
+  const STAGES = [
+    { k: "gc", n: "1", t: "Golden cross = Wave 1", th: "MA50 ตัดขึ้น MA200 = Wave 1" },
+    { k: "curl", n: "2", t: "MA50 curls down = Wave 2", th: "MA50 ม้วนลง = Wave 2" },
+    { k: "nest_i", n: "3", t: "Nest (i) fails under Wave-1 high", th: "เด้งไม่ผ่านยอด Wave 1" },
+    { k: "buy", n: "4", t: "(ii) ≥ 61.8% · histogram ↑ + MACD > 0", th: "(ii) ย่อ ≥ 61.8% ของขา (i) · histogram พลิกบวก + MACD > 0 · SL ≥ 2 ATR → BUY (PP = เต็ม · ไม่มี = ครึ่ง)" },
+    { k: "scale", n: "5", t: "Scale-in: Stoch RSI ↑20 + MACD > 0", th: "ไม้ครึ่ง → เติมให้เต็มเมื่อ Stoch RSI ตัดขึ้น 20" },
+    { k: "vcp", n: "6", t: "VCP pivot breakout → ADD ½", th: "เบรกกรอบ VCP พร้อม volume → เติม ½" },
+    { k: "tp1", n: "7", t: "TP1 161.8% → trail 1/3 · rest SL → cost", th: "ผ่าน 161.8% ของ 1-2 เล็ก → 1/3 แรก trailing 2.5 ATR · ไม้ที่เหลือ SL กันหน้าทุน" },
+    { k: "tp2", n: "8", t: "TP2 261.8% → trail 1/3 @ 2.5 ATR", th: "ผ่าน 261.8% → 1/3 ที่สอง trailing" },
+    { k: "tp3", n: "9", t: "TP3 423.6% → trail last 1/3", th: "ผ่าน 423.6% → ไม้สุดท้าย trailing" },
+  ];
+  const LV = [1.618, 2.618, 4.236];
+
+  function runEngine(m) {
+    const { o, h, l, c, v, m50, m200, macd, hist, atr, vma, pp, stK } = m, N = c.length;
+    const ev = [], snap = new Array(N);
+    let S;
+    const E = (i, type, extra) => { const e = Object.assign({ i, type, cyc: S.cycle }, extra || {}); ev.push(e); return e; };
+    const fresh = (cycle, cum) => ({ stage: {}, st: "WAIT_GC", cycle, cum, gc: -1, curl: -1, w1hI: -1, W1H: NaN, W1L: NaN, w1lI: -1, w2I: -1, W2: NaN,
+      zzDir: 0, zzExt: NaN, zzExtI: -1, iI: -1, I: NaN, iiI: -1, II: NaN, under: false, recrossed: false, pos: null, TP: [NaN, NaN, NaN], TPbig: [NaN, NaN, NaN],
+      noNest: false, invalid: false, head: NaN, headI: -1, watchRun: false, runFired: false, nnB: NaN, savedFired: false, lastTrap: -99, entries: 0, reentry: false, realized: 0,
+      fv: null });
+    S = fresh(1, 0);
+    const dn3 = (i) => m50[i] < m50[i - 3];
+    // generic swing tracker used for VCP detection
+    const swingStep = (T, i) => {
+      const thrV = 1.6 * atr[i];
+      if (T.zd === 1) { if (h[i] > T.zx) { T.zx = h[i]; T.zxi = i; } else if (T.zx - l[i] >= thrV) { T.sw.push({ t: "H", i: T.zxi, p: T.zx }); T.zd = -1; T.zx = l[i]; T.zxi = i; } }
+      else { if (l[i] < T.zx) { T.zx = l[i]; T.zxi = i; } else if (h[i] - T.zx >= thrV) { T.sw.push({ t: "L", i: T.zxi, p: T.zx }); T.zd = 1; T.zx = h[i]; T.zxi = i; } }
+      const pairs = []; for (let k = 0; k + 1 < T.sw.length; k++) if (T.sw[k].t === "H" && T.sw[k + 1].t === "L") pairs.push({ H: T.sw[k], L: T.sw[k + 1], d: (T.sw[k].p - T.sw[k + 1].p) / T.sw[k].p });
+      if (pairs.length >= 2) {
+        const a = pairs[pairs.length - 2], b = pairs[pairs.length - 1];
+        if (b.d < a.d * 0.85 && b.d <= 0.12 && b.L.p > a.L.p && Math.abs(b.H.p / a.H.p - 1) <= 0.06) T.vcp = { pivot: b.H.p, lo: b.L.p, i0: a.H.i, i1: b.L.i, depths: pairs.slice(-3).map(x => x.d) };
+      }
+      return T.vcp;
+    };
+    const newTracker = (i) => ({ sw: [], zd: 1, zx: h[i], zxi: i, vcp: null });
+    const histUpRecently = (i) => { if (!(hist[i] > 0)) return false; for (let j = i; j >= i - 15; j--) { if (hist[j] <= 0) return false; if (hist[j - 1] <= 0) return true; } return false; };
+    const fractalLow = (j, w) => { for (let q = j - w; q <= j + w; q++) if (q !== j && l[q] < l[j]) return false; return true; };
+
+    const openPos = (i, via, sl0, lo, loI) => {
+      const ppNow = pp[i] || pp[i - 1] || pp[i - 2];
+      const units = ppNow ? 1 : 0.5, rUnit = c[i] - sl0;
+      const w1s = S.I - S.W2; S.TP = LV.map(k => S.II + k * w1s); S.TPbig = LV.map(k => S.W2 + k * (S.W1H - S.W1L));
+      S.pos = { entryI: i, e1: c[i], units, lots: [{ q: units, p: c[i] }], sl: sl0, rUnit, pp: ppNow, scaled: units >= 1, vcpDone: false, lifted: false, liftPending: false,
+        tr: null, realized: 0, heat: false, T: newTracker(i), I: S.I, via };
+      S.entries++; S.stage.buy = i; S.st = "LONG";
+      E(i, "BUY", { price: c[i], units, pp: ppNow, sl: sl0, ii: lo, iiI: loI, I: S.I, TP: S.TP.slice(), TPbig: S.TPbig.slice(), W2: S.W2, via, reentry: S.entries > 1 });
+    };
+
+    for (let i = 200; i < N; i++) {
+      // ================= setup =================
+      if (S.st === "WAIT_GC") {
+        if (m50[i - 1] <= m200[i - 1] && m50[i] > m200[i]) { S.gc = i; S.st = "WAIT_CURL"; S.stage.gc = i; E(i, "GC"); }
+      } else if (S.st === "WAIT_CURL") {
+        if (dn3(i) && !dn3(i - 4) && c[i] < c[i - 5]) {
+          let k = Math.max(0, S.gc - 40), top = -1; for (let j = Math.max(0, S.gc - 40); j <= i; j++) if (h[j] > top) { top = h[j]; k = j; }
+          S.w1hI = k; S.W1H = top; let lo = 1e9; for (let j = Math.max(0, S.gc - 110); j <= k; j++) if (l[j] < lo) { lo = l[j]; S.w1lI = j; } S.W1L = lo;
+          S.curl = i; S.stage.curl = i; S.st = "WAVE2"; S.W2 = 1e9;
+          for (let j = k; j <= i; j++) if (l[j] < S.W2) { S.W2 = l[j]; S.w2I = j; }
+          S.zzDir = -1; S.zzExt = S.W2; S.zzExtI = S.w2I;
+          E(i, "CURL", { W1H: S.W1H, W1L: S.W1L, w1hI: k });
+        }
+      }
+      if (S.st === "WAVE2" || S.st === "NEST") {
+        const thr = 0.2 * (S.W1H - S.W1L);
+        if (S.iI < 0 && l[i] < S.W2) { S.W2 = l[i]; S.w2I = i; }
+        if (S.W2 < S.W1L) { S.invalid = true; S.st = "DEAD"; E(i, "INVALID", { W2: S.W2, W1L: S.W1L }); }
+        else {
+          if (S.zzDir === -1) {
+            if (l[i] < S.zzExt) { S.zzExt = l[i]; S.zzExtI = i; }
+            else if (h[i] - S.zzExt >= thr) { S.zzDir = 1; S.zzExt = h[i]; S.zzExtI = i; }
+          } else {
+            if (h[i] > S.zzExt) { S.zzExt = h[i]; S.zzExtI = i; }
+            else if (S.zzExt - l[i] >= thr * 0.8) {
+              const Hp = { i: S.zzExtI, p: S.zzExt }; S.zzDir = -1; S.zzExt = l[i]; S.zzExtI = i;
+              if (S.iI < 0 && Hp.p < S.W1H && Hp.i > S.w2I) {
+                S.iI = Hp.i; S.I = Hp.p; S.st = "NEST"; S.stage.nest_i = i; S.fv = null; E(i, "NEST_I", { at: Hp.i, price: Hp.p, re: S.entries > 0 });
+                if (S.entries === 0) {
+                  let pk = -1, pkI = -1;
+                  for (let j = S.w1lI - 8; j >= Math.max(21, S.w1lI - 160); j--) { let isPk = true; for (let q = j - 20; q <= Math.min(N - 1, j + 20); q++) if (h[q] > h[j]) { isPk = false; break; } if (isPk) { let lo2 = 1e9; for (let q = Math.max(0, j - 70); q < j; q++) lo2 = Math.min(lo2, l[q]); if (h[j] / lo2 >= 1.3) { pk = h[j]; pkI = j; } break; } }
+                  if (pk > 0 && S.W2 >= pk * 0.95 && S.W2 <= pk * 1.12 && pk < S.W1H * 0.85) { S.head = pk; S.headI = pkI; E(i, "HEAD_SUPPORT", { head: pk, at: pkI, W2: S.W2, w2I: S.w2I }); }
+                }
+              }
+            }
+          }
+          if (!S.under && m50[i] < m200[i]) { S.under = true; S.stage.dip = i; E(i, "DIP"); }
+          if (S.st === "WAVE2" && c[i] > S.W1H) {
+            if (S.entries > 0) { S.st = "DONE"; }
+            else { S.noNest = true; S.st = "NONEST"; S.nnB = c[i]; E(i, "NONEST_BREAKOUT", { price: c[i] }); }
+          }
+          const hup = hist[i] > 0 && hist[i - 1] <= 0;
+          if (S.st === "WAVE2" && hup && macd[i] > 0 && i - S.lastTrap > 20) { S.lastTrap = i; E(i, "TRAP_NO_NEST"); }
+          if (S.st === "NEST") {
+            let lo = 1e9, loI = -1; for (let j = S.iI; j <= i; j++) if (l[j] < lo) { lo = l[j]; loI = j; }
+            if (lo <= S.W2) { S.st = "WAVE2"; S.iI = -1; S.I = NaN; S.W2 = lo; S.w2I = loI; delete S.stage.nest_i; E(i, "NEST_BROKEN"); }
+            else {
+              const retr = (S.I - lo) / (S.I - S.W2), validII = retr >= 0.618;
+              if (!S.fv || S.fv.lo !== lo) S.fv = { lo, T: newTracker(loI) };
+              const fvcp = validII ? swingStep(S.fv.T, i) : null;
+              const sl0 = lo * 0.99, distOK = c[i] - sl0 >= 2 * atr[i];
+              let via = null;
+              if (validII && macd[i] > 0 && c[i] < S.W1H && distOK && S.entries < 2) {
+                if (histUpRecently(i)) via = "hist";
+                else if (pp[i]) via = "pp";
+                else if (fvcp && c[i] > fvcp.pivot && v[i] >= 1.3 * vma[i]) via = "vcp";
+              }
+              if (via) { S.iiI = loI; S.II = lo; openPos(i, via, sl0, lo, loI); }
+              else if (hup && macd[i] > 0 && !validII && i - S.lastTrap > 20) { S.lastTrap = i; E(i, "TRAP_SHALLOW", { retr, lo, I: S.I }); }
+            }
+          }
+        }
+      }
+      if (S.st === "NONEST" && !S.savedFired && c[i] < S.nnB * 0.8) { S.savedFired = true; E(i, "SAVED", { from: S.nnB, price: c[i] }); }
+      if (S.watchRun && !S.runFired && c[i] > S.W1H) { S.runFired = true; E(i, "RUN_WITHOUT_YOU", { price: c[i] }); }
+      if (S.under && !S.recrossed && S.stage.buy && m50[i - 1] <= m200[i - 1] && m50[i] > m200[i]) { S.recrossed = true; E(i, "RECROSS"); }
+      // ================= position =================
+      if (S.st === "LONG" && S.pos && i > S.pos.entryI) {
+        const P = S.pos;
+        const qty = () => P.lots.reduce((s, x) => s + x.q, 0);
+        const avg = () => P.lots.reduce((s, x) => s + x.q * x.p, 0) / Math.max(1e-12, qty());
+        const sell = (q, px) => { const a = avg(), tot = qty(); P.realized += q * (px - a) / P.rUnit; const f = 1 - q / tot; P.lots = P.lots.map(x => ({ q: x.q * f, p: x.p })); };
+        if (l[i] <= P.sl) {
+          const px = Math.min(o[i], P.sl), q = qty(); sell(q, px); P.lots = [];
+          const gapped = o[i] < P.sl * 0.985 && !P.tr;
+          const typ = gapped ? "GAP_STOP" : (P.realized > 0.05 ? "STOP_PROFIT" : "STOP");
+          E(i, typ, { price: px, R: P.realized, sl: P.sl, q });
+          S.realized += P.realized;
+          if (typ !== "STOP_PROFIT") {
+            S.watchRun = true;
+            if (S.entries < 2) { S.st = "WAVE2"; S.iI = -1; S.I = NaN; S.zzDir = -1; S.zzExt = l[i]; S.zzExtI = i; S.fv = null; delete S.stage.buy; delete S.stage.nest_i; S.pos = null; }
+            else { S.st = "DONE"; }
+          } else S.st = "DONE";
+        } else {
+          // scale-in (half -> full)
+          if (!P.scaled && !P.tr && macd[i] > 0 && stK[i - 1] <= 20 && stK[i] > 20) { P.lots.push({ q: 0.5, p: c[i] }); P.scaled = true; S.stage.scale = i; E(i, "SCALE_IN", { price: c[i], k: stK[i], macd: macd[i] }); }
+          // VCP add (+ one-time SL lift if not lifted yet)
+          if (!P.tr) {
+            const vcp = swingStep(P.T, i); P.vcp = vcp;
+            if (!P.vcpDone && vcp && vcp.i1 > P.entryI && c[i] > vcp.pivot && v[i] >= 1.3 * vma[i]) {
+              P.lots.push({ q: 0.5, p: c[i] }); P.vcpDone = true; S.stage.vcp = i;
+              let lifted = false; if (!P.lifted && vcp.lo * 0.99 > P.sl) { P.sl = vcp.lo * 0.99; P.lifted = true; lifted = true; }
+              E(i, "VCP_ADD", { price: c[i], pivot: vcp.pivot, lo: vcp.lo, i0: vcp.i0, i1: vcp.i1, depths: vcp.depths, sl: P.sl, vr: v[i] / vma[i], lifted });
+              if (lifted) E(i, "SL_LIFT", { sl: P.sl, pivot: vcp.lo, why: "vcp", at: vcp.i1 });
+            }
+            // one-time lift after close above (i): to the latest pivot low before the break
+            if (!P.lifted && !P.liftPending && c[i] > P.I) P.liftPending = true;
+            if (!P.lifted && P.liftPending) {
+              for (let j = i - 3; j > P.entryI; j--) { if (fractalLow(j, 3)) { if (l[j] * 0.99 > P.sl) { P.sl = l[j] * 0.99; P.lifted = true; E(i, "SL_LIFT", { sl: P.sl, pivot: l[j], why: "i", at: j }); } else { P.lifted = true; E(i, "SL_LIFT", { sl: P.sl, pivot: l[j], why: "i", at: j, noop: true }); } break; } }
+            }
+          }
+          // TP triggers: arm per-1/3 trailing; at TP1 the rest go to break-even
+          for (let k = 0; k < 3; k++) {
+            if (h[i] >= S.TP[k] && !(P.tr && P.tr[k].armed)) {
+              if (!P.tr) { const q3 = qty() / 3; P.tr = [0, 1, 2].map(() => ({ q: q3, armed: false, open: true, trail: NaN, hh: NaN })); }
+              const T = P.tr[k]; if (T.open) {
+                T.armed = true; T.hh = h[i]; T.trail = h[i] - 2.5 * atr[i]; S.stage["tp" + (k + 1)] = i;
+                E(i, "TP" + (k + 1) + "_TRIG", { level: S.TP[k], trail: T.trail, atr: atr[i] });
+                if (k === 0) { const be = avg() * 1.002; if (be > P.sl) { P.sl = be; E(i, "SL_BE", { sl: P.sl }); } }
+              }
+            }
+          }
+          if (P.tr) for (let k = 0; k < 3; k++) {
+            const T = P.tr[k]; if (!T.armed || !T.open) continue;
+            T.hh = Math.max(T.hh, h[i]); T.trail = Math.max(T.trail, T.hh - 2.5 * atr[i]);
+            if (c[i] < T.trail) { const q = Math.min(T.q, qty()); sell(q, c[i]); T.open = false; E(i, "TP" + (k + 1) + "_EXIT", { price: c[i], R: P.realized, q, left: P.tr.filter(x => x.open).length }); }
+          }
+          if (qty() < 1e-9) { S.realized += P.realized; S.st = "DONE"; E(i, "FLAT", { R: P.realized }); }
+          else {
+            if (pp[i] && !P.tr) E(i, "PP_DAY", { price: c[i], sl: P.sl });
+            if (!P.heat) { const oR = P.lots.reduce((s, x) => s + x.q * (c[i] - x.p), 0) / P.rUnit; if (oR <= -0.5 * P.units) { P.heat = true; E(i, "HEAT", { R: oR, sl: P.sl }); } }
+          }
+        }
+      }
+      // ================= new cycle =================
+      if ((S.st === "DONE" || S.st === "DEAD" || S.st === "NONEST") && m50[i] < m200[i] && i > S.curl + 20) {
+        const cum = S.cum + S.realized; S = fresh(S.cycle + 1, cum); E(i, "CYCLE_RESET", { cycle: S.cycle });
+      }
+      // ================= snapshot =================
+      const P = S.pos, live = P && S.st === "LONG";
+      const q = live ? P.lots.reduce((s, x) => s + x.q, 0) : 0;
+      const openR = live ? P.lots.reduce((s, x) => s + x.q * (c[i] - x.p), 0) / P.rUnit : 0;
+      const posR = live ? P.realized : 0;
+      snap[i] = { st: S.st, cycle: S.cycle, stage: Object.assign({}, S.stage), W1H: S.W1H, W1L: S.W1L, W2: S.W2, w1hI: S.w1hI, w2I: S.w2I, iI: S.iI, I: S.I, iiI: S.iiI, II: S.II,
+        TP: S.TP.slice(), TPbig: S.TPbig.slice(), sl: live ? P.sl : NaN, qty: q, avg: live && q ? P.lots.reduce((s, x) => s + x.q * x.p, 0) / q : NaN,
+        tr: live && P.tr ? P.tr.map(T => ({ armed: T.armed, open: T.open, trail: T.trail })) : null, vcp: live && P.vcp ? Object.assign({}, P.vcp) : null,
+        lifted: live ? P.lifted : false, openR, realR: S.realized + posR, cum: S.cum, totR: S.cum + S.realized + posR + openR,
+        noNest: S.noNest, invalid: S.invalid, head: S.head, headI: S.headI, entries: S.entries };
+    }
+    return { ev, snap };
+  }
+
+  function fromOHLC(rows) {
+    const m = { o: [], h: [], l: [], c: [], v: [], time: [], tpl: "csv", seed: 0 };
+    rows.forEach(r => { m.o.push(r.o); m.h.push(r.h); m.l.push(r.l); m.c.push(r.c); m.v.push(r.v > 0 ? r.v : 1); m.time.push(r.t); });
+    m.N = m.c.length; indicators(m); m.run = runEngine(m); return m;
+  }
+
+  const API = { makeRng, genMarket, genScenario, runEngine, fromOHLC, indicators, TEMPLATES, TYPES, STAGES, sma, ema };
+  if (typeof module !== "undefined" && module.exports) module.exports = API; else root.NEST = API;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const fmt = (x, d = 2) => (x === undefined || x === null || !isFinite(x)) ? "—" : x.toFixed(d);
+const sgn = (x, d = 2) => (!isFinite(x) ? "—" : (x >= 0 ? "+" : "") + x.toFixed(d));
+const now = () => performance.now();
+let _FF = null; const FF = () => _FF || (_FF = getComputedStyle(document.body).fontFamily || "sans-serif");
+
+// ---------- theme & palette ----------
+let PAL = {};
+function readPal() {
+  const cs = getComputedStyle(document.documentElement);
+  const g = (k) => cs.getPropertyValue(k).trim();
+  PAL = { bg: g("--bg"), bg2: g("--bg2"), line: g("--line"), line2: g("--line2"), txt: g("--txt"), mut: g("--mut"), dim: g("--dim"), grid: g("--grid"),
+    gold: g("--gold"), buy: g("--buy"), add: g("--add"), tgt: g("--tgt"), stop: g("--stop"), ma50: g("--ma50"), ma200: g("--ma200"), dip: g("--dip"), vdu: g("--vdu"), up: g("--up"), dn: g("--dn"),
+    light: document.documentElement.dataset.theme === "light" };
+}
+function hexA(hex, a) {
+  if (!hex) return `rgba(128,128,128,${a})`;
+  if (hex.startsWith("rgb")) return hex.replace(/rgba?\(([^)]+)\)/, (m, inner) => { const p = inner.split(",").slice(0, 3).join(","); return `rgba(${p},${a})`; });
+  let h = hex.replace("#", ""); if (h.length === 3) h = h.split("").map(x => x + x).join("");
+  const n = parseInt(h, 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+if (window.cowork) document.documentElement.dataset.theme = "light";
+try { const t = localStorage.getItem("nest-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+readPal();
+$("#themeBtn").onclick = () => {
+  const r = document.documentElement; r.dataset.theme = r.dataset.theme === "light" ? "dark" : "light";
+  try { localStorage.setItem("nest-theme", r.dataset.theme); } catch (e) {}
+  readPal(); Replay.dirty = true; Lab.redraw(); Grader.render(true);
+};
+
+// ---------- canvas helper ----------
+function fitCanvas(cv) {
+  const r = cv.getBoundingClientRect(); const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, W: r.width, H: r.height, dpr };
+}
+
+// ---------- sound (WebAudio, default muted) ----------
+const Sound = { on: false, ac: null,
+  tone(freqs, dur = 0.18, type = "sine", vol = 0.06) {
+    if (!this.on) return;
+    try {
+      this.ac = this.ac || new (window.AudioContext || window.webkitAudioContext)();
+      const t0 = this.ac.currentTime;
+      freqs.forEach((f, k) => {
+        const o = this.ac.createOscillator(), g = this.ac.createGain();
+        o.type = type; o.frequency.value = f; o.connect(g); g.connect(this.ac.destination);
+        const st = t0 + k * 0.07; g.gain.setValueAtTime(0, st); g.gain.linearRampToValueAtTime(vol, st + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+        o.start(st); o.stop(st + dur + 0.05);
+      });
+    } catch (e) {}
+  } };
+$("#soundBtn").onclick = () => { Sound.on = !Sound.on; $("#soundBtn").textContent = Sound.on ? "🔊" : "🔇"; $("#soundBtn").classList.toggle("on", Sound.on); if (Sound.on) Sound.tone([660, 880], 0.15); };
+
+// ---------- event catalogue ----------
+const EVM = {
+  GC:        { n: "1", c: "gold", t: "GOLDEN CROSS = WAVE 1", th: () => "MA50 ตัดขึ้น MA200 — Wave 1 เริ่มแล้ว", toast: true, snd: [523] },
+  CURL:      { n: "2", c: "gold", t: "MA50 CURLS DOWN = WAVE 2", th: (e) => `MA50 ม้วนลง — เข้า Wave 2 · ยอด Wave 1 = ${fmt(e.W1H)}`, toast: true, snd: [440] },
+  NEST_I:    { n: "3", c: "gold", t: "NEST (i) · FAILS UNDER WAVE-1 HIGH", th: (e) => `${e.re ? "(i) ใหม่หลังโดน SL · " : ""}เด้งไปแค่ ${fmt(e.price)} ไม่ผ่านยอด Wave 1 — รอ (ii) ย่อ ≥ 61.8%`, toast: true, snd: [587] },
+  HEAD_SUPPORT: { n: "⌂", c: "tgt", t: "WAVE 2 SITS ON THE OLD HEAD", th: (e) => `Wave 2 ยืนบนยอดของ 1-2 ชุดแรก (${fmt(e.head)}) — ทรงแบบ 868`, toast: true, snd: [494, 659] },
+  DIP:       { n: "↘", c: "dip", t: "MA50 DIPS UNDER MA200", th: () => "MA50 มุดใต้ MA200 (ข้อมูลประกอบ ไม่ใช่เงื่อนไข)", toast: false, quiet: true },
+  TRAP_NO_NEST: { n: "!", c: "mut", t: "SIGNAL · NO NEST YET", th: () => "histogram พลิกบวก + MACD > 0 แต่ยังไม่มี nest → รอ", toast: false },
+  TRAP_SHALLOW: { n: "!", c: "mut", t: "SIGNAL · (ii) TOO SHALLOW", th: (e) => `histogram พลิกบวก แต่ (ii) ย่อแค่ ${(e.retr * 100).toFixed(0)}% ของขา (i) (ต้อง ≥ 61.8%) → รอ`, toast: false },
+  NEST_BROKEN:  { n: "✕", c: "stop", t: "NEST BROKEN", th: () => "หลุด low ของ Wave 2 — nest พัง นับ Wave 2 ใหม่", toast: true, snd: [220] },
+  INVALID:   { n: "✕", c: "stop", t: "WAVE 2 > 100% · COUNT INVALID", th: () => "Wave 2 ลงต่ำกว่าจุดเริ่ม Wave 1 → นับผิด · NO TRADE", toast: true, snd: [196, 165] },
+  NONEST_BREAKOUT: { n: "∅", c: "mut", t: "BREAKOUT WITHOUT A NEST", th: () => "ทะลุยอด Wave 1 โดยไม่มี nest → ไม่เทรด", toast: true, snd: [330] },
+  SAVED:     { n: "✓", c: "buy", t: "NO NEST SAVED YOU", th: (e) => `จาก ${fmt(e.from)} ร่วงถึง ${fmt(e.price)} (−${((1 - e.price / e.from) * 100).toFixed(0)}%) — no nest = no trade ช่วยไว้`, toast: true, snd: [523, 784] },
+  BUY:       { n: "4", c: "buy", t: "BUY", th: (e) => `${e.reentry ? "เข้าใหม่ · " : ""}BUY @ ${fmt(e.price)} — ${{ hist: "histogram พลิกบวก", pp: "Pocket Pivot", vcp: "เบรกกรอบ VCP" }[e.via]} + MACD > 0 · (ii) ${fmt(e.ii)} · ${e.pp ? "PP → เต็มไม้" : "ไม่มี PP → ครึ่งไม้"} · SL ${fmt(e.sl)}`, toast: true, snd: [523, 659, 784] },
+  RECROSS:   { n: "↗", c: "ma50", t: "MA50 RE-CROSSES MA200", th: () => "MA50 ตัดกลับขึ้นเหนือ MA200", toast: false, quiet: true },
+  SCALE_IN:  { n: "5", c: "vdu", t: "SCALE-IN · STOCH RSI ↑20", th: (e) => `Stoch RSI ตัดขึ้น 20 + MACD > 0 → เติม ½ ให้เต็มไม้ @ ${fmt(e.price)}`, toast: true, snd: [587, 740] },
+  VCP_ADD:   { n: "6", c: "add", t: "VCP PIVOT BREAKOUT · ADD ½", th: (e) => `เบรกกรอบ VCP ที่ ${fmt(e.pivot)} (vol ${fmt(e.vr, 1)}×) → เติม ½${e.lifted ? ` · ยก SL ครั้งเดียว → ${fmt(e.sl)}` : ""}`, toast: true, snd: [659, 880] },
+  SL_LIFT:   { n: "⇡", c: "stop", t: "ONE-TIME SL LIFT", th: (e) => e.noop ? `ปิดเหนือยอด (i) · pivot low ล่าสุด (${fmt(e.pivot)}) ไม่สูงกว่า SL → SL คงเดิม · หยุดจนถึง TP1` : e.why === "i" ? `ปิดเหนือยอด (i) → ยก SL ครั้งเดียวไปใต้ pivot low ${fmt(e.pivot)} = ${fmt(e.sl)} · หยุดจนถึง TP1` : `ยก SL ใต้ low กรอบ VCP = ${fmt(e.sl)} · หยุดจนถึง TP1`, toast: false },
+  SL_BE:     { n: "", c: "stop", t: "REST → BREAK-EVEN", th: (e) => `ถึง TP1 → SL ของไม้ TP2/TP3 ยกมากันหน้าทุน ${fmt(e.sl)}`, toast: false },
+  PP_DAY:    { n: "", c: "buy", t: "POCKET PIVOT", th: () => "Pocket Pivot ระหว่างทาง", toast: false, quiet: true },
+  HEAT:      { n: "!", c: "stop", t: "UNDER WATER", th: (e) => `ติดลบ ${sgn(e.R)}R แต่ยังเหนือ SL — แผนยังไม่เปลี่ยน`, toast: false },
+  TP1_TRIG:  { n: "7", c: "tgt", t: "TP1 161.8% · TRAIL 1/3 ARMED", th: (e) => `ผ่าน TP1 ${fmt(e.level)} → 1/3 แรกเริ่ม trailing 2.5 ATR (${fmt(e.trail)}) · ไม้ที่เหลือ SL กันหน้าทุน`, toast: true, snd: [784, 988] },
+  TP2_TRIG:  { n: "8", c: "tgt", t: "TP2 261.8% · TRAIL 1/3 ARMED", th: (e) => `ผ่าน TP2 ${fmt(e.level)} → 1/3 ที่สองเริ่ม trailing 2.5 ATR`, toast: true, snd: [880, 1175] },
+  TP3_TRIG:  { n: "9", c: "tgt", t: "TP3 423.6% · TRAIL LAST 1/3", th: (e) => `ผ่าน TP3 ${fmt(e.level)} → ไม้สุดท้ายเริ่ม trailing 2.5 ATR`, toast: true, snd: [988, 1319, 1568] },
+  TP1_EXIT:  { n: "7", c: "tgt", t: "TP1 TRAIL HIT · SELL 1/3", th: (e) => `ปิดต่ำกว่า trailing ของไม้ TP1 → ขาย 1/3 @ ${fmt(e.price)} · อีก ${e.left} ไม้ถือต่อ`, toast: true, snd: [659, 523] },
+  TP2_EXIT:  { n: "8", c: "tgt", t: "TP2 TRAIL HIT · SELL 1/3", th: (e) => `ปิดต่ำกว่า trailing ของไม้ TP2 → ขาย 1/3 @ ${fmt(e.price)}`, toast: true, snd: [659, 523] },
+  TP3_EXIT:  { n: "9", c: "tgt", t: "TP3 TRAIL HIT · SELL LAST 1/3", th: (e) => `ไม้สุดท้ายออกตาม trailing @ ${fmt(e.price)}`, toast: true, snd: [784, 659] },
+  FLAT:      { n: "■", c: "buy", t: "POSITION CLOSED", th: (e) => `ปิดครบทุกไม้ · ไม้นี้ ${sgn(e.R)}R`, toast: true, snd: [988, 1319] },
+  STOP:      { n: "✕", c: "stop", t: "STOPPED OUT", th: (e) => `โดน SL @ ${fmt(e.price)} · ${sgn(e.R)}R — ขาดทุนตามแผน · รอ (ii) ใหม่เพื่อเข้าอีกครั้ง`, toast: true, snd: [262, 196] },
+  STOP_PROFIT: { n: "■", c: "stop", t: "SL HIT · PROFIT KEPT", th: (e) => `ไม้ที่เหลือโดน SL (กันหน้าทุน) @ ${fmt(e.price)} · รวม ${sgn(e.R)}R`, toast: true, snd: [392, 330] },
+  GAP_STOP:  { n: "⚡", c: "stop", t: "GAP THROUGH STOP", th: (e) => `Gap เปิดที่ ${fmt(e.price)} ต่ำกว่า SL ${fmt(e.sl)} · ${sgn(e.R)}R`, toast: true, snd: [196, 147] },
+  RUN_WITHOUT_YOU: { n: "↗", c: "mut", t: "IT RAN WITHOUT YOU", th: () => "ราคาวิ่งทะลุยอด Wave 1 หลังโดน SL โดยไม่เกิด (ii) ใหม่ — เจ็บแต่ถูกระบบ", toast: true, snd: [330, 294] },
+  CYCLE_RESET: { n: "", c: "mut", t: "NEW CYCLE", th: (e) => `MA50 กลับลงใต้ MA200 — เริ่มหา setup รอบใหม่ (รอบที่ ${e.cycle})`, toast: false },
+};
+const SCEN = [
+  { k: "textbook", c: "gold", label: "Textbook" },
+  { k: "ondo", c: "buy", label: "Nest above MA200 (ONDO)" },
+  { k: "basehead", c: "tgt", label: "Base on head (868)" },
+  { k: "double", c: "vdu", label: "Double nest" },
+  { k: "extended", c: "add", label: "Extended → TP3" },
+  { k: "climax", c: "add", label: "Climax" },
+  { k: "stall", c: "ma200", label: "TP1 then stall" },
+  { k: "failed", c: "stop", label: "Failed nest" },
+  { k: "shakeout", c: "stop", label: "Shakeout" },
+  { k: "gap", c: "stop", label: "Gap" },
+  { k: "nonest", c: "ma50", label: "No nest" },
+  { k: "fakeout", c: "dip", label: "Fake breakout" },
+  { k: "deep2", c: "dip", label: "Wave 2 > 100%" },
+  { k: "random", c: "buy", label: "⟳ สุ่ม" },
+  { k: "csv", c: "mut", label: "📂 CSV หุ้นจริง" },
+];
+const TPCOL = ["#ffd166", "#ffb347", "#ff7a59"];
+
+/* ============================================================
+   REPLAY
+============================================================ */
+const Replay = {
+  mode: "replay", m: null, run: null, t: 0, playing: false, speed: 1, cine: true, holdUntil: 0,
+  span: 230, follow: true, panOff: 0, cam: null, fired: -1, firedSet: new Set(), hover: null, parts: [], orbs: {}, dirty: true, tpl: "textbook",
+  init() {
+    this.cv = $("#chart"); this.sc = $("#scrub");
+    this.buildScen();
+    const cv = this.cv;
+    cv.style.touchAction = "pan-y";
+    cv.addEventListener("pointermove", (e) => { const r = cv.getBoundingClientRect(); this.hover = e.pointerType === "mouse" ? { x: e.clientX - r.left, y: e.clientY - r.top } : null; if (this.drag) { const dx = e.clientX - this.drag.x; this.panOff = this.drag.off - dx / this.pxPerBar; if (Math.abs(dx) > 3) this.follow = false; } });
+    cv.addEventListener("pointerleave", () => { this.hover = null; });
+    cv.addEventListener("pointerdown", (e) => { this.drag = { x: e.clientX, off: this.panOff }; });
+    window.addEventListener("pointerup", () => { this.drag = null; });
+    cv.addEventListener("wheel", (e) => { e.preventDefault(); this.span = clamp(this.span * (e.deltaY > 0 ? 1.1 : 0.9), 50, 900); }, { passive: false });
+    cv.addEventListener("dblclick", () => { this.panOff = 0; this.follow = true; });
+    const sc = this.sc; let sdrag = false;
+    const seek = (e) => { if (this.mode === "dojo") return; const r = sc.getBoundingClientRect(); const f = clamp((e.clientX - r.left) / r.width, 0, 1); this.seek(Math.round(lerp(this.t0, this.m.N, f))); };
+    sc.style.touchAction = "none";
+    sc.addEventListener("pointerdown", (e) => { if (this.mode === "dojo") return; sdrag = true; this.playing = false; this.syncPlay(); seek(e); });
+    window.addEventListener("pointermove", (e) => { if (sdrag) seek(e); });
+    window.addEventListener("pointerup", () => { sdrag = false; });
+    $("#bPlay").onclick = () => this.toggle();
+    $("#bBack").onclick = () => { this.playing = false; this.syncPlay(); this.seek(Math.floor(this.t) - 1); };
+    $("#bFwd").onclick = () => { this.playing = false; this.syncPlay(); this.seek(Math.floor(this.t) + 1); };
+    $("#bRestart").onclick = () => { this.seek(this.t0); this.panOff = 0; this.follow = true; };
+    $("#bNext").onclick = () => this.nextEvent();
+    $("#speed").onchange = (e) => { this.speed = +e.target.value; };
+    $("#bCine").onclick = () => { this.cine = !this.cine; $("#bCine").classList.toggle("on", this.cine); };
+    $("#bFit").onclick = () => { this.span = this.span > 500 ? 230 : Math.min(900, this.m.N - 150); this.panOff = 0; this.follow = true; };
+    window.addEventListener("keydown", (e) => {
+      if (!$("#v-chart").classList.contains("on")) return;
+      if (e.code === "Space") { e.preventDefault(); this.toggle(); }
+      if (this.mode === "dojo") return;
+      if (e.code === "ArrowRight") { this.playing = false; this.syncPlay(); this.seek(Math.floor(this.t) + 1); }
+      if (e.code === "ArrowLeft") { this.playing = false; this.syncPlay(); this.seek(Math.floor(this.t) - 1); }
+      if (e.code === "KeyN") this.nextEvent();
+    });
+  },
+  buildScen() {
+    const box = $("#scen"); box.innerHTML = "";
+    SCEN.forEach(s => {
+      const b = document.createElement("button"); b.className = "chip"; b.dataset.k = s.k; b.style.setProperty("--c", `var(--${s.c})`);
+      b.innerHTML = `<span class="dot"></span>${s.label}`; if (s.k === "csv") b.classList.add("csv");
+      b.title = s.k === "csv" ? "อัปโหลดไฟล์ CSV (time, open, high, low, close, volume) จาก TradingView ≥ 260 แท่ง" : s.k === "random" ? "สุ่มทุกอย่าง ไม่บอกชื่อทรง" : NEST.TEMPLATES[s.k].th + " · แล้วต่อด้วยตลาดสุ่มอีก 1–2 รอบ";
+      b.onclick = () => this.load(s.k); box.appendChild(b);
+    });
+    const sp = document.createElement("span"); sp.className = "sp"; box.appendChild(sp);
+    const id = document.createElement("span"); id.className = "mkt"; id.id = "mktId"; box.appendChild(id);
+    const sh = document.createElement("button"); sh.className = "chip"; sh.textContent = "🔗"; sh.title = "คัดลอกลิงก์ตลาดนี้"; sh.onclick = () => this.shareURL(); box.appendChild(sh);
+  },
+  load(k, seed) {
+    if (k === "csv") { $("#csvFile").click(); return; }
+    seed = seed || (1 + Math.floor(Math.random() * 999999));
+    this.key = k; this.seed = seed; this.csvName = null;
+    const m = NEST.genScenario(k === "random" ? "random" : k, seed);
+    this.tpl = m.tpl; this.setMarket(m);
+    $("#mktId").textContent = `MARKET #${seed}${k === "random" ? " · ???" : ""}`;
+  },
+  loadCSV(m, name) { this.tpl = "csv"; this.key = "csv"; this.seed = 0; this.csvName = name; this.setMarket(m); $("#mktId").textContent = `${name} · ${m.N} bars`; },
+  setMarket(m) {
+    this.m = m; this.run = m.run;
+    $$("#scen .chip").forEach(c => c.classList.toggle("on", c.dataset.k === this.key));
+    this.t0 = 232; this.t = this.t0; this.fired = this.t0 - 1; this.firedSet = new Set(); this.parts = []; this.orbs = {}; this.panOff = 0; this.follow = true; this.span = 230;
+    this.cam = null; this.ended = false;
+    $("#log").innerHTML = ""; this.hideToast(); $("#endcard").classList.remove("show");
+    this.renderStages(true); this.updatePanels(true);
+    if (this.mode === "dojo") Dojo.onLoad();
+    this.writeHash(); this.dirty = true;
+  },
+  blockNames() { return (this.m.blocks || []).map(b => NEST.TEMPLATES[b].name).join(" → "); },
+  writeHash() { if (this.key === "csv") return; try { history.replaceState(null, "", `#tab=${this.mode}&s=${this.key}&seed=${this.seed}`); } catch (e) {} },
+  shareURL() {
+    const u = location.href.split("#")[0] + `#tab=${this.mode}&s=${this.key}&seed=${this.seed}`;
+    const done = () => this.showToast({ type: "_SHARE" });
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(done, () => prompt("คัดลอกลิงก์นี้", u)); else prompt("คัดลอกลิงก์นี้", u);
+  },
+  showEnd() {
+    if (this.mode !== "replay" || this.ended) return; this.ended = true;
+    const S = this.run.snap[this.m.N - 1]; const nB = this.run.ev.filter(e => e.type === "BUY").length;
+    if (this.tpl === "csv") { $("#ecT").textContent = `${this.csvName} · จบข้อมูล`; $("#ecP").textContent = `ผลรวมตามกฎทุก setup: ${sgn(S.totR)}R (${nB} ไม้)`; }
+    else { const T = NEST.TEMPLATES[this.tpl]; $("#ecT").textContent = `${sgn(S.totR)}R · ${nB} ไม้`; $("#ecP").innerHTML = `ตลาดนี้: <b>${this.blockNames()}</b><br>บทเรียนรอบแรก: ${T.lesson}`; $("#mktId").textContent = `MARKET #${this.seed}`; }
+    $("#endcard").classList.add("show");
+  },
+  toggle() { if (this.mode === "dojo" && Dojo.waiting) return; if (Math.floor(this.t) >= this.m.N - 1) { if (this.mode === "dojo") return; this.seek(this.t0); } this.playing = !this.playing; this.syncPlay(); },
+  syncPlay() { $("#bPlay").textContent = this.playing ? "❚❚" : "▶"; },
+  seek(bar) {
+    bar = clamp(bar, this.t0, this.m.N - 1);
+    if (bar < this.m.N - 1) { this.ended = false; $("#endcard").classList.remove("show"); }
+    const back = bar < this.t; this.t = bar;
+    if (back) { this.firedSet = new Set(); this.orbs = {}; $("#log").innerHTML = ""; }
+    this.fireUpTo(bar - 1, true); this.updatePanels(true); this.dirty = true;
+  },
+  nextEvent() {
+    const cb = Math.floor(this.t) - 1;
+    const e = this.run.ev.find(x => x.i > cb && EVM[x.type] && EVM[x.type].toast);
+    if (e) { this.playing = false; this.syncPlay(); this.seek(e.i + 1); }
+  },
+  fireUpTo(bar, silent) {
+    const dojo = this.mode === "dojo";
+    if (dojo && !silent) {
+      const q = Dojo.nextQ();
+      if (q && q.i <= bar) {
+        for (const e of this.run.ev) if (e.i <= q.i && !this.firedSet.has(e) && !Dojo.isQEvent(e)) { this.firedSet.add(e); this.onEvent(e, false); }
+        Dojo.ask(q); return false;
+      }
+    }
+    for (const e of this.run.ev) {
+      if (e.i > bar || this.firedSet.has(e)) continue;
+      if (dojo && Dojo.isQEvent(e) && !Dojo.isAnswered(e)) continue;
+      this.firedSet.add(e); this.onEvent(e, silent);
+    }
+    this.fired = Math.max(this.fired, bar);
+    return true;
+  },
+  onEvent(e, silent) {
+    const M = EVM[e.type]; if (!M) return;
+    if (this.mode === "dojo" && Dojo.hard) return;
+    this.addLog(e);
+    this.orbs[e.i + ":" + e.type] = { born: silent ? now() - 5000 : now() };
+    if (silent) return;
+    if (M.toast) { this.showToast(e); this.pulseAt = now(); }
+    if (M.snd) Sound.tone(M.snd, 0.22, "sine", 0.05);
+    const p = this.eventPoint(e); if (p && M.toast) this.burst(p.bar, p.price, PAL[M.c] || PAL.gold, e.type === "BUY" || e.type === "FLAT" ? 70 : 40);
+    if (this.cine && M.toast && this.playing && this.mode !== "dojo") this.holdUntil = now() + (e.type === "BUY" ? 1500 : 900);
+  },
+  eventPoint(e) {
+    const m = this.m;
+    switch (e.type) {
+      case "GC": case "DIP": case "RECROSS": case "CURL": return { bar: e.i, price: m.m50[e.i] };
+      case "NEST_I": return { bar: e.at, price: e.price };
+      case "HEAD_SUPPORT": return { bar: e.w2I, price: e.W2 };
+      case "TP1_TRIG": case "TP2_TRIG": case "TP3_TRIG": return { bar: e.i, price: e.level };
+      case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": case "FLAT": case "RUN_WITHOUT_YOU": return { bar: e.i, price: m.h[e.i] };
+      default: return { bar: e.i, price: m.l[e.i] };
+    }
+  },
+  showToast(e) {
+    const M = e.type === "_SHARE" ? { c: "buy", n: "🔗", t: "COPIED", th: () => "คัดลอกลิงก์ตลาดนี้แล้ว" } : EVM[e.type]; const el = $("#toast");
+    el.style.setProperty("--tc", PAL[M.c] || PAL.gold);
+    el.querySelector(".orb").textContent = M.n || "•";
+    el.querySelector(".tt").textContent = M.t + (e.type === "BUY" ? (e.pp ? " · FULL (PP)" : " · HALF") : "");
+    el.querySelector(".ts").textContent = M.th(e);
+    el.classList.add("show"); clearTimeout(this._tt); this._tt = setTimeout(() => el.classList.remove("show"), 2600);
+  },
+  hideToast() { $("#toast").classList.remove("show"); },
+  addLog(e) {
+    const M = EVM[e.type]; if (!M) return;
+    const box = $("#log"); const d = document.createElement("div"); d.className = "li";
+    d.style.setProperty("--lc", PAL[M.c] || PAL.line2); if (!M.toast) d.style.opacity = 0.7;
+    d.innerHTML = `<div class="b">#${e.i}</div><div class="m">${M.n && M.n !== "!" ? `<b style="color:${PAL[M.c] || PAL.txt}">${M.n}</b> ` : ""}${M.th(e)}</div>`;
+    box.appendChild(d); if (box.children.length > 160) box.removeChild(box.firstChild); box.scrollTop = box.scrollHeight;
+  },
+  burst(bar, price, col, n) {
+    const p = this.toScreen(bar, price); if (!p) return;
+    if (innerWidth < 800) n = Math.round(n * 0.4);
+    for (let k = 0; k < n; k++) { const a = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 220; this.parts.push({ x: p.x, y: p.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, life: 0.8 + Math.random() * 0.9, age: 0, col, r: 1 + Math.random() * 2.4 }); }
+  },
+  frame(dt) {
+    if (!this.m) return;
+    const N = this.m.N, dojo = this.mode === "dojo";
+    if (this.playing && now() > this.holdUntil && !(dojo && Dojo.waiting)) {
+      const bps = 8 * this.speed * (dojo ? 1.6 : 1);
+      const prevBar = Math.floor(this.t);
+      this.t = Math.min(N - 1 + 0.999, this.t + bps * dt);
+      const cb = Math.floor(this.t) - 1;
+      const ok = this.fireUpTo(cb, false); if (!ok) this.t = Math.floor(this.t);
+      if (dojo) Dojo.book.stepTo(Math.floor(this.t) - 1);
+      if (Math.floor(this.t) !== prevBar) { this.updatePanels(false); if (dojo) Dojo.paint(); }
+      if (this.t >= N - 1 && !(dojo && Dojo.waiting)) { this.playing = false; this.syncPlay(); if (dojo) Dojo.finish(); else this.showEnd(); }
+    }
+    this.draw(dt); this.drawScrub();
+  },
+  layout(W, H) {
+    const L = 14, R = 76, T = 40, B = 18, gap = 10, ph = H - T - B - gap * 3;
+    const pH = ph * 0.6, vH = ph * 0.13, mH = ph * 0.14, sH = ph * 0.13;
+    const price = { y: T, h: pH }, vol = { y: T + pH + gap, h: vH }, macd = { y: vol.y + vH + gap, h: mH }, stoch = { y: macd.y + mH + gap, h: sH };
+    return { L, R, T, pw: W - L - R, price, vol, macd, stoch };
+  },
+  toScreen(bar, price) { if (!this.G || !this.cam) return null; return { x: this.xOf(bar), y: this.yOf(price) }; },
+  xOf(bar) { const G = this.G, c = this.cam; return G.L + (bar - c.x0) / (c.x1 - c.x0) * G.pw; },
+  yOf(p) { const G = this.G, c = this.cam; return G.price.y + (Math.log(c.y1) - Math.log(p)) / (Math.log(c.y1) - Math.log(c.y0)) * G.price.h; },
+  cycEv(S, type, last) { return this.run.ev.find(e => e.cyc === S.cycle && e.type === type && e.i <= last); },
+  draw(dt) {
+    const { ctx, W, H } = fitCanvas(this.cv); if (W < 50) return;
+    const m = this.m, G = this.G = this.layout(W, H), dojo = this.mode === "dojo";
+    const cbar = Math.floor(this.t), frac = this.t - cbar, last = Math.max(0, cbar - 1);
+    const S = this.run.snap[last] || {};
+    const HH = this.hardHide();
+    const pa = this.pulseAt ? (now() - this.pulseAt) / 1000 : 9, pulse = pa < 1.6 ? Math.sin(Math.min(1, pa / 1.6) * Math.PI) : 0;
+    const span = this.span * (1 - 0.14 * pulse);
+    let x1 = this.t + span * 0.2 + this.panOff, x0 = x1 - span;
+    const minX = (m.blocks && m.blocks[0] === "basehead") ? 70 : 196;
+    if (x0 < minX) { x0 = minX; x1 = Math.max(x1, x0 + 90); }
+    let lo = Infinity, hi = -Infinity;
+    for (let i = Math.max(0, Math.floor(x0)); i <= Math.min(cbar, Math.ceil(x1)); i++) { lo = Math.min(lo, m.l[i]); hi = Math.max(hi, m.h[i]); }
+    const showT = S.stage && S.stage.buy !== undefined && !HH && S.TP && isFinite(S.TP[0]);
+    if (showT) S.TP.forEach(v => { if (v < hi * 1.25) hi = Math.max(hi, v * 1.02); });
+    const lr = Math.log(hi / lo), ty0 = lo * Math.exp(-lr * 0.12), ty1 = hi * Math.exp(lr * 0.14);
+    if (!this.cam) this.cam = { x0, x1, y0: ty0, y1: ty1 };
+    const k = 1 - Math.pow(0.0015, dt || 0.016), c = this.cam;
+    c.x0 = lerp(c.x0, x0, Math.min(1, k * 1.4)); c.x1 = lerp(c.x1, x1, Math.min(1, k * 1.4)); c.y0 = Math.exp(lerp(Math.log(c.y0), Math.log(ty0), k)); c.y1 = Math.exp(lerp(Math.log(c.y1), Math.log(ty1), k));
+    this.pxPerBar = G.pw / (c.x1 - c.x0);
+    ctx.clearRect(0, 0, W, H);
+    const i0 = Math.max(0, Math.floor(c.x0) - 1), i1 = Math.min(cbar, Math.ceil(c.x1) + 1);
+    const X = (i) => this.xOf(i), Y = (p) => this.yOf(p);
+    // grid
+    ctx.save(); ctx.lineWidth = 1; ctx.strokeStyle = PAL.grid; ctx.font = "11px " + FF(); ctx.fillStyle = PAL.dim;
+    let tickStep = 1; const rngP = c.y1 - c.y0;
+    for (const e of [0.1, 1, 10, 100, 1000]) for (const s of [1, 2, 2.5, 5]) { const st = s * e; if (rngP / st <= 9 && rngP / st >= 3) tickStep = st; }
+    for (let p = Math.ceil(c.y0 / tickStep) * tickStep; p < c.y1; p += tickStep) { const y = Y(p); if (y < G.price.y + 4 || y > G.price.y + G.price.h - 4) continue; ctx.beginPath(); ctx.moveTo(G.L, y); ctx.lineTo(G.L + G.pw, y); ctx.stroke(); ctx.fillText(p.toFixed(p < 10 ? 2 : 0), G.L + G.pw + 10, y + 4); }
+    const vstep = span > 500 ? 100 : span > 200 ? 50 : 25;
+    for (let b = Math.ceil(c.x0 / vstep) * vstep; b < c.x1; b += vstep) { const x = X(b); ctx.beginPath(); ctx.moveTo(x, G.price.y); ctx.lineTo(x, G.stoch.y + G.stoch.h); ctx.stroke(); }
+    ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(G.L, G.price.y, G.pw, G.price.h); ctx.clip();
+    const hasW1 = S.stage && S.stage.curl !== undefined;
+    const vcpE = this.cycEv(S, "VCP_ADD", last), nnE = this.cycEv(S, "NONEST_BREAKOUT", last);
+    // nest zone
+    if (!HH && hasW1 && S.stage.nest_i !== undefined && S.w2I > 0) {
+      const endB = Math.min(cbar, vcpE ? vcpE.i : cbar);
+      const xa = X(S.w2I - 2), xb = X(endB);
+      const g = ctx.createLinearGradient(0, Y(S.W1H), 0, Y(S.W2));
+      g.addColorStop(0, hexA(PAL.gold, PAL.light ? 0.12 : 0.1)); g.addColorStop(1, hexA(PAL.gold, 0.01));
+      ctx.fillStyle = g; ctx.fillRect(xa, Y(S.W1H), xb - xa, Y(S.W2 * 0.985) - Y(S.W1H));
+      ctx.fillStyle = hexA(PAL.gold, 0.8); ctx.font = "700 10px " + FF(); ctx.fillText("NEST", xa + 6, Y(S.W1H) + 14);
+    }
+    // MA50 < MA200 fill (after curl)
+    if (hasW1) {
+      ctx.beginPath(); let inDip = false, ds = 0; const end = Math.min(i1, cbar);
+      for (let i = Math.max(i0, S.stage.curl); i <= end; i++) {
+        const u = m.m50[i] < m.m200[i];
+        if (u && !inDip) { ctx.moveTo(X(i), Y(m.m50[i])); inDip = true; ds = i; }
+        if (u) ctx.lineTo(X(i), Y(m.m50[i]));
+        if ((!u || i === end) && inDip) { for (let j = u ? i : i - 1; j >= ds; j--) ctx.lineTo(X(j), Y(m.m200[j])); ctx.closePath(); inDip = false; }
+      }
+      ctx.fillStyle = hexA(PAL.dip, PAL.light ? 0.28 : 0.3); ctx.fill();
+    }
+    // wave-1 high
+    if (hasW1 && !HH) {
+      const endB = Math.min(cbar, (vcpE || nnE || {}).i || cbar);
+      ctx.setLineDash([7, 6]); ctx.strokeStyle = hexA(PAL.add, 0.85); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(X(S.w1hI), Y(S.W1H)); ctx.lineTo(X(Math.max(endB, S.w1hI + 5)), Y(S.W1H)); ctx.stroke(); ctx.setLineDash([]);
+    }
+    if (S.stage && isFinite(S.head) && !HH) {
+      ctx.setLineDash([3, 5]); ctx.strokeStyle = hexA(PAL.tgt, 0.8); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(X(Math.max(i0, S.headI)), Y(S.head)); ctx.lineTo(X(cbar), Y(S.head)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.tgt; ctx.font = "800 11px " + FF(); ctx.fillText("OLD HEAD · 1-2 ชุดแรก", X(Math.max(i0 + 2, S.headI - 8)), Y(S.head) - 8);
+    }
+    // VCP box
+    if (S.vcp && !HH) {
+      const v = S.vcp, xa = X(v.i0), xb = X(Math.min(cbar, vcpE ? vcpE.i : cbar));
+      ctx.fillStyle = hexA(PAL.add, 0.08); ctx.fillRect(xa, Y(v.pivot), X(v.i1) - xa, Y(v.lo) - Y(v.pivot));
+      ctx.strokeStyle = hexA(PAL.add, 0.7); ctx.lineWidth = 1.2; ctx.strokeRect(xa, Y(v.pivot), X(v.i1) - xa, Y(v.lo) - Y(v.pivot));
+      ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(xa, Y(v.pivot)); ctx.lineTo(xb, Y(v.pivot)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.add; ctx.font = "800 10px " + FF(); ctx.fillText("VCP pivot", xa + 4, Y(v.pivot) - 5);
+    }
+    // (ii) must reach 61.8% of the (i) leg
+    if (!HH && S.st === "NEST" && S.iI > 0 && isFinite(S.I)) {
+      const r618 = S.I - 0.618 * (S.I - S.W2), y = Y(r618);
+      ctx.setLineDash([2, 4]); ctx.strokeStyle = hexA(PAL.gold, 0.75); ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(X(S.iI), y); ctx.lineTo(X(cbar) + 30, y); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.gold; ctx.font = "800 10px " + FF(); ctx.fillText("61.8% ของขา (i)", X(cbar) + 34, y + 4);
+    }
+    // big-degree fib (confluence only)
+    if (showT && S.TPbig) S.TPbig.slice(0, 2).forEach((v, j) => {
+      if (!isFinite(v)) return; const y = Y(v); if (y < G.price.y || y > G.price.y + G.price.h) return;
+      ctx.setLineDash([2, 7]); ctx.strokeStyle = hexA(PAL.mut, 0.45); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(X(S.stage.buy), y); ctx.lineTo(G.L + G.pw, y); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = hexA(PAL.mut, 0.8); ctx.font = "600 10px " + FF(); ctx.fillText(`big° ${["161.8", "261.8"][j]}%`, X(S.stage.buy) + 4, y - 4);
+    });
+    // TP levels (small 1-2)
+    if (showT) S.TP.forEach((v, j) => {
+      ctx.setLineDash([10, 6]); ctx.strokeStyle = hexA(TPCOL[j], 0.8); ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(X(S.stage.buy), Y(v)); ctx.lineTo(G.L + G.pw, Y(v)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = TPCOL[j]; ctx.font = "800 10px " + FF(); ctx.textAlign = "right"; ctx.fillText(["161.8%", "261.8%", "423.6%"][j], G.L + G.pw - 6, Y(v) - 4); ctx.textAlign = "left";
+    });
+    // system SL + per-tranche trails (hidden in dojo: you see your own)
+    if (!dojo) {
+      ctx.lineWidth = 2; ctx.strokeStyle = PAL.stop; ctx.setLineDash([6, 4]); ctx.beginPath(); let pen = false;
+      for (let i = Math.max(i0, 200); i <= last; i++) { const s = this.run.snap[i]; if (s && isFinite(s.sl)) { const sp = this.run.snap[i - 1]; if (!pen) { ctx.moveTo(X(i), Y(s.sl)); pen = true; } else { if (sp && isFinite(sp.sl) && sp.sl !== s.sl) ctx.lineTo(X(i), Y(sp.sl)); ctx.lineTo(X(i), Y(s.sl)); } } else pen = false; }
+      ctx.stroke(); ctx.setLineDash([]);
+      for (let kk = 0; kk < 3; kk++) {
+        ctx.strokeStyle = TPCOL[kk]; ctx.lineWidth = 2; ctx.beginPath(); pen = false;
+        for (let i = Math.max(i0, 200); i <= last; i++) { const s = this.run.snap[i]; const T = s && s.tr && s.tr[kk]; if (T && T.armed && T.open) { pen ? ctx.lineTo(X(i), Y(T.trail)) : ctx.moveTo(X(i), Y(T.trail)); pen = true; } else pen = false; }
+        ctx.stroke();
+      }
+    } else Dojo.drawUser(ctx, X, Y, i0, last);
+    // MAs
+    const drawMA = (arr, col) => {
+      ctx.save(); ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.shadowColor = col; ctx.shadowBlur = PAL.light ? 0 : 8; ctx.beginPath(); let st = false;
+      for (let i = Math.max(i0, 1); i <= cbar; i++) { let v = arr[i]; if (!isFinite(v) || !isFinite(arr[i - 1])) continue; if (i === cbar) v = lerp(arr[i - 1], arr[i], frac); const x = i === cbar ? lerp(X(i - 1), X(i), frac) : X(i); st ? ctx.lineTo(x, Y(v)) : ctx.moveTo(x, Y(v)); st = true; }
+      ctx.stroke(); ctx.restore();
+    };
+    drawMA(m.m200, PAL.ma200); drawMA(m.m50, PAL.ma50);
+    // candles
+    const bw = Math.max(1, this.pxPerBar * 0.66);
+    for (let i = i0; i <= Math.min(i1, cbar); i++) {
+      let o = m.o[i], cl = m.c[i], h = m.h[i], l = m.l[i];
+      if (i === cbar) { const f = Math.pow(frac, 0.8); cl = lerp(o, cl, f); h = Math.max(o, cl, lerp(o, h, f)); l = Math.min(o, cl, lerp(o, l, f)); }
+      const col = cl >= o ? PAL.up : PAL.dn, x = X(i);
+      ctx.strokeStyle = col; ctx.lineWidth = Math.max(1, bw * 0.16); ctx.beginPath(); ctx.moveTo(x, Y(h)); ctx.lineTo(x, Y(l)); ctx.stroke();
+      const y0 = Y(Math.max(o, cl)), y1 = Y(Math.min(o, cl)); ctx.fillStyle = col; ctx.fillRect(x - bw / 2, y0, bw, Math.max(1, y1 - y0));
+      if (i === cbar && !PAL.light) { ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 18; ctx.fillRect(x - bw / 2, y0, bw, Math.max(1, y1 - y0)); ctx.restore(); }
+    }
+    // wave labels
+    if (!HH) {
+      ctx.font = "800 13px " + FF(); ctx.textAlign = "center";
+      const lab = (bar, price, t, below) => { if (bar < i0 || bar > cbar) return; ctx.fillStyle = PAL.txt; ctx.fillText(t, X(bar), below ? Y(price) + 18 : Y(price) - 9); };
+      if (hasW1) lab(S.w1hI, S.W1H, "(1)");
+      if (S.stage && S.stage.nest_i !== undefined) { lab(S.w2I, S.W2, "(2)", true); lab(S.iI, S.I, "(i)"); }
+      if (S.stage && S.stage.buy !== undefined && S.iiI > 0) lab(S.iiI, S.II, "(ii)", true);
+      ctx.textAlign = "left";
+    }
+    // orbs
+    for (const e of this.run.ev) {
+      if (e.i > last) continue; const M = EVM[e.type]; if (!M || (!M.toast && e.type !== "RECROSS")) continue;
+      if (HH) continue;
+      if (dojo && Dojo.isQEvent(e) && !Dojo.isAnswered(e)) continue;
+      const p = this.eventPoint(e); if (p.bar < i0 - 2 || p.bar > i1 + 2) continue;
+      const ob = this.orbs[e.i + ":" + e.type]; this.drawOrb(ctx, e, M, p, ob ? (now() - ob.born) / 1000 : 9);
+    }
+    ctx.restore();
+    // price tag
+    const lc = lerp(m.o[cbar], m.c[cbar], frac), yT = Y(lc), tc = lc >= m.o[cbar] ? PAL.up : PAL.dn;
+    ctx.setLineDash([2, 4]); ctx.strokeStyle = hexA(tc, 0.6); ctx.beginPath(); ctx.moveTo(G.L, yT); ctx.lineTo(G.L + G.pw, yT); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = tc; this.rr(ctx, G.L + G.pw + 4, yT - 10, 62, 20, 5); ctx.fill();
+    ctx.fillStyle = "#000"; ctx.font = "700 11px Menlo, Consolas, monospace"; ctx.fillText(lc.toFixed(2), G.L + G.pw + 10, yT + 4);
+    const tag = (v, t, col) => { const y = Y(v); if (!isFinite(y) || y < G.price.y || y > G.price.y + G.price.h) return; ctx.fillStyle = hexA(col, 0.18); this.rr(ctx, G.L + G.pw + 4, y - 9, 68, 18, 5); ctx.fill(); ctx.fillStyle = col; ctx.font = "700 10px " + FF(); ctx.fillText(t, G.L + G.pw + 9, y + 3.5); };
+    if (showT) S.TP.forEach((v, j) => tag(v, `TP${j + 1} ${v.toFixed(0)}`, TPCOL[j]));
+    if (!dojo && isFinite(S.sl)) tag(S.sl, "SL " + S.sl.toFixed(1), PAL.stop);
+    if (dojo && Dojo.book.pos) tag(Dojo.book.pos.sl, "YOUR SL", PAL.vdu);
+    if (hasW1 && !HH) tag(S.W1H, "W1 " + S.W1H.toFixed(0), PAL.add);
+    // legend
+    ctx.font = "600 11px " + FF(); let lx = G.L + 6; const ly = 22;
+    [[PAL.ma50, "MA50"], [PAL.ma200, "MA200"], [PAL.dip, "MA50<MA200"], [PAL.add, "W1 high · VCP"], [TPCOL[0], "TP 1-2 เล็ก / trails"], [hexA(PAL.mut, 0.6), "big° fib"], [dojo ? PAL.vdu : PAL.stop, dojo ? "YOUR SL" : "SL"]].forEach(([col, t]) => {
+      ctx.fillStyle = col; this.rr(ctx, lx, ly - 5, 14, 4, 2); ctx.fill(); ctx.fillStyle = PAL.mut; ctx.fillText(t, lx + 19, ly); lx += ctx.measureText(t).width + 32;
+    });
+    ctx.fillStyle = PAL.dim; ctx.textAlign = "right";
+    const firstName = this.m.blocks ? NEST.TEMPLATES[this.m.blocks[0]].name : "";
+    ctx.fillText(this.tpl === "csv" ? (this.csvName || "CSV") : this.revealAll() ? `${this.blockNames()}  ·  รอบที่ ${S.cycle || 1}` : (this.key === "random" || dojo) ? `? ? ?  ·  รอบที่ ${S.cycle || 1}` : `${firstName} → ตลาดสุ่มต่อ  ·  รอบที่ ${S.cycle || 1}`, G.L + G.pw, ly); ctx.textAlign = "left";
+    // volume
+    const V = G.vol; let vmax = 0; for (let i = i0; i <= Math.min(i1, cbar); i++) vmax = Math.max(vmax, m.v[i]); vmax *= 1.15;
+    const addSet = new Set(this.run.ev.filter(e => e.type === "VCP_ADD").map(e => e.i));
+    for (let i = i0; i <= Math.min(i1, cbar); i++) {
+      let v = m.v[i]; if (i === cbar) v *= frac;
+      let col = hexA(PAL.mut, PAL.light ? 0.35 : 0.3);
+      if (m.pp[i]) col = PAL.buy; else if (addSet.has(i) && !HH) col = PAL.add; else if (v < 0.5 * m.vma[i] && i > 250) col = hexA(PAL.vdu, 0.85);
+      const hh = v / vmax * V.h; ctx.fillStyle = col; ctx.fillRect(X(i) - bw / 2, V.y + V.h - hh, bw, hh);
+    }
+    ctx.strokeStyle = hexA(PAL.gold, 0.7); ctx.lineWidth = 1.2; ctx.beginPath();
+    for (let i = Math.max(i0, 60); i <= cbar; i++) { const y = V.y + V.h - m.vma[i] / vmax * V.h; i === Math.max(i0, 60) ? ctx.moveTo(X(i), y) : ctx.lineTo(X(i), y); } ctx.stroke();
+    ctx.font = "700 10px " + FF(); ctx.fillStyle = PAL.dim; ctx.fillText("VOLUME ·", G.L + 4, V.y + 11); ctx.fillStyle = PAL.buy; ctx.fillText("PP", G.L + 60, V.y + 11); ctx.fillStyle = PAL.vdu; ctx.fillText("VDU", G.L + 80, V.y + 11);
+    // MACD
+    const Mc = G.macd; let mm = 0.01; for (let i = i0; i <= Math.min(i1, cbar); i++) mm = Math.max(mm, Math.abs(m.macd[i]), Math.abs(m.sig[i]));
+    const my = (v) => Mc.y + Mc.h / 2 - v / (mm * 1.15) * Mc.h / 2;
+    ctx.strokeStyle = PAL.line2; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(G.L, my(0)); ctx.lineTo(G.L + G.pw, my(0)); ctx.stroke(); ctx.setLineDash([]);
+    for (let i = i0; i <= Math.min(i1, cbar); i++) { const hv = m.hist[i]; ctx.fillStyle = hexA(hv >= 0 ? PAL.up : PAL.dn, 0.45); const y = my(0), y2 = my(hv); ctx.fillRect(X(i) - bw / 2, Math.min(y, y2), bw, Math.abs(y2 - y)); }
+    const line = (arr, col, ys) => { ctx.strokeStyle = col; ctx.lineWidth = 1.7; ctx.beginPath(); let st = false; for (let i = Math.max(i0, 32); i <= cbar; i++) { if (!isFinite(arr[i])) continue; const x = X(i), y = ys(arr[i]); st ? ctx.lineTo(x, y) : ctx.moveTo(x, y); st = true; } ctx.stroke(); };
+    line(m.macd, PAL.ma50, my); line(m.sig, PAL.tgt, my);
+    ctx.fillStyle = PAL.dim; ctx.fillText("MACD", G.L + 4, Mc.y + 11);
+    // Stoch RSI
+    const St = G.stoch, sy = (v) => St.y + St.h - v / 100 * St.h;
+    ctx.fillStyle = hexA(PAL.mut, 0.05); ctx.fillRect(G.L, sy(80), G.pw, sy(20) - sy(80));
+    ctx.strokeStyle = PAL.line2; ctx.setLineDash([3, 4]); [20, 80].forEach(v => { ctx.beginPath(); ctx.moveTo(G.L, sy(v)); ctx.lineTo(G.L + G.pw, sy(v)); ctx.stroke(); }); ctx.setLineDash([]);
+    line(m.stK, PAL.vdu, sy); line(m.stD, hexA(PAL.tgt, 0.8), sy);
+    ctx.fillStyle = PAL.dim; ctx.fillText("STOCH RSI · 20 / 80", G.L + 4, St.y + 11);
+    for (const e of this.run.ev) {
+      if (e.i > last || e.i < i0 || HH) continue;
+      if (dojo && Dojo.isQEvent(e) && !Dojo.isAnswered(e)) continue;
+      if (e.type === "BUY") { ctx.strokeStyle = PAL.buy; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X(e.i), my(m.macd[e.i]), 6, 0, 7); ctx.stroke(); }
+      if (e.type === "SCALE_IN") { ctx.strokeStyle = PAL.vdu; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X(e.i), sy(m.stK[e.i]), 6, 0, 7); ctx.stroke(); }
+      if (e.type.startsWith("TRAP") && !dojo) { ctx.fillStyle = hexA(PAL.mut, 0.8); ctx.font = "800 10px " + FF(); ctx.fillText("wait", X(e.i) - 10, Mc.y + 22); }
+    }
+    // crosshair
+    if (this.hover && this.hover.x > G.L && this.hover.x < G.L + G.pw) {
+      const b = Math.round(c.x0 + (this.hover.x - G.L) / G.pw * (c.x1 - c.x0));
+      if (b <= cbar && b >= 0) {
+        const x = X(b); ctx.strokeStyle = hexA(PAL.txt, 0.25); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, G.price.y); ctx.lineTo(x, St.y + St.h); ctx.stroke();
+        const rows = [[m.time ? "DATE" : "BAR", m.time ? String(m.time[b]).slice(0, 10) : "#" + b], ["O", fmt(m.o[b])], ["H", fmt(m.h[b])], ["L", fmt(m.l[b])], ["C", fmt(m.c[b])], ["MA50", fmt(m.m50[b])], ["MA200", fmt(m.m200[b])], ["MACD", sgn(m.macd[b])], ["StochRSI", fmt(m.stK[b], 0)], ["ATR×2.5", fmt(m.atr[b] * 2.5)], ["VOL/avg", fmt(m.v[b] / m.vma[b]) + "×"]];
+        const bxW = 150, bxH = rows.length * 16 + 12; let bx = this.hover.x + 16; if (bx + bxW > G.L + G.pw) bx = this.hover.x - bxW - 16; const by = G.price.y + 10;
+        ctx.fillStyle = hexA(PAL.light ? "#ffffff" : "#0b1018", 0.94); ctx.strokeStyle = PAL.line2; this.rr(ctx, bx, by, bxW, bxH, 10); ctx.fill(); ctx.stroke();
+        ctx.font = "600 11px " + FF();
+        rows.forEach(([kk, vv], j) => { ctx.fillStyle = PAL.mut; ctx.fillText(kk, bx + 10, by + 20 + j * 16); ctx.fillStyle = PAL.txt; ctx.textAlign = "right"; ctx.fillText(vv, bx + bxW - 10, by + 20 + j * 16); ctx.textAlign = "left"; });
+      }
+    }
+    // particles
+    const pdt = dt || 0.016; this.parts = this.parts.filter(p => (p.age += pdt) < p.life);
+    for (const p of this.parts) { p.x += p.vx * pdt; p.y += p.vy * pdt; p.vy += 160 * pdt; p.vx *= 0.985; const a = 1 - p.age / p.life; ctx.fillStyle = hexA(p.col, a); ctx.beginPath(); ctx.arc(p.x, p.y, p.r * (0.6 + a), 0, 7); ctx.fill(); }
+  },
+  revealAll() { return Math.floor(this.t) >= this.m.N - 1; },
+  hardHide() { return this.mode === "dojo" && Dojo.hard && !this.revealAll(); },
+  rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); },
+  drawOrb(ctx, e, M, p, age) {
+    const col = PAL[M.c] || PAL.gold, X = this.xOf(p.bar), Yp = this.yOf(p.price);
+    const above = ["GC", "CURL", "NEST_I", "TP1_TRIG", "TP2_TRIG", "TP3_TRIG", "TP1_EXIT", "TP2_EXIT", "TP3_EXIT", "FLAT", "RUN_WITHOUT_YOU", "NONEST_BREAKOUT"].includes(e.type);
+    const off = e.type === "RECROSS" ? 0 : (above ? -30 : 30), cy = Yp + off;
+    const s = age < 0.5 ? 1 + Math.sin(age / 0.5 * Math.PI) * 0.6 * (1 - age / 0.5) : 1;
+    const R = (e.type === "RECROSS" ? 7 : 11) * (age < 0.25 ? age / 0.25 : 1) * s;
+    if (e.type !== "RECROSS") { ctx.strokeStyle = hexA(col, 0.6); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(X, Yp); ctx.lineTo(X, cy + (above ? R : -R)); ctx.stroke(); }
+    if (age < 1.4) { ctx.strokeStyle = hexA(col, Math.max(0, 0.6 - age / 1.4 * 0.6)); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(X, cy, R + age * 40, 0, 7); ctx.stroke(); }
+    const g = ctx.createRadialGradient(X - R * 0.35, cy - R * 0.4, 1, X, cy, Math.max(1, R)); g.addColorStop(0, "#ffffff"); g.addColorStop(0.35, col); g.addColorStop(1, col);
+    ctx.save(); if (!PAL.light) { ctx.shadowColor = col; ctx.shadowBlur = 14; }
+    ctx.beginPath(); ctx.arc(X, cy, Math.max(0.1, R), 0, 7); if (e.type === "RECROSS") { ctx.strokeStyle = col; ctx.lineWidth = 2.2; ctx.stroke(); } else { ctx.fillStyle = g; ctx.fill(); }
+    ctx.restore();
+    if (e.type !== "RECROSS" && R > 6) { ctx.fillStyle = "#000"; ctx.font = "900 11px " + FF(); ctx.textAlign = "center"; ctx.fillText(M.n, X, cy + 4); ctx.textAlign = "left"; }
+    const short = { BUY: (e.reentry ? "RE-" : "") + (e.pp ? "BUY FULL" : "BUY HALF"), SCALE_IN: "SCALE-IN", VCP_ADD: "VCP +½", TP1_TRIG: "TP1 ▲", TP2_TRIG: "TP2 ▲", TP3_TRIG: "TP3 ▲", TP1_EXIT: "TP1 out", TP2_EXIT: "TP2 out", TP3_EXIT: "TP3 out", FLAT: "FLAT", STOP: "STOP", STOP_PROFIT: "SL hit", INVALID: "INVALID", NONEST_BREAKOUT: "NO NEST", NEST_BROKEN: "BROKEN", GAP_STOP: "GAP", SAVED: "SAVED", HEAD_SUPPORT: "ON HEAD", RUN_WITHOUT_YOU: "RAN" }[e.type];
+    if (short && age > 0.2) { ctx.fillStyle = col; ctx.font = "800 10px " + FF(); ctx.textAlign = "center"; ctx.fillText(short, X, above ? cy - R - 6 : cy + R + 13); ctx.textAlign = "left"; }
+  },
+  drawScrub() {
+    const { ctx, W, H } = fitCanvas(this.sc); if (W < 20) return;
+    const m = this.m, t0 = this.t0, N = m.N, cb = Math.floor(this.t), dojo = this.mode === "dojo"; ctx.clearRect(0, 0, W, H);
+    const xs = (i) => (i - t0) / (N - 1 - t0) * W;
+    let lo = Infinity, hi = -Infinity; for (let i = t0; i < N; i++) { lo = Math.min(lo, m.c[i]); hi = Math.max(hi, m.c[i]); }
+    const ys = (p) => H - 8 - (Math.log(p) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) * (H - 16);
+    ctx.fillStyle = hexA(PAL.mut, 0.06); this.rr(ctx, 0, 0, W, H, 8); ctx.fill();
+    if (!dojo) { ctx.strokeStyle = hexA(PAL.mut, 0.35); ctx.lineWidth = 1.2; ctx.beginPath(); for (let i = t0; i < N; i++) i === t0 ? ctx.moveTo(xs(i), ys(m.c[i])) : ctx.lineTo(xs(i), ys(m.c[i])); ctx.stroke(); }
+    ctx.strokeStyle = PAL.gold; ctx.lineWidth = 1.8; ctx.beginPath(); for (let i = t0; i <= cb; i++) i === t0 ? ctx.moveTo(xs(i), ys(m.c[i])) : ctx.lineTo(xs(i), ys(m.c[i])); ctx.stroke();
+    if (!dojo) for (const e of this.run.ev) { const M = EVM[e.type]; if (!M || !M.toast) continue; ctx.fillStyle = PAL[M.c] || PAL.gold; ctx.beginPath(); ctx.arc(xs(e.i), H - 4, 2.6, 0, 7); ctx.fill(); }
+    ctx.fillStyle = PAL.gold; ctx.fillRect(xs(this.t) - 1, 0, 2, H);
+    $("#tlabel").textContent = `bar ${cb}/${N - 1}`;
+  },
+  renderStages(reset) {
+    const box = $("#stages"); if (reset) box.innerHTML = "";
+    const col = { gc: "gold", curl: "gold", nest_i: "gold", buy: "buy", scale: "vdu", vcp: "add", tp1: "tgt", tp2: "tgt", tp3: "tgt" };
+    NEST.STAGES.forEach((s) => {
+      if (box.querySelector(`[data-k="${s.k}"]`)) return;
+      const el = document.createElement("div"); el.className = "stg"; el.dataset.k = s.k; el.style.setProperty("--sc", `var(--${col[s.k]})`);
+      el.innerHTML = `<div class="n">${s.n}</div><div class="tx">${s.t}<small>${s.th}</small></div><div class="when"></div>`; box.appendChild(el);
+    });
+  },
+  updatePanels() {
+    if (!this.m || this.mode !== "replay") return;
+    const m = this.m, last = Math.max(0, Math.floor(this.t) - 1), S = this.run.snap[last] || { stage: {} };
+    const cyc = this.run.ev.filter(e => e.cyc === S.cycle && e.i <= last), has = (t) => cyc.some(e => e.type === t);
+    const buy = cyc.find(e => e.type === "BUY");
+    const done = Object.assign({}, S.stage);
+    let activeSet = false;
+    NEST.STAGES.forEach(({ k }) => {
+      const el = $(`#stages [data-k="${k}"]`); if (!el) return; el.className = "stg"; const w = el.querySelector(".when");
+      if (k === "scale" && buy && buy.pp) { el.classList.add("done"); w.textContent = "เต็มแล้ว"; return; }
+      if (done[k] !== undefined && done[k] <= last) { el.classList.add("done"); w.textContent = "#" + done[k]; return; }
+      w.textContent = "";
+      const closed = S.st === "DONE" && buy;
+      const failed = (has("INVALID") && k === "nest_i") || (has("NONEST_BREAKOUT") && k === "nest_i") || (closed && ["scale", "vcp", "tp1", "tp2", "tp3"].includes(k));
+      if (failed && !activeSet) { el.classList.add("fail"); activeSet = true; }
+      else if (!activeSet && S.st !== "DONE" && S.st !== "DEAD" && S.st !== "NONEST") { el.classList.add("active"); activeSet = true; }
+    });
+    const i = last, W1 = S.W1H;
+    let retr = null; if (S.st === "NEST" && S.iI > 0 && isFinite(S.I)) { let lo = Infinity; for (let j = S.iI; j <= i; j++) lo = Math.min(lo, m.l[j]); retr = (S.I - lo) / (S.I - S.W2); }
+    const gap = (m.m50[i] / m.m200[i] - 1) * 100, vr = m.v[i] / Math.max(1e-9, m.maxDownVol[i]);
+    const sig = [
+      ["HISTOGRAM", (m.hist[i] >= m.hist[i - 1] ? "↑ " : "↓ ") + sgn(m.hist[i], 2), m.hist[i] > 0 ? PAL.buy : PAL.stop],
+      ["MA50 vs 200", sgn(gap, 1) + "%", gap < 0 ? PAL.dip : PAL.ma200],
+      ["MACD", sgn(m.macd[i], 2), m.macd[i] > 0 ? PAL.buy : PAL.stop],
+      ["STOCH RSI", fmt(m.stK[i], 0), m.stK[i] < 20 ? PAL.vdu : m.stK[i] > 80 ? PAL.tgt : PAL.txt],
+      ["VOL/DOWN", fmt(vr, 2) + "×" + (m.pp[i] ? " PP" : ""), m.pp[i] ? PAL.buy : PAL.mut],
+      retr !== null ? ["(ii) RETRACE", (retr * 100).toFixed(0) + "%", retr >= 0.618 ? PAL.buy : PAL.mut] : ["vs W1 HIGH", isFinite(W1) ? sgn((m.c[i] / W1 - 1) * 100, 1) + "%" : "—", isFinite(W1) && m.c[i] > W1 ? PAL.add : PAL.txt],
+    ];
+    const sg = $("#sigs"); if (!sg.children.length) sig.forEach(() => { const d = document.createElement("div"); d.className = "sig"; d.innerHTML = `<div class="k"></div><div class="v"></div>`; sg.appendChild(d); });
+    sig.forEach(([kk, vv, cc], j) => { const d = sg.children[j]; d.querySelector(".k").textContent = kk; const x = d.querySelector(".v"); x.textContent = vv; x.style.color = cc; });
+    const st = S.st === "LONG" ? "LONG" : S.st === "DONE" ? "CLOSED" : S.noNest || S.invalid ? "NO TRADE" : "FLAT";
+    const R = S.totR || 0, rc = R > 0 ? PAL.buy : R < 0 ? PAL.stop : PAL.mut;
+    const trTxt = S.tr ? S.tr.map((T, j) => `<span style="color:${TPCOL[j]}">TP${j + 1}:${!T.armed ? "–" : T.open ? fmt(T.trail, 1) : "✓"}</span>`).join(" ") : (buy ? "ยังไม่ถึง TP1" : "—");
+    $("#pos").innerHTML = `<div class="big"><div class="R" style="color:${rc}">${sgn(R, 2)}R</div><div class="st" style="${st === "LONG" ? `color:${PAL.buy};border-color:${PAL.buy}` : st === "NO TRADE" ? `color:${PAL.stop};border-color:${PAL.stop}` : ""}">${st}</div><div class="st">รอบ ${S.cycle || 1}</div></div>
+      <div class="kv"><div class="k">SIZE</div><div class="v">${S.qty ? fmt(S.qty, 2) : "—"}</div></div>
+      <div class="kv"><div class="k">AVG COST</div><div class="v">${fmt(S.avg)}</div></div>
+      <div class="kv"><div class="k">SL${S.tr && S.tr[0] && S.tr[0].armed ? " · กันทุน" : S.lifted ? " · ยกแล้ว" : isFinite(S.sl) ? " · ใต้ (ii)" : ""}</div><div class="v" style="color:${PAL.stop}">${fmt(S.sl)}</div></div>
+      <div class="kv" style="grid-column:1/-1"><div class="k">TRAILING 2.5 ATR · แยกทีละ 1/3 · ไม้ที่ยังไม่ถึงระดับใช้ SL</div><div class="v" style="font-size:12px">${trTxt}</div></div>`;
+  },
+};
+
+/* ============================================================
+   DOJO  — your own book vs the system
+============================================================ */
+const Book = {
+  reset(m, run) {
+    this.m = m; this.pos = null; this.real = 0; this.marks = []; this.slHist = []; this.stepped = 231; this.trades = 0;
+    this.noopLift = new Set(run.ev.filter(e => e.type === "SL_LIFT" && e.noop).map(e => e.i));
+    this.exitBars = [0, 1, 2].map(k => new Set(run.ev.filter(e => e.type === "TP" + (k + 1) + "_EXIT").map(e => e.i)));
+  },
+  qty() { return this.pos ? this.pos.lots.reduce((s, x) => s + x.q, 0) : 0; },
+  avg() { const q = this.qty(); return q ? this.pos.lots.reduce((s, x) => s + x.q * x.p, 0) / q : NaN; },
+  low20(i) { let lo = 1e9; for (let j = i - 20; j <= i; j++) lo = Math.min(lo, this.m.l[j]); return lo * 0.99; },
+  fractalLow(j) { const l = this.m.l; for (let q = j - 3; q <= j + 3; q++) if (q !== j && l[q] < l[j]) return false; return true; },
+  open(i, q, sl, rRef, opt) {
+    const p = this.m.c[i];
+    if (this.pos) { this.add(i, q); return; }
+    this.pos = Object.assign({ lots: [{ q, p }], sl, rRef: Math.max(rRef || p - sl, p * 0.01), tr: null, scaled: q >= 1, lifted: false, chase: false, restTrail: false, entryI: i }, opt || {}); this.trades++;
+    this.marks.push({ i, p, t: "B", q }); this.slHist.push([i, sl]);
+  },
+  add(i, q) { if (!this.pos) return; const p = this.m.c[i]; this.pos.lots.push({ q, p }); this.marks.push({ i, p, t: "A", q }); },
+  setSL(i, sl) { if (!this.pos || !isFinite(sl) || sl === this.pos.sl) return; this.pos.sl = sl; this.slHist.push([i, sl]); },
+  liftSL(i, sl) { if (this.pos && isFinite(sl) && sl > this.pos.sl) this.setSL(i, sl); },
+  sellQ(i, q, px) {
+    if (!this.pos) return; const tot = this.qty(); q = Math.min(q, tot); if (q <= 1e-9) return;
+    this.real += q * (px - this.avg()) / this.pos.rRef; const f = 1 - q / tot;
+    this.pos.lots = this.pos.lots.map(x => ({ q: x.q * f, p: x.p })); this.marks.push({ i, p: px, t: "S", q });
+    if (this.qty() < 1e-9) { this.pos = null; this.slHist.push([i, NaN]); }
+  },
+  closeAll(i, px) { if (this.pos) this.sellQ(i, this.qty(), px); },
+  ensureTr() { const P = this.pos; if (P && !P.tr) { const q3 = this.qty() / 3; P.tr = [0, 1, 2].map(() => ({ q: q3, mode: null, open: true, trail: NaN, hh: NaN })); } },
+  arm(i, k, mode) {
+    const P = this.pos; if (!P) return; const m = this.m; this.ensureTr();
+    const T = P.tr[k]; if (!T.open || T.mode) return; T.mode = mode;
+    if (mode === "sell") { this.sellQ(i, T.q, m.c[i]); T.open = false; }
+    if (mode === "trail") { T.hh = m.h[i]; T.trail = m.h[i] - 2.5 * m.atr[i]; if (m.c[i] < T.trail && !this.exitBars[k].has(i)) { this.sellQ(i, T.q, m.c[i]); T.open = false; } }
+  },
+  sellTranche(i, k) { const P = this.pos; if (!P) return; if (!P.tr) { this.sellQ(i, this.qty() / 3, this.m.c[i]); return; } const T = P.tr[k]; if (T.open) { this.sellQ(i, T.q, this.m.c[i]); T.open = false; } },
+  step(i) {
+    const P = this.pos, m = this.m; if (!P) return;
+    if (m.l[i] <= P.sl) { this.closeAll(i, Math.min(m.o[i], P.sl)); return; }
+    if (this.noopLift.has(i) && !P.lifted) P.lifted = true;
+    if (P.chase) { const j = i - 3; if (j > P.entryI + 3 && this.fractalLow(j)) this.liftSL(i, m.l[j] * 0.99); }
+    if (P.tr) P.tr.forEach((T, k) => {
+      if (!this.pos || T.mode !== "trail" || !T.open) return;
+      T.hh = Math.max(T.hh, m.h[i]); T.trail = Math.max(T.trail, T.hh - 2.5 * m.atr[i]);
+      if (m.c[i] < T.trail && !this.exitBars[k].has(i)) { this.sellQ(i, T.q, m.c[i]); T.open = false; }
+    });
+    if (this.pos && P.restTrail && P.tr && P.tr[0].mode === "trail" && isFinite(P.tr[0].trail)) this.liftSL(i, P.tr[0].trail);
+  },
+  stepTo(bar) { bar = Math.min(bar, this.m.N - 1); while (this.stepped < bar) { this.stepped++; this.step(this.stepped); } },
+  openR(i) { return this.pos ? this.pos.lots.reduce((s, x) => s + x.q * (this.m.c[i] - x.p), 0) / this.pos.rRef : 0; },
+  total(i) { return this.real + this.openR(i); },
+};
+
+const GRADE = { ok: { s: "✓", t: "ตรงระบบ", c: "buy" }, acc: { s: "≈", t: "ไม่ผิดกฎ", c: "gold" }, bad: { s: "✕", t: "ผิดกฎ", c: "stop" } };
+const Dojo = {
+  hard: false, waiting: false, queue: [], qByEv: new Map(), cur: null, timer: null, book: Book, ppAsked: {},
+  mk: { ok: 0, acc: 0, t: 0, streak: 0, best: 0 }, ses: { ok: 0, acc: 0, t: 0, m: 0, you: 0, sys: 0 }, life: { total: 0, ok: 0, acc: 0, markets: 0, best: 0, you: 0, sys: 0 },
+  loadLife() { try { Object.assign(this.life, JSON.parse(localStorage.getItem("nest-dojo4") || "{}")); } catch (err) {} },
+  saveLife() { try { localStorage.setItem("nest-dojo4", JSON.stringify(this.life)); } catch (err) {} },
+  enter() {
+    this.loadLife(); ["#bBack", "#bFwd", "#bNext", "#bRestart"].forEach(q => $(q).disabled = true);
+    $("#brain").classList.add("hidden"); $("#dojo").classList.remove("hidden"); $("#dojoStart").classList.remove("hidden");
+    Replay.playing = false; Replay.syncPlay(); Replay.load("random");
+  },
+  exit() { ["#bBack", "#bFwd", "#bNext", "#bRestart"].forEach(q => $(q).disabled = false); $("#brain").classList.remove("hidden"); $("#dojo").classList.add("hidden"); $("#dojoStart").classList.add("hidden"); this.waiting = false; clearInterval(this.timer); },
+  onLoad() {
+    this.waiting = false; this.cur = null; this.mk = { ok: 0, acc: 0, t: 0, streak: 0, best: 0 }; this.ppAsked = {}; clearInterval(this.timer);
+    Book.reset(Replay.m, Replay.run); this.buildQueue(); this.done = false;
+    $("#dqBody").innerHTML = "กด ▶ แล้วรอจุดตัดสินใจแรก… ตัดสินใจเองทุกไม้ ผลกำไรขาดทุนของคุณคิดจริงตามกราฟ<br><br>ให้คะแนน 3 ระดับ: <b style='color:var(--buy)'>✓ ตรงระบบ</b> · <b style='color:var(--gold)'>≈ ไม่ผิดกฎ</b> · <b style='color:var(--stop)'>✕ ผิดกฎ</b>"; this.paint();
+  },
+  buildQueue() {
+    const ev = Replay.run.ev, Q = []; this.qByEv = new Map();
+    const add = (i, type, e, extra) => { const q = Object.assign({ i, type, e, answered: false, seq: Q.length }, extra || {}); Q.push(q); if (e && !this.qByEv.has(e)) this.qByEv.set(e, q); return q; };
+    ev.forEach(e => {
+      if (e.i < Replay.t0) return;
+      switch (e.type) {
+        case "TRAP_NO_NEST": case "TRAP_SHALLOW": case "SCALE_IN": case "VCP_ADD": case "HEAT": case "STOP": case "STOP_PROFIT": case "GAP_STOP": case "INVALID": case "NONEST_BREAKOUT":
+        case "TP2_TRIG": case "TP3_TRIG": case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": case "PP_DAY": add(e.i, e.type, e); break;
+        case "TP1_TRIG": add(e.i, "TP1_TRIG", e); add(e.i, "TP1_REST", null, { tp: e }); break;
+        case "BUY": add(e.i, "BUY", e); add(e.i, "BUY_SL", null, { buy: e }); break;
+        case "SL_LIFT": if (e.why === "i" && !e.noop) add(e.i, "SL_LIFT", e); break;
+      }
+    });
+    if (this.hard) {
+      const rng = NEST.makeRng(Replay.seed + 5);
+      for (let i = Replay.t0 + 30; i < Replay.m.N - 5; i += Math.round(rng.r(80, 130))) if (!Q.some(q => Math.abs(q.i - i) < 10)) add(i, "DECOY", null);
+    }
+    Q.sort((a, b) => a.i - b.i || a.seq - b.seq); this.queue = Q;
+  },
+  nextQ() { return this.queue.find(q => !q.answered); },
+  isQEvent(e) { return this.qByEv.has(e); },
+  isAnswered(e) { const q = this.qByEv.get(e); return !q || q.answered; },
+  shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
+  build(q) {
+    const m = Replay.m, e = q.e, i = q.i, B = Book, S = Replay.run.snap[i] || {}, P = B.pos, has = !!P;
+    const O = (t, g, act) => ({ t, g, act });
+    const pct = (x) => (x * 100).toFixed(0) + "%";
+    switch (q.type) {
+      case "TRAP_NO_NEST": case "TRAP_SHALLOW": {
+        if (has) return null; const sh = q.type === "TRAP_SHALLOW", ck = "t" + e.cyc; if ((this.ppAsked[ck] || 0) >= 2) return null; this.ppAsked[ck] = (this.ppAsked[ck] || 0) + 1;
+        return { q: "histogram พลิกบวก + MACD > 0 — ทำอะไร?",
+          facts: sh ? [`(i) ${fmt(e.I)}`, `(ii) ตอนนี้ ${fmt(e.lo)}`, `ย่อ ${pct(e.retr)} ของขา (i)`, `MACD ${sgn(m.macd[i])}`] : ["ยังไม่มี (i) ที่ล้มใต้ยอด Wave 1", `MACD ${sgn(m.macd[i])}`],
+          opts: [O(sh ? "WAIT — (ii) ต้องย่อ ≥ 61.8% ก่อน" : "WAIT — ยังไม่มี nest", "ok"), O("BUY เต็มไม้", "bad", () => B.open(i, 1, B.low20(i))), O("BUY ครึ่งไม้", "bad", () => B.open(i, 0.5, B.low20(i))), O("BUY ครึ่งไม้ · SL แคบใต้แท่งนี้", "bad", () => B.open(i, 0.5, m.l[i] * 0.99))],
+          why: sh ? `(ii) ย่อแค่ ${pct(e.retr)} ของขา (i) — ต่ำกว่า 61.8% ยังไม่ใช่ (ii) ที่ระบบรับ` : "no nest = no trade — ไกปืนอย่างเดียวไม่พอ" };
+      }
+      case "BUY": {
+        if (has) return null;
+        const retr = (e.I - e.ii) / (e.I - e.W2), R = e.price - e.sl;
+        const via = { hist: "histogram พลิกบวก", pp: "Pocket Pivot", vcp: "เบรกกรอบ VCP" }[e.via];
+        return { q: `${e.reentry ? "หลังโดน SL เกิด (ii) ใหม่ · " : ""}${via} + MACD > 0 — ทำอะไร?`,
+          facts: [`(ii) ย่อ ${pct(retr)} ของขา (i)`, `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`, `MACD ${sgn(m.macd[i])}`, e.pp ? "PP ใน 3 แท่ง: มี" : "PP ใน 3 แท่ง: ไม่มี"],
+          opts: [O("BUY เต็มไม้", e.pp ? "ok" : "bad", () => B.open(i, 1, e.sl, R)), O("BUY ครึ่งไม้", e.pp ? "acc" : "ok", () => B.open(i, 0.5, e.sl, R)), O("WAIT ต่อ", "bad"), O("BUY 1.5 ไม้ — มั่นใจ", "bad", () => B.open(i, 1.5, e.sl, R))],
+          why: e.pp ? "ครบ: (ii) ≥ 61.8% · SL ≥ 2 ATR · ไกปืน + MACD > 0 · มี PP → เต็มไม้ (ครึ่งไม้ไม่ผิดกฎ แค่เล็กกว่าระบบ)" : "ครบทุกเงื่อนไข แต่ไม่มี PP → ครึ่งไม้ แล้วค่อยเติมตอน Stoch RSI ตัดขึ้น 20" };
+      }
+      case "BUY_SL": {
+        if (!has) return null; const b = q.buy;
+        return { q: "SL ของไม้นี้วางตรงไหน?", facts: [`(ii) ${fmt(b.ii)}`, `low Wave 2 ${fmt(b.W2)}`, `ราคาเข้า ${fmt(b.price)}`],
+          opts: [O("ใต้ (ii) — higher low ล่าสุดของ nest", "ok", () => B.setSL(i, b.sl)), O("ใต้ low ของ Wave 2", "acc", () => B.setSL(i, b.W2 * 0.99)), O("−8% จากราคาเข้า", "bad", () => B.setSL(i, b.price * 0.92)), O("ไม่ตั้ง SL — ดูเป็นรายวัน", "bad", () => B.setSL(i, 1e-6))],
+          why: "SL ใต้ (ii) — ถ้าหลุด nest พัง · ใต้ Wave 2 ไม่ผิดกฎ แต่เสี่ยงต่อไม้มากกว่าที่วางแผน" };
+      }
+      case "SCALE_IN": {
+        if (!has || P.tr || P.scaled) return null;
+        return { q: "ไม้แรกเข้าครึ่งไม้ ยังไม่ได้เติม · Stoch RSI ตัดขึ้น 20 · MACD > 0 — ทำอะไร?", facts: [`Stoch RSI ${fmt(m.stK[i - 1], 0)} → ${fmt(m.stK[i], 0)}`, `MACD ${sgn(m.macd[i])}`, `ถืออยู่ ${fmt(B.qty(), 2)}`],
+          opts: [O("เติม ½ ให้เต็มไม้", "ok", () => { B.add(i, 0.5); P.scaled = true; }), O("ยังไม่เติม — ถือเท่าเดิม", "acc", () => { P.scaled = true; }), O("เติมอีก 1 ไม้เต็ม", "bad", () => { B.add(i, 1); P.scaled = true; }), O("เติม ½ แล้วยก SL มาที่ทุน", "bad", () => { B.add(i, 0.5); P.scaled = true; B.liftSL(i, B.avg()); })],
+          why: "ไม้ครึ่งเติมให้เต็มเมื่อ Stoch RSI ตัดขึ้น 20 + MACD > 0 · SL ยังไม่ขยับ (ยกได้ครั้งเดียวตอนพ้น (i) หรือเบรก VCP)" };
+      }
+      case "VCP_ADD": {
+        const facts = [`pivot ${fmt(e.pivot)}`, `contractions ${e.depths.map(d => (d * 100).toFixed(0) + "%").join(" → ")}`, `vol ${fmt(e.vr, 1)}× avg`, `low กรอบ ${fmt(e.lo)}`];
+        if (has) {
+          if (P.tr) return null;
+          const lift = () => { if (B.pos && !B.pos.lifted && e.lo * 0.99 > B.pos.sl) { B.setSL(i, e.lo * 0.99); B.pos.lifted = true; } };
+          return { q: "ราคาเบรกกรอบ VCP (pivot) พร้อม volume — ทำอะไร?", facts: facts.concat([P.lifted ? "SL คุณยกไปแล้ว 1 ครั้ง" : "SL คุณยังไม่เคยยก"]),
+            opts: [O(P.lifted ? "เติม ½ ที่เบรก pivot · SL คงเดิม (ยกไปแล้ว)" : "เติม ½ ที่เบรก pivot + ยก SL ครั้งเดียวใต้ low กรอบ", "ok", () => { B.add(i, 0.5); lift(); }), O("รอให้ทะลุยอด Wave 1 ก่อนค่อยเติม", "acc"), O("เติมเต็มไม้", "bad", () => { B.add(i, 1); lift(); }), O("ขาย ½ ที่แนวต้าน", "bad", () => B.sellQ(i, B.qty() / 2, m.c[i]))],
+            why: "จุดเติมคือเบรกกรอบ VCP — ถ้ายังไม่เคยยก SL ให้ยกครั้งเดียวใต้ low กรอบแล้วแช่ไว้จนถึง TP1 · รอยอด Wave 1 ไม่ผิดกฎแต่ช้า" };
+        }
+        const pp = m.pp[i], sl = e.lo * 0.99, R = m.c[i] - sl;
+        return { q: "คุณไม่มีของ · ราคาเบรกกรอบ VCP พร้อม volume — ทำอะไร?", facts: facts.concat([pp ? "PP แท่งนี้: มี" : "PP แท่งนี้: ไม่มี"]),
+          opts: [O(`เข้า ${pp ? "เต็มไม้ (มี PP)" : "½ ไม้ (ไม่มี PP)"} · SL ใต้ low กรอบ VCP`, "ok", () => B.open(i, pp ? 1 : 0.5, sl, R, { lifted: true })), O("ไม่เข้า รอ setup ถัดไป", "acc"), O("เข้า 2 ไม้ชดเชยที่พลาด", "bad", () => B.open(i, 2, sl, R, { lifted: true })), O("เข้าเต็มไม้ ไม่ตั้ง SL", "bad", () => B.open(i, 1, 1e-6, R))],
+          why: "เบรก VCP เป็นจุดเข้าได้แม้พลาดไม้แรก — ขนาดตามกฎ PP · SL ใต้ low กรอบ" };
+      }
+      case "SL_LIFT": {
+        if (!has || P.lifted || P.tr) return null;
+        return { q: "ราคาปิดเหนือยอด (i) ของ nest ตัวเอง — SL ทำอย่างไร?", facts: [`pivot low ล่าสุดก่อนเบรก ${fmt(e.pivot)}`, `SL คุณ ${fmt(P.sl)}`, `ทุน ${fmt(B.avg())}`],
+          opts: [O("ยก SL ครั้งเดียวไปใต้ pivot low นั้น แล้วหยุดจนถึง TP1", "ok", () => { B.liftSL(i, e.sl); P.lifted = true; }), O("ไม่ขยับ จนกว่าจะถึง TP1", "acc", () => { P.lifted = true; }), O("ยก SL มาที่ทุนเลย", "bad", () => { B.liftSL(i, B.avg()); P.lifted = true; }), O("ยกตาม pivot low ทุกอันต่อจากนี้", "bad", () => { B.liftSL(i, e.sl); P.lifted = true; P.chase = true; })],
+          why: "ยกได้ครั้งเดียว (พ้น (i) หรือเบรก VCP อย่างไหนมาก่อน) แล้วแช่ไว้จนถึง TP1 · ไม่ขยับเลยก็ไม่ผิดกฎ · ไล่ทุก pivot = โดนเขย่าหลุดง่าย" };
+      }
+      case "HEAT": {
+        if (!has) return null;
+        return { q: "ติดลบ แต่ราคายังเหนือ SL — ทำอะไร?", facts: [`คุณ ${sgn(B.openR(i))}R`, `SL คุณ ${fmt(P.sl)}`, `ปิด ${fmt(m.c[i])}`],
+          opts: [O("ถือต่อ ให้ SL ทำงาน", "ok"), O("ขายครึ่งลดความเสี่ยง", "acc", () => B.sellQ(i, B.qty() / 2, m.c[i])), O("ขายตัดขาดทุนทั้งหมด", "bad", () => B.closeAll(i, m.c[i])), O("ขยับ SL ลงให้ห่างขึ้น", "bad", () => B.setSL(i, P.sl * 0.95))],
+          why: "แผนตั้งไว้ตอนเข้า — ความกลัวไม่ใช่สัญญาณ · ลดไม้ไม่ผิดกฎ แต่ไม่ใช่ระบบ" };
+      }
+      case "TP1_TRIG": case "TP2_TRIG": case "TP3_TRIG": {
+        const k = +q.type[2] - 1; if (!has) return null; if (P.tr && (!P.tr[k].open || P.tr[k].mode)) return null;
+        const lv = ["161.8%", "261.8%", "423.6%"][k];
+        return { q: `ราคาผ่าน TP${k + 1} (${lv} ของ 1-2 เล็ก) — ทำอะไรกับไม้ 1/3 ชุดนี้?`, facts: [`TP${k + 1} ${fmt(e.level)}`, `2.5 ATR = ${fmt(m.atr[i] * 2.5)} (${fmt(m.atr[i] * 250 / m.c[i], 1)}%)`, `ถืออยู่ ${fmt(B.qty(), 2)}`],
+          opts: [O("เริ่ม trailing 2.5 ATR เฉพาะ 1/3 นี้", "ok", () => B.arm(i, k, "trail")), O("ขาย 1/3 นี้ทันที", "acc", () => B.arm(i, k, "sell")), O("ถือต่อโดยไม่ trail", "bad", () => B.arm(i, k, "hold")), O("ขายทั้งหมด", "bad", () => B.closeAll(i, m.c[i]))],
+          why: "ผ่านระดับ fibo = เปิด trailing 2.5 ATR ของไม้นั้น แล้วให้ trailing เป็นคนขาย · ขายทันทีไม่ผิดกฎ แต่ตัดโอกาสวิ่งต่อ" };
+      }
+      case "TP1_REST": {
+        if (!has || !P.tr || !P.tr.some((T, k) => k > 0 && T.open)) return null;
+        const be = B.avg() * 1.002;
+        return { q: "ถึง TP1 แล้ว · ไม้ TP2/TP3 ที่ยังไม่ถึงระดับของมัน — SL ทำอย่างไร?", facts: [`SL คุณ ${fmt(P.sl)}`, `ทุน ${fmt(B.avg())}`, P.tr[0].mode === "trail" && P.tr[0].open ? `trailing ไม้ TP1 ${fmt(P.tr[0].trail)}` : "ไม้ TP1 ไม่ได้ trail"],
+          opts: [O("ยกมากันหน้าทุน", "ok", () => B.liftSL(i, be)), O("คงไว้ที่ SL เดิมด้านล่าง", "acc"), O("ใช้ trailing เดียวกับไม้ TP1", "bad", () => { P.restTrail = true; if (P.tr[0].mode === "trail") B.liftSL(i, P.tr[0].trail); }), O("ขยับชิดใต้ low แท่งนี้", "bad", () => B.liftSL(i, m.l[i] * 0.99))],
+          why: "ไม้ที่ยังไม่ถึงระดับของตัวเองไม่ใช้ trailing ของไม้ TP1 — ระบบยกมากันหน้าทุน · คงไว้ที่ SL เดิมไม่ผิดกฎ" };
+      }
+      case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": {
+        const k = +q.type[2] - 1; if (!has || !P.tr || !P.tr[k].open) return null; const T = P.tr[k];
+        return { q: `ราคาปิดต่ำกว่า trailing ของไม้ TP${k + 1} — ทำอะไร?`, facts: [`ปิด ${fmt(m.c[i])}`, T.mode === "trail" ? `trailing ${fmt(T.trail)}` : `ไม้นี้คุณเลือก ${T.mode || "ไม่ได้ตั้ง"}`, "ไม้ที่ยังไม่ถึงระดับของมัน ใช้ SL เดิม"],
+          opts: [O(`ขายเฉพาะ 1/3 ของ TP${k + 1} · ที่เหลือถือต่อ`, "ok", () => B.sellTranche(i, k)), O("ขาย 1/3 นี้ + ไม้ที่เหลือยก SL กันหน้าทุน", "acc", () => { const a = B.avg(); B.sellTranche(i, k); B.liftSL(i, a * 1.002); }), O("ขายทั้งหมด", "bad", () => B.closeAll(i, m.c[i])), O("ถือต่อ — ไม่สน trailing", "bad", () => { T.mode = "hold"; })],
+          timeout: () => { T.mode = "hold"; },
+          why: "แต่ละ 1/3 มี trailing ของตัวเอง — ไม้ที่ยังไม่แตะระดับของมันไม่ต้องออก" };
+      }
+      case "STOP": case "STOP_PROFIT": case "GAP_STOP": {
+        if (!has) return null; const gap = q.type === "GAP_STOP", px = gap ? m.o[i] : m.c[i];
+        return { q: gap ? "Gap ลงต่ำกว่า SL ของระบบ · คุณยังถืออยู่ — ทำอะไร?" : "ราคาหลุด SL ของระบบ แต่ SL คุณยังไม่โดน — ทำอะไร?", facts: [`SL ระบบ ${fmt(e.sl)}`, `SL คุณ ${fmt(P.sl)}`, gap ? `เปิด ${fmt(m.o[i])}` : `ปิด ${fmt(m.c[i])}`],
+          opts: [O("ออกทั้งหมดตอนนี้", "ok", () => B.closeAll(i, px)), O("ถือตาม SL ของผมเอง", P.sl > 1e-3 ? "acc" : "bad"), O("ย้าย SL ลงไปอีก รอเด้ง", "bad", () => B.setSL(i, P.sl * 0.9)), O("ซื้อเพิ่มเพราะถูก", "bad", () => B.add(i, 0.5))],
+          why: "โครงสร้างที่ SL ระบบคุมอยู่พังแล้ว — ถือตาม SL ของตัวเองไม่ผิดกฎถ้าวางไว้ตั้งแต่แรก แต่ย้าย SL หนีห้ามเด็ดขาด" };
+      }
+      case "INVALID": {
+        if (has) return { q: "Wave 2 ลงต่ำกว่าจุดเริ่ม Wave 1 · คุณยังถืออยู่ — ทำอะไร?", facts: ["Wave 2 ย่อเกิน 100%", `SL คุณ ${fmt(P.sl)}`],
+          opts: [O("ออกทั้งหมด — ทรงจบ", "ok", () => B.closeAll(i, m.c[i])), O("ถือตาม SL ของผม", P.sl > 1e-3 ? "acc" : "bad"), O("ซื้อเพิ่มเพราะถูก", "bad", () => B.add(i, 0.5)), O("ย้าย SL ลง", "bad", () => B.setSL(i, P.sl * 0.9))], why: "กฎ Elliott: Wave 2 ห้ามเกิน 100% — ทรงนี้จบ" };
+        return { q: "Wave 2 ลงต่ำกว่าจุดเริ่ม Wave 1 — ทำอะไร?", facts: ["Wave 2 ย่อเกิน 100%"],
+          opts: [O("NO TRADE — ทรงจบ รอ Wave 1 ใหม่", "ok"), O("ซื้อเพราะถูกแล้ว", "bad", () => B.open(i, 1, m.c[i] * 0.92)), O("ซื้อครึ่งไม้ลองดู", "bad", () => B.open(i, 0.5, m.c[i] * 0.92)), O("ทยอยซื้อเฉลี่ย", "bad", () => B.open(i, 0.33, m.c[i] * 0.85))], why: "กฎ Elliott: Wave 2 ห้ามเกิน 100%" };
+      }
+      case "NONEST_BREAKOUT": {
+        if (has) return null;
+        return { q: "ราคาทะลุยอด Wave 1 แรงมาก แต่ไม่มี nest — ทำอะไร?", facts: ["ไม่มี (i) ที่ล้มใต้ยอด", "ไม่มี (ii)"],
+          opts: [O("NO TRADE — ปล่อยไป", "ok"), O("รอดูว่าจะย่อสร้าง nest ใหม่ไหม", "acc"), O("ไล่ซื้อเต็มไม้", "bad", () => B.open(i, 1, (S.W2 || m.c[i] * 0.9) * 0.99)), O("ไล่ซื้อครึ่งไม้", "bad", () => B.open(i, 0.5, (S.W2 || m.c[i] * 0.9) * 0.99))], why: "no nest = no trade" };
+      }
+      case "PP_DAY": {
+        if (has || S.st !== "LONG" || !isFinite(S.II)) return null;
+        const c = e.cyc; if ((this.ppAsked[c] || 0) >= 2) return null;
+        const sl = S.II * 0.99, R = m.c[i] - sl; if (R < 2 * m.atr[i]) return null;
+        this.ppAsked[c] = (this.ppAsked[c] || 0) + 1;
+        return { q: "คุณไม่มีของ · Pocket Pivot หลัง (ii) ที่ผ่านเกณฑ์ — ทำอะไร?", facts: [`(ii) ${fmt(S.II)}`, `vol ${fmt(m.v[i] / m.maxDownVol[i], 1)}× down-vol สูงสุด 10 วัน`, `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`],
+          opts: [O("เข้าเต็มไม้ · SL ใต้ (ii)", "ok", () => B.open(i, 1, sl, R)), O("เข้าครึ่งไม้ · SL ใต้ (ii)", "acc", () => B.open(i, 0.5, sl, R)), O("ไม่เข้า", "acc"), O("เข้าเต็มไม้ ไม่ตั้ง SL", "bad", () => B.open(i, 1, 1e-6, R))],
+          why: "PP หลัง (ii) ที่ผ่านเกณฑ์ = จุดเข้าได้แม้พลาดไม้แรก · มี PP → เต็มไม้ · SL ใต้ (ii)" };
+      }
+      case "DECOY":
+        return has ? { q: "ระหว่างทาง — ตอนนี้ทำอะไร?", facts: [], opts: [O("HOLD ตามแผน", "ok"), O("ขายทั้งหมด", "bad", () => B.closeAll(i, m.c[i])), O("ขาย 1/3", "bad", () => B.sellQ(i, B.qty() / 3, m.c[i])), O("ขยับ SL ชิดใต้แท่งนี้", "bad", () => B.liftSL(i, m.l[i] * 0.99))], why: "ไม่มีเงื่อนไขขายใดเกิดขึ้น — ถือตามแผน" }
+          : { q: "ตอนนี้ทำอะไร?", facts: [], opts: [O("WAIT — ยังไม่มีสัญญาณครบ", "ok"), O("BUY เต็มไม้", "bad", () => B.open(i, 1, B.low20(i))), O("BUY ครึ่งไม้", "bad", () => B.open(i, 0.5, B.low20(i))), O("BUY ¼ ทดลอง", "bad", () => B.open(i, 0.25, B.low20(i)))], why: "ระบบยังไม่มีสัญญาณเข้า ณ แท่งนี้" };
+    }
+    return null;
+  },
+  ask(q) {
+    this.cur = q; Book.stepTo(q.i);
+    const d = this.build(q);
+    if (!d) { q.answered = true; return; }
+    this.waiting = true; Replay.playing = false; Replay.syncPlay(); Replay.t = q.i + 1;
+    Sound.tone([440, 554], 0.2, "triangle", 0.05);
+    d.opts = this.shuffle(d.opts); this.__lastOk = d.opts.findIndex(o => o.g === "ok"); this.__lastAcc = d.opts.findIndex(o => o.g === "acc");
+    const facts = this.hard ? "" : `<div class="facts">${d.facts.map(f => `<span class="fact">${f}</span>`).join("")}</div>`;
+    $("#dqBody").innerHTML = `<h4>${d.q}</h4>${facts}<div class="opts">${d.opts.map((o, j) => `<button class="opt" data-j="${j}"><span>${o.t}</span><span class="gtag"></span></button>`).join("")}</div><div class="fb" id="dfb"></div>${this.hard ? '<div class="note" id="dTimer" style="margin-top:8px"></div>' : ""}`;
+    $$("#dqBody .opt").forEach(b => b.onclick = () => this.answer(q, d, +b.dataset.j));
+    clearInterval(this.timer);
+    if (this.hard) { let left = 15; const tick = () => { const el = $("#dTimer"); if (el) el.textContent = `⏱ ${left} วินาที`; if (left-- <= 0) { clearInterval(this.timer); this.answer(q, d, -1); } }; tick(); this.timer = setInterval(tick, 1000); }
+    this.paint();
+  },
+  answer(q, d, j) {
+    if (q.answered) return; clearInterval(this.timer);
+    const choice = d.opts[j], g = choice ? choice.g : "bad"; q.answered = true;
+    this.mk.t++; if (g === "ok") this.mk.ok++; if (g === "acc") this.mk.acc++;
+    if (g !== "bad") { this.mk.streak++; this.mk.best = Math.max(this.mk.best, this.mk.streak); } else this.mk.streak = 0;
+    Sound.tone(g === "ok" ? [784, 1047] : g === "acc" ? [659, 784] : [220, 185], 0.22, g === "bad" ? "sawtooth" : "sine", g === "bad" ? 0.03 : 0.05);
+    this.life.total = (this.life.total || 0) + 1; if (g === "ok") this.life.ok = (this.life.ok || 0) + 1; if (g === "acc") this.life.acc = (this.life.acc || 0) + 1; this.saveLife();
+    if (choice && choice.act) choice.act(); else if (!choice && d.timeout) d.timeout();
+    $$("#dqBody .opt").forEach((b, k) => {
+      b.disabled = true; const G = GRADE[d.opts[k].g], tg = b.querySelector(".gtag");
+      if (d.opts[k].g === "ok") b.classList.add("right"); else if (d.opts[k].g === "acc") b.classList.add("acc"); else if (k === j) b.classList.add("wrong");
+      if (tg && (d.opts[k].g !== "bad" || k === j)) tg.textContent = G.s + " " + G.t;
+      if (k === j) b.classList.add("mine");
+    });
+    const sysT = d.opts.find(o => o.g === "ok").t, G = GRADE[g];
+    const head = j < 0 ? `<b style="color:${PAL.stop}">⏱ หมดเวลา = ✕</b>` : `<b style="color:${PAL[G.c]}">${G.s} ${G.t}</b>`;
+    const pendingSame = this.queue.some(x => !x.answered && x.i === q.i);
+    $("#dfb").innerHTML = `${head}${g === "ok" ? "" : ` · ระบบ: <b>${sysT}</b>`}<br>${d.why}<br><button class="bigbtn" style="margin-top:12px;padding:9px 18px;font-size:12px" id="dCont">${pendingSame ? "คำถามต่อ ▶" : "ต่อ ▶"}</button>`;
+    if (q.e && !Replay.firedSet.has(q.e) && !this.queue.some(x => x.e === q.e && !x.answered)) { Replay.firedSet.add(q.e); Replay.onEvent(q.e, false); }
+    this.paint(); Replay.dirty = true;
+    $("#dCont").onclick = () => {
+      this.waiting = false; const nq = this.nextQ();
+      let nq2 = nq; while (nq2 && nq2.i === q.i) { this.ask(nq2); if (this.waiting) return; nq2 = this.nextQ(); }
+      if (Math.floor(Replay.t) >= Replay.m.N - 1) { this.finish(); return; }
+      Replay.playing = true; Replay.syncPlay(); $("#dqBody").innerHTML = "กำลังเล่น… รอจุดตัดสินใจถัดไป";
+    };
+  },
+  pcts() { const t = this.mk.t; return { disc: t ? Math.round((this.mk.ok + this.mk.acc) / t * 100) : 100, exact: t ? Math.round(this.mk.ok / t * 100) : 100 }; },
+  finish() {
+    if (this.done) return; this.done = true;
+    const N = Replay.m.N, sys = Replay.run.snap[N - 1].totR; Book.stepTo(N - 1); const you = Book.total(N - 1);
+    const { disc, exact } = this.pcts(), bad = this.mk.t - this.mk.ok - this.mk.acc;
+    const grade = disc >= 95 && exact >= 80 ? "SENSEI" : disc >= 90 ? "DISCIPLINED" : disc >= 70 ? "ALMOST" : "หลุดกฎบ่อย";
+    this.ses.m++; this.ses.ok += this.mk.ok; this.ses.acc += this.mk.acc; this.ses.t += this.mk.t; this.ses.you += you; this.ses.sys += sys;
+    this.life.markets = (this.life.markets || 0) + 1; this.life.you = (this.life.you || 0) + you; this.life.sys = (this.life.sys || 0) + sys; if (this.mk.t >= 5) this.life.best = Math.max(this.life.best || 0, disc); this.saveLife();
+    const T = NEST.TEMPLATES[Replay.tpl]; const col = (v) => v > 0 ? PAL.buy : v < 0 ? PAL.stop : PAL.mut;
+    $("#dqBody").innerHTML = `<h4>จบตลาด · ${Replay.blockNames()}</h4>
+      <div class="score" style="margin:10px 0"><div><div class="v" style="color:${col(you)}">${sgn(you)}R</div><div class="k">คุณ</div></div><div><div class="v" style="color:${col(sys)}">${sgn(sys)}R</div><div class="k">ระบบ</div></div><div><div class="v">${disc}%</div><div class="k">DISCIPLINE</div></div></div>
+      <div class="fb">ระดับ <b style="color:${PAL.gold}">${grade}</b> · <b style="color:${PAL.buy}">✓ ${this.mk.ok}</b> · <b style="color:${PAL.gold}">≈ ${this.mk.acc}</b> · <b style="color:${PAL.stop}">✕ ${bad}</b> จาก ${this.mk.t} คำถาม · ตรงระบบ ${exact}% · streak ไม่ผิดกฎสูงสุด ${this.mk.best} · คุณเข้า ${Book.trades} ไม้</div>
+      <div class="fb"><b>บทเรียนรอบแรก:</b> ${T.lesson}</div>
+      <div class="note" style="margin-top:8px">ตลาดจำลอง · ผลขึ้นกับกราฟสุ่มแต่ละรอบ ไม่ใช่ผลเทรดจริง</div>
+      <button class="bigbtn" style="margin-top:14px" id="dNext">ตลาดถัดไป ⟳</button>`;
+    $("#dNext").onclick = () => { Replay.load("random"); Replay.playing = true; Replay.syncPlay(); };
+    this.paint(); Replay.dirty = true;
+  },
+  paint() {
+    const i = Math.max(0, Math.floor(Replay.t) - 1), you = Book.total(i), col = you > 0 ? PAL.buy : you < 0 ? PAL.stop : PAL.mut;
+    const { disc } = this.pcts();
+    $("#dCorrect").textContent = `${this.mk.ok}/${this.mk.t}`;
+    $("#dAcc").textContent = `≈ ${this.mk.acc} · ✕ ${this.mk.t - this.mk.ok - this.mk.acc}`;
+    $("#dPct").textContent = this.mk.t ? disc + "%" : "—";
+    $("#dPct").style.color = !this.mk.t ? PAL.mut : disc >= 90 ? PAL.buy : disc >= 70 ? PAL.gold : PAL.stop;
+    $("#dYouR").textContent = sgn(you) + "R"; $("#dYouR").style.color = col;
+    const P = Book.pos;
+    $("#dPos").textContent = P ? `ถือ ${fmt(Book.qty(), 2)} · ทุน ${fmt(Book.avg())} · SL ${P.sl > 1e-3 ? fmt(P.sl) : "ไม่มี"}${P.lifted && !P.tr ? " (ยกแล้ว)" : ""}${P.chase ? " (ไล่ pivot)" : ""}` + (P.tr ? " · " + P.tr.map((T, k) => `TP${k + 1}:${!T.open ? "✓" : T.mode === "trail" ? fmt(T.trail, 1) : T.mode === "hold" ? "hold" : "–"}`).join(" ") : "") : "ไม่มี position";
+    $("#dSys").textContent = this.done ? `SYSTEM: ${sgn(Replay.run.snap[Replay.m.N - 1].totR)}R` : "SYSTEM P&L: เฉลยตอนจบตลาด";
+    const L = this.life, S2 = this.ses, sd = S2.t ? Math.round((S2.ok + S2.acc) / S2.t * 100) : 0;
+    $("#dLife").textContent = (S2.m ? `วันนี้ ${S2.m} ตลาด · discipline ${sd}% · คุณ ${sgn(S2.you)}R vs ระบบ ${sgn(S2.sys)}R · ` : "") + (L.total ? `สะสม ${L.markets || 0} ตลาด · discipline ${Math.round(((L.ok || 0) + (L.acc || 0)) / L.total * 100)}% · ดีที่สุด ${L.best || 0}%` : "ยังไม่มีสถิติสะสม");
+  },
+  drawUser(ctx, X, Y, i0, last) {
+    const B = Book; if (!B.m) return;
+    ctx.strokeStyle = PAL.vdu; ctx.lineWidth = 2; ctx.setLineDash([5, 4]); ctx.beginPath(); let pen = false;
+    const hist = B.slHist; let k = 0, cur = NaN;
+    for (let i = Math.max(i0, 232); i <= last; i++) { while (k < hist.length && hist[k][0] <= i) { cur = hist[k][1]; k++; } if (isFinite(cur) && cur > 1e-3) { pen ? ctx.lineTo(X(i), Y(cur)) : ctx.moveTo(X(i), Y(cur)); pen = true; } else pen = false; }
+    ctx.stroke(); ctx.setLineDash([]);
+    if (B.pos && B.pos.tr) B.pos.tr.forEach((T, kk) => { if (T.mode === "trail" && T.open && isFinite(T.trail)) { ctx.strokeStyle = TPCOL[kk]; ctx.lineWidth = 1.6; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.moveTo(X(Math.max(i0, last - 12)), Y(T.trail)); ctx.lineTo(X(last), Y(T.trail)); ctx.stroke(); ctx.setLineDash([]); } });
+    B.marks.forEach(mk => { if (mk.i < i0 || mk.i > last) return; const x = X(mk.i), y = Y(mk.p); ctx.fillStyle = mk.t === "S" ? PAL.tgt : PAL.vdu; ctx.beginPath();
+      if (mk.t === "S") { ctx.moveTo(x - 7, y - 16); ctx.lineTo(x + 7, y - 16); ctx.lineTo(x, y - 5); } else { ctx.moveTo(x - 7, y + 16); ctx.lineTo(x + 7, y + 16); ctx.lineTo(x, y + 5); }
+      ctx.fill(); ctx.font = "800 9px " + FF(); ctx.textAlign = "center"; ctx.fillText(mk.t === "S" ? "YOU SELL" : mk.t === "B" ? "YOU BUY" : "YOU ADD", x, mk.t === "S" ? y - 19 : y + 26); ctx.textAlign = "left"; });
+  },
+};
+
+$("#dojoGo").onclick = () => { $("#dojoStart").classList.add("hidden"); Replay.playing = true; Replay.syncPlay(); };
+$("#hardT").onclick = () => { Dojo.hard = !Dojo.hard; $("#hardT").classList.toggle("on", Dojo.hard); if (Replay.mode === "dojo") { Replay.load("random"); $("#dojoStart").classList.remove("hidden"); } };
+$("#aboutBtn").onclick = () => $("#about").classList.remove("hidden");
+$("#aboutClose").onclick = () => $("#about").classList.add("hidden");
+$("#about").onclick = (e) => { if (e.target.id === "about") $("#about").classList.add("hidden"); };
+$("#ecNext").onclick = () => { Replay.load("random"); Replay.playing = true; Replay.syncPlay(); };
+$("#ecAgain").onclick = () => { Replay.seek(Replay.t0); Replay.playing = true; Replay.syncPlay(); };
+$("#ecShare").onclick = () => Replay.shareURL();
+$("#csvFile").onchange = (ev) => {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const lines = String(rd.result).split(/\r?\n/).filter(x => x.trim());
+      const sep = lines[0].includes(";") && !lines[0].includes(",") ? ";" : ",";
+      const hdr = lines[0].split(sep).map(x => x.trim().toLowerCase().replace(/"/g, ""));
+      const col = (names) => hdr.findIndex(hh => names.some(n => hh === n || hh.startsWith(n)));
+      const ci = { t: col(["time", "date", "datetime", "timestamp"]), o: col(["open"]), h: col(["high"]), l: col(["low"]), c: col(["close", "adj close"]), v: col(["volume", "vol"]) };
+      if (ci.o < 0 || ci.h < 0 || ci.l < 0 || ci.c < 0) throw new Error("ต้องมีคอลัมน์ open, high, low, close");
+      const rows = [];
+      for (let k = 1; k < lines.length; k++) {
+        const p = lines[k].split(sep).map(x => x.replace(/"/g, "").trim()), num = (i) => parseFloat(p[i]);
+        const r = { o: num(ci.o), h: num(ci.h), l: num(ci.l), c: num(ci.c), v: ci.v >= 0 ? num(ci.v) : 1, t: ci.t >= 0 ? p[ci.t] : k };
+        if ([r.o, r.h, r.l, r.c].every(isFinite) && r.c > 0) rows.push(r);
+      }
+      if (rows.length && /^\d{9,10}$/.test(String(rows[0].t))) rows.forEach(r => r.t = new Date(+r.t * 1000).toISOString().slice(0, 10));
+      if (rows.length < 260) throw new Error(`มีแค่ ${rows.length} แท่ง — ต้องการอย่างน้อย 260 แท่ง`);
+      Replay.loadCSV(NEST.fromOHLC(rows), f.name.replace(/\.csv$/i, "")); Replay.playing = true; Replay.syncPlay();
+    } catch (err) { alert("อ่านไฟล์ไม่ได้: " + err.message); }
+  };
+  rd.readAsText(f); ev.target.value = "";
+};
+
+/* ============================================================
+   MONTE CARLO LAB
+============================================================ */
+const Lab = {
+  P: { wr: 40, win: 3.5, loss: 0.9, rpt: 2, tpy: 5, yrs: 5 },
+  defs: [["wr", "Win rate", 15, 75, 1, "%"], ["win", "Avg win (R)", 1, 10, 0.1, "R"], ["loss", "Avg loss (R)", 0.3, 1.5, 0.05, "R"], ["rpt", "Risk per trade", 0.25, 6, 0.25, "%"], ["tpy", "Trades / year", 1, 40, 1, ""], ["yrs", "Years", 1, 10, 1, "y"]],
+  presets: [["Nest only (สมมติ)", { wr: 40, win: 3.5, loss: 0.9, rpt: 2, tpy: 5, yrs: 5 }], ["Scan 8 ชื่อ แบบเดิม", { wr: 35, win: 2.5, loss: 1, rpt: 1, tpy: 30, yrs: 5 }], ["RPT ดุ 4%", { wr: 40, win: 3.5, loss: 0.9, rpt: 4, tpy: 5, yrs: 5 }], ["Edge หาย", { wr: 28, win: 2.2, loss: 1, rpt: 2, tpy: 5, yrs: 5 }]],
+  res: null, anim: 0, animStart: 0,
+  init() {
+    const pb = $("#presets"); this.presets.forEach(([n, p], k) => { const b = document.createElement("button"); b.className = "chip" + (k === 0 ? " on" : ""); b.textContent = n; b.onclick = () => { Object.assign(this.P, p); $$("#presets .chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); this.syncCtl(); this.run(); }; pb.appendChild(b); });
+    const box = $("#ctls");
+    this.defs.forEach(([k, lab, mn, mx, st, u]) => {
+      const d = document.createElement("div"); d.className = "ctl";
+      d.innerHTML = `<label>${lab}</label><output id="o_${k}"></output><input type="range" id="r_${k}" min="${mn}" max="${mx}" step="${st}">`;
+      box.appendChild(d); const r = d.querySelector("input"); r.oninput = () => { this.P[k] = +r.value; this.syncCtl(); clearTimeout(this._t); this._t = setTimeout(() => this.run(), 250); };
+    });
+    this.syncCtl(); $("#runMC").onclick = () => this.run();
+  },
+  syncCtl() { this.defs.forEach(([k, , , , , u]) => { $("#r_" + k).value = this.P[k]; $("#o_" + k).textContent = this.P[k] + u; }); },
+  run() {
+    const P = this.P, runs = 1000, T = Math.max(1, Math.round(P.tpy * P.yrs)), rng = NEST.makeRng((Math.random() * 1e9) | 0);
+    const paths = [], finals = [], dds = [], streaks = [];
+    for (let r = 0; r < runs; r++) {
+      let eq = 1, peak = 1, mdd = 0, st = 0, mst = 0; const path = new Float32Array(T + 1); path[0] = 1;
+      for (let t = 1; t <= T; t++) {
+        let R;
+        if (rng.u() < P.wr / 100) { R = Math.max(0.3, P.win * Math.exp(rng.n() * 0.55 - 0.151)); st = 0; }
+        else { R = -(rng.u() < 0.3 ? P.loss * 0.5 : P.loss) * (1 + rng.n() * 0.08); st++; mst = Math.max(mst, st); }
+        eq *= Math.max(0.01, 1 + P.rpt / 100 * R); peak = Math.max(peak, eq); mdd = Math.max(mdd, 1 - eq / peak); path[t] = eq;
+      }
+      paths.push(path); finals.push(eq); dds.push(mdd); streaks.push(mst);
+    }
+    const sorted = finals.slice().sort((a, b) => a - b), q = (a, p) => a[Math.floor(p * (a.length - 1))];
+    const ddS = dds.slice().sort((a, b) => a - b);
+    const b = P.win / P.loss, W = P.wr / 100, kelly = W - (1 - W) / b;
+    const bands = [0.05, 0.25, 0.5, 0.75, 0.95].map(p => { const arr = new Float32Array(T + 1); for (let t = 0; t <= T; t++) { const col = paths.map(x => x[t]).sort((a, b) => a - b); arr[t] = q(col, p); } return arr; });
+    const rank = finals.map((f, i) => [f, i]).sort((a, b) => a[0] - b[0]); const pct = new Array(runs); rank.forEach(([, i], k) => pct[i] = k / (runs - 1));
+    this.res = { paths, finals, dds, ddS, streaks, T, med: q(sorted, 0.5), p05: q(sorted, 0.05), p95: q(sorted, 0.95), cagr: Math.pow(q(sorted, 0.5), 1 / P.yrs) - 1,
+      pLoss: finals.filter(f => f < 1).length / runs, mdd: q(ddS, 0.5), p20: dds.filter(d => d > 0.2).length / runs, p5s: streaks.filter(s => s >= 5).length / runs, kelly, bands, pct, exp: W * P.win - (1 - W) * P.loss * 0.85 };
+    this.animStart = now(); this.stats();
+  },
+  stats() {
+    const r = this.res, P = this.P; if (!r) return;
+    const c = (v, good) => good ? PAL.buy : PAL.stop;
+    const cards = [
+      ["MEDIAN RESULT", "×" + r.med.toFixed(2), `${P.yrs} ปี · 5–95%: ×${r.p05.toFixed(2)} – ×${r.p95.toFixed(2)}`, r.med > 1],
+      ["MEDIAN CAGR", (r.cagr * 100).toFixed(1) + "%", "ของถังเทรด", r.cagr > 0],
+      ["EXPECTANCY", sgn(r.exp, 2) + "R", "ต่อไม้ (โดยประมาณ)", r.exp > 0],
+      ["P(ขาดทุนทั้งช่วง)", (r.pLoss * 100).toFixed(0) + "%", "จบต่ำกว่าทุน", r.pLoss < 0.2],
+      ["MEDIAN MAX DD", (r.mdd * 100).toFixed(0) + "%", "drawdown ที่ต้องทนได้", r.mdd < 0.2],
+      ["P(DD > 20%)", (r.p20 * 100).toFixed(0) + "%", "โอกาสเจ็บหนัก", r.p20 < 0.25],
+      ["P(แพ้ติด ≥ 5)", (r.p5s * 100).toFixed(0) + "%", "เกิดแน่ถ้าเทรดนานพอ", r.p5s < 0.5],
+      ["KELLY f*", (r.kelly * 100).toFixed(1) + "%", `RPT = ${(P.rpt / Math.max(0.001, r.kelly * 100)).toFixed(2)}× ของ Kelly`, P.rpt <= r.kelly * 100 * 0.35],
+    ];
+    $("#mcStats").innerHTML = cards.map(([k, v, s, g]) => `<div class="stat"><div class="k">${k}</div><div class="v" style="color:${c(v, g)}">${v}</div><div class="s">${s}</div></div>`).join("");
+  },
+  redraw() { this.animStart = now() - 5000; this._key = null; },
+  frame() {
+    if (!this.res || !$("#v-lab").classList.contains("on")) return;
+    const r = this.res; const prog = clamp((now() - this.animStart) / 1800, 0, 1); const e = 1 - Math.pow(1 - prog, 3);
+    const sz = $("#fan").getBoundingClientRect(); const key = prog + ":" + sz.width + "x" + sz.height + ":" + PAL.light;
+    if (prog >= 1 && this._key === key) return; this._key = key;
+    // fan
+    { const { ctx, W, H } = fitCanvas($("#fan")); ctx.clearRect(0, 0, W, H);
+      const L = 56, R = 20, T = 40, B = 34, pw = W - L - R, ph = H - T - B;
+      let lo = Math.min(0.5, r.bands[0].reduce((a, b) => Math.min(a, b), 9)), hi = Math.max(2, r.bands[4].reduce((a, b) => Math.max(a, b), 0) * 1.05);
+      lo = Math.max(lo, 0.2);
+      const xs = (t) => L + t / r.T * pw, ys = (v) => T + (Math.log(hi) - Math.log(clamp(v, lo * 0.5, hi * 2))) / (Math.log(hi) - Math.log(lo)) * ph;
+      ctx.font = "11px " + FF(); ctx.fillStyle = PAL.dim; ctx.strokeStyle = PAL.grid;
+      [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5, 8, 13, 20].forEach(v => { if (v < lo || v > hi) return; const y = ys(v); ctx.beginPath(); ctx.moveTo(L, y); ctx.lineTo(L + pw, y); ctx.stroke(); ctx.fillText("×" + v, 12, y + 4); });
+      for (let yr = 0; yr <= this.P.yrs; yr++) { const x = xs(yr * this.P.tpy); ctx.fillText(yr + "y", x - 6, H - 12); }
+      ctx.strokeStyle = hexA(PAL.txt, 0.35); ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(L, ys(1)); ctx.lineTo(L + pw, ys(1)); ctx.stroke(); ctx.setLineDash([]);
+      const tmax = Math.max(1, Math.floor(e * r.T));
+      // band
+      ctx.fillStyle = hexA(PAL.gold, PAL.light ? 0.12 : 0.08); ctx.beginPath();
+      for (let t = 0; t <= tmax; t++) ctx.lineTo(xs(t), ys(r.bands[4][t])); for (let t = tmax; t >= 0; t--) ctx.lineTo(xs(t), ys(r.bands[0][t])); ctx.closePath(); ctx.fill();
+      ctx.globalCompositeOperation = PAL.light ? "source-over" : "lighter";
+      const step = r.paths.length > 400 ? 2 : 1;
+      for (let k = 0; k < r.paths.length; k += step) {
+        const p = r.paths[k], pc = r.pct[k]; const col = pc < 0.2 ? PAL.stop : pc > 0.8 ? PAL.buy : PAL.ma50;
+        ctx.strokeStyle = hexA(col, PAL.light ? 0.05 : 0.07); ctx.lineWidth = 1; ctx.beginPath();
+        for (let t = 0; t <= tmax; t++) t ? ctx.lineTo(xs(t), ys(p[t])) : ctx.moveTo(xs(t), ys(p[t])); ctx.stroke();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      [[1, PAL.gold, 1.4, [5, 4]], [3, PAL.gold, 1.4, [5, 4]], [2, PAL.gold, 3, []]].forEach(([bi, col, w, d]) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.setLineDash(d); ctx.beginPath(); for (let t = 0; t <= tmax; t++) t ? ctx.lineTo(xs(t), ys(r.bands[bi][t])) : ctx.moveTo(xs(t), ys(r.bands[bi][t])); ctx.stroke(); }); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.txt; ctx.font = "800 13px " + FF(); ctx.fillText("1,000 FUTURES OF YOUR TRADING BUCKET", L, 24);
+      ctx.fillStyle = PAL.mut; ctx.font = "12px " + FF(); ctx.fillText(`median ×${r.med.toFixed(2)}  ·  เส้นทอง = median / 25–75%  ·  เขียว = top 20%  ·  แดง = bottom 20%`, L + 300, 24);
+    }
+    // dd histogram
+    { const { ctx, W, H } = fitCanvas($("#ddh")); ctx.clearRect(0, 0, W, H);
+      const L = 56, R = 20, T = 36, B = 28, pw = W - L - R, ph = H - T - B; const bins = 30, mx = 0.6; const cnt = new Array(bins).fill(0);
+      r.dds.forEach(d => cnt[Math.min(bins - 1, Math.floor(d / mx * bins))]++); const cm = Math.max(...cnt);
+      for (let k = 0; k < bins; k++) { const x = L + k / bins * pw, w = pw / bins - 3, hh = cnt[k] / cm * ph * e; const dd = (k + 0.5) / bins * mx; ctx.fillStyle = dd > 0.2 ? hexA(PAL.stop, 0.75) : dd > 0.1 ? hexA(PAL.gold, 0.75) : hexA(PAL.buy, 0.75); ctx.fillRect(x, T + ph - hh, w, hh); }
+      ctx.fillStyle = PAL.dim; ctx.font = "11px " + FF(); [0, 10, 20, 30, 40, 50, 60].forEach(v => ctx.fillText(v + "%", L + v / 100 / mx * pw - 8, H - 8));
+      ctx.fillStyle = PAL.txt; ctx.font = "800 13px " + FF(); ctx.fillText("MAX DRAWDOWN DISTRIBUTION", L, 22);
+      const x20 = L + 0.2 / mx * pw; ctx.strokeStyle = PAL.stop; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x20, T); ctx.lineTo(x20, T + ph); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = PAL.stop; ctx.fillText("−20%", x20 + 4, T + 12);
+    }
+  },
+};
+
+/* ============================================================
+   FRACTAL  (self-similar nest, seamless infinite zoom)
+============================================================ */
+const Fractal = {
+  s: 0.42, b: [0.36, 0.16], phi: 0, cycle: 0, pos: 0, playing: true, dir: 1, labels: true,
+  names: [["SUPERCYCLE", "(I)", "(II)"], ["CYCLE", "I", "II"], ["PRIMARY", "((1))", "((2))"], ["INTERMEDIATE", "(1)", "(2)"], ["MINOR", "1", "2"], ["MINUTE", "((i))", "((ii))"], ["MINUETTE", "(i)", "(ii)"], ["SUBMINUETTE", "i", "ii"]],
+  cols: ["gold", "add", "ma50", "buy", "tgt", "dip", "vdu", "gold"],
+  init() {
+    const rng = NEST.makeRng(42);
+    const P0 = [0, 0], A1 = [0.12, 0.33], A2 = [0.17, 0.25], W1 = [0.28, 0.62], s = this.s, b = this.b;
+    const T = (p) => [b[0] + s * p[0], b[1] + s * p[1]];
+    const Pend = [1, 1.52];
+    const wig = (pts, amp) => { const out = []; for (let k = 1; k < pts.length; k++) { const [x0, y0] = pts[k - 1], [x1, y1] = pts[k]; const n = 14; for (let j = (k === 1 ? 0 : 1); j <= n; j++) { const f = j / n, e = Math.sin(f * Math.PI) * amp * (rng.u() - 0.5) * Math.hypot(x1 - x0, y1 - y0); out.push([x0 + (x1 - x0) * f + e * 0.3, y0 + (y1 - y0) * f + e]); } } return out; };
+    this.head = wig([P0, A1, A2, W1, [0.31, 0.5], [0.33, 0.55], b], 0.22);
+    this.tail = wig([T(Pend), [0.84, 0.95], [0.87, 0.9], [0.95, 1.3], [0.965, 1.22], Pend], 0.18);
+    this.W1 = W1; this.Tend = T(Pend); this.Pend = Pend; this.fix = [b[0] / (1 - s), b[1] / (1 - s)];
+    const lad = $("#ladder"); lad.innerHTML = "";
+    this.names.forEach((n, k) => { const d = document.createElement("div"); d.className = "rung"; d.style.setProperty("--rc", `var(--${this.cols[k]})`); d.innerHTML = `<span class="nt">${n[1]} ${n[2]}</span>${n[0]}<span class="bar"></span>`; lad.appendChild(d); });
+    $("#fPlay").onclick = () => { this.playing = !this.playing; $("#fPlay").textContent = this.playing ? "❚❚ หยุดซูม" : "▶ ซูมต่อ"; $("#fPlay").classList.toggle("on", this.playing); };
+    $("#fDir").onclick = () => { this.dir *= -1; $("#fDir").textContent = this.dir > 0 ? "ซูมออก" : "ซูมเข้า"; };
+    $("#fLbl").onclick = () => { this.labels = !this.labels; $("#fLbl").classList.toggle("on", this.labels); };
+    $("#frac").addEventListener("wheel", (e) => { e.preventDefault(); this.pos = clamp(this.pos + (e.deltaY > 0 ? -1 : 1) * 0.05, 0, 6.98); }, { passive: false });
+  },
+  frame(dt) {
+    if (!$("#v-fractal").classList.contains("on")) return;
+    if (this.playing) this.pos += dt * 0.09 * this.dir;
+    if (this.pos >= 6.98) { this.pos = 6.98; this.dir = -1; $("#fDir").textContent = "ซูมเข้า"; }
+    if (this.pos <= 0) { this.pos = 0; this.dir = 1; $("#fDir").textContent = "ซูมออก"; }
+    this.cycle = Math.floor(this.pos); this.phi = this.pos - this.cycle;
+    const { ctx, W, H } = fitCanvas($("#frac")); ctx.clearRect(0, 0, W, H);
+    const bgg = ctx.createRadialGradient(W * 0.5, H * 0.55, 10, W * 0.5, H * 0.55, Math.max(W, H) * 0.7);
+    bgg.addColorStop(0, hexA(PAL.ma50, PAL.light ? 0.06 : 0.1)); bgg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = bgg; ctx.fillRect(0, 0, W, H);
+    const s = this.s, Z = Math.pow(1 / s, this.phi), base = Math.min(W / 1.25, H / 1.75), fx = this.fix;
+    const cx = W * 0.47, cy = H * 0.6;
+    const scr = (p) => [cx + (p[0] - fx[0]) * base * Z, cy - (p[1] - fx[1]) * base * Z];
+    const Tk = (p, k) => { let x = p[0], y = p[1]; for (let j = 0; j < k; j++) { x = this.b[0] + s * x; y = this.b[1] + s * y; } return [x, y]; };
+    // draw from outer (k=-2) to deep (k=9)
+    for (let k = -3; k < 10; k++) {
+      const scale = base * Z * Math.pow(s, k); if (scale < 3) break; if (scale > W * 12) continue;
+      const lvl = k + this.cycle + 1; const ni = clamp(lvl, 0, 7); const col = PAL[this.cols[ni]] || PAL.gold; const named = lvl >= 0 && lvl <= 7;
+      const tr = (p) => { const q = k >= 0 ? Tk(p, k) : this.inv(p, -k); return scr(q); };
+      const alpha = clamp((scale - 3) / 60, 0, 1) * clamp(1.6 - Math.log10(scale / base) * 0.6, 0.25, 1);
+      // nest box + wave-1 line
+      const w1 = tr(this.W1), bb = tr(this.b), te = tr(this.Tend);
+      ctx.fillStyle = hexA(col, 0.045 * alpha * clamp(900 / scale, 0.2, 1)); ctx.fillRect(bb[0], w1[1], te[0] - bb[0], bb[1] - w1[1]);
+      ctx.setLineDash([6, 6]); ctx.strokeStyle = hexA(col, 0.45 * alpha); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(w1[0], w1[1]); ctx.lineTo(te[0] - (te[0] - bb[0]) * 0.08, w1[1]); ctx.stroke(); ctx.setLineDash([]);
+      // path pieces
+      ctx.save(); if (!PAL.light) { ctx.shadowColor = col; ctx.shadowBlur = 12; }
+      ctx.strokeStyle = hexA(col, 0.95 * alpha); ctx.lineWidth = clamp(scale / 260, 1, 3.2); ctx.lineJoin = "round";
+      [this.head, this.tail].forEach(pc => { ctx.beginPath(); pc.forEach((p, j) => { const q = tr(p); j ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]); }); ctx.stroke(); });
+      ctx.restore();
+      if (this.labels && named && scale > 70) {
+        const nm = this.names[ni]; const fs = clamp(scale / 22, 10, 26);
+        ctx.font = `800 ${fs}px ` + FF(); ctx.textAlign = "center"; ctx.fillStyle = hexA(col, alpha);
+        ctx.fillText(nm[1], w1[0], w1[1] - fs * 0.6); ctx.fillText(nm[2], bb[0], bb[1] + fs * 1.2);
+        if (scale > 240) { ctx.font = `700 ${clamp(fs * 0.5, 9, 13)}px ` + FF(); ctx.fillStyle = hexA(col, alpha * 0.8); ctx.fillText(nm[0] + " · NEST", (bb[0] + te[0]) / 2, w1[1] + clamp(fs * 0.7, 12, 18)); }
+        ctx.textAlign = "left";
+      }
+    }
+    // ladder highlight: level whose scale ~ base
+    const di = clamp(Math.round(this.pos) + 1, 0, 7);
+    $$("#ladder .rung").forEach((r, k) => r.classList.toggle("on", k === di));
+  },
+  inv(p, k) { let x = p[0], y = p[1]; for (let j = 0; j < k; j++) { x = (x - this.b[0]) / this.s; y = (y - this.b[1]) / this.s; } return [x, y]; },
+};
+
+/* ============================================================
+   GRADER
+============================================================ */
+const Grader = {
+  items: [
+    { k: "gc", t: "Golden cross เกิดแล้ว (Wave 1)", s: "MA50 ตัดขึ้น MA200 · ถ้าไม่มี = ยังไม่มี Wave 1 ตามนิยาม MA" },
+    { k: "w2ok", t: "Wave 2 ไม่หลุดจุดเริ่ม Wave 1", s: "ย่อไม่เกิน 100% — ถ้าหลุด = นับผิด จบ" },
+    { k: "curl", t: "MA50 ม้วนลง = Wave 2", s: "ไม่จำเป็นต้องมุดใต้ MA200" },
+    { k: "nest", t: "Nest: (i) เด้งไม่ผ่านยอด Wave 1", s: "แก่นของระบบ — ไม่มี = ไม่เทรด" },
+    { k: "hl", t: "(ii) ย่อ ≥ 61.8% ของขา (i) และอยู่เหนือ low Wave 2", s: "จุดวาง SL · SL ต้องห่าง ≥ 2 ATR ไม่งั้นรอ" },
+    { k: "trig", t: "MACD histogram พลิกบวก + MACD > 0", s: "ไกปืน — MA ใช้นิยาม Wave 1/2 เท่านั้น" },
+    { k: "pp", t: "มี Pocket Pivot ตอนเข้า", s: "มี = เต็มไม้ · ไม่มี = ครึ่งไม้" },
+  ],
+  presets: [
+    ["2566 · ก.ย. 2026", { gc: false, w2ok: false, curl: false, nest: false, hl: false, trig: false, pp: true }, "อ่านจากกราฟที่คุณส่งมา: MA50 ไม่เคยตัดขึ้น MA200 · ขาขึ้นปี 2025 ถูกย่อคืนเกิน 100%"],
+    ["Estun · พ.ค. 2026", { gc: true, w2ok: true, curl: true, nest: true, hl: true, trig: true, pp: true }, "อ่านคร่าวๆ จากกราฟที่คุณส่งมา: nest 2025–26 + PP · ยังไม่ได้วัด % ย่อของ (ii) กับ histogram — เช็คเองอีกครั้ง"],
+    ["868 · 2016 (weekly)", { gc: true, w2ok: true, curl: true, nest: true, hl: true, trig: true, pp: false }, "อ่านจากกราฟที่คุณส่งมา: 2013 เด้งไม่ผ่านยอด 2011 · 2015–16 low ยกสูง · ฐานนั่งแถวยอด 2007 · PP ไม่ได้ดู"],
+    ["ว่าง", { gc: false, w2ok: false, curl: false, nest: false, hl: false, trig: false, pp: false }, ""],
+  ],
+  st: {}, note: "", anim: 0, target: 0, disp: 0,
+  init() {
+    const pb = $("#gPresets"); this.presets.forEach(([n, st, note], k) => { const b = document.createElement("button"); b.className = "chip" + (k === 0 ? " on" : ""); b.textContent = n; b.onclick = () => { this.st = Object.assign({}, st); this.note = note; $$("#gPresets .chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); this.render(); }; pb.appendChild(b); });
+    const box = $("#gItems"); this.items.forEach((it, k) => { const d = document.createElement("div"); d.className = "gitem"; d.dataset.k = it.k; d.innerHTML = `<div class="gn">${k + 1}</div><div style="flex:1"><div class="gt">${it.t}</div><div class="gs">${it.s}</div></div><div class="sw"></div>`; d.onclick = () => { this.st[it.k] = !this.st[it.k]; $$("#gPresets .chip").forEach(x => x.classList.remove("on")); this.note = ""; this.render(); }; box.appendChild(d); });
+    this.st = Object.assign({}, this.presets[0][1]); this.note = this.presets[0][2]; this.render();
+  },
+  verdict() {
+    const s = this.st; const core = ["gc", "w2ok", "curl", "nest", "hl", "trig"]; const n = core.filter(k => s[k]).length;
+    if (!s.w2ok && s.gc) return { v: "COUNT INVALID", c: "stop", sub: "Wave 2 หลุดจุดเริ่ม Wave 1 — ทรงนี้จบ ต้องรอ Wave 1 ใหม่", score: n / 6 };
+    if (!s.gc) return { v: "NOT STARTED", c: "mut", sub: "ยังไม่มี Wave 1 ตามนิยาม MA — watchlist + alert golden cross", score: n / 6 };
+    if (!s.curl) return { v: "WAVE 1 · WAIT", c: "gold", sub: "รอ MA50 ม้วนลงเข้า Wave 2", score: n / 6 };
+    if (!s.nest) return { v: "NO NEST = NO TRADE", c: "stop", sub: "Wave 2 ยังไม่มี nest — ห้ามเข้า ถึงราคาจะเด้งแรงก็ตาม", score: n / 6 };
+    if (!s.hl) return { v: "NEST · WAIT FOR (ii)", c: "gold", sub: "มี (i) แล้ว แต่ (ii) ยังย่อไม่ถึง 61.8% หรือ SL ใกล้กว่า 2 ATR — รอ", score: n / 6 };
+    if (!s.trig) return { v: "ARMED · SET ALERTS", c: "gold", sub: "มี nest แล้ว — รอ histogram พลิกบวก + MACD > 0", score: n / 6 };
+    return s.pp ? { v: "A · FULL SIZE", c: "buy", sub: "ครบทุกข้อ + PP → เข้าเต็มไม้ · SL ใต้ (ii) ยกครั้งเดียว · TP1/TP2/TP3 จาก 1-2 เล็ก · trailing 2.5 ATR แยกทีละ 1/3", score: 1 } : { v: "A · HALF SIZE", c: "buy", sub: "ครบทุกข้อ แต่ไม่มี PP → ครึ่งไม้", score: 0.92 };
+  },
+  render(themeOnly) {
+    $$("#gItems .gitem").forEach(d => d.classList.toggle("on", !!this.st[d.dataset.k]));
+    const V = this.verdict(); this.target = V.score; this.V = V;
+    $("#vt").textContent = V.v; $("#vt").style.color = PAL[V.c]; $("#vs").textContent = V.sub + (this.note ? " · " + this.note : "");
+    $("#reasons").innerHTML = this.items.map(it => `<div class="reason"><span style="color:${this.st[it.k] ? PAL.buy : PAL.stop}">${this.st[it.k] ? "✓" : "✕"}</span>${it.t}</div>`).join("");
+  },
+  frame(dt) {
+    if (!$("#v-grader").classList.contains("on")) return;
+    this.disp = lerp(this.disp, this.target, 1 - Math.pow(0.02, dt)); this.anim += dt;
+    const { ctx, W, H } = fitCanvas($("#dial")); ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 18; const col = PAL[(this.V || {}).c] || PAL.gold;
+    ctx.lineCap = "round"; ctx.lineWidth = 16; ctx.strokeStyle = hexA(PAL.mut, 0.15); ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 0.75, Math.PI * 2.25); ctx.stroke();
+    ctx.save(); if (!PAL.light) { ctx.shadowColor = col; ctx.shadowBlur = 22; } ctx.strokeStyle = col; ctx.beginPath(); ctx.arc(cx, cy, R, Math.PI * 0.75, Math.PI * 0.75 + Math.PI * 1.5 * clamp(this.disp, 0.001, 1)); ctx.stroke(); ctx.restore();
+    for (let k = 0; k < 7; k++) { const a = Math.PI * 0.75 + Math.PI * 1.5 * (k / 6); ctx.fillStyle = hexA(PAL.txt, 0.4); ctx.beginPath(); ctx.arc(cx + Math.cos(a) * (R - 22), cy + Math.sin(a) * (R - 22), 2, 0, 7); ctx.fill(); }
+    ctx.fillStyle = PAL.txt; ctx.textAlign = "center"; ctx.font = "900 54px " + FF(); ctx.fillText(Math.round(this.disp * 100) + "", cx, cy + 12);
+    ctx.font = "700 11px " + FF(); ctx.fillStyle = PAL.mut; ctx.fillText("SETUP SCORE", cx, cy + 36); ctx.textAlign = "left";
+  },
+};
+
+/* ============================================================
+   BACKGROUND FX (subtle starfield of candles)
+============================================================ */
+const BG = {
+  pts: [], init() { for (let k = 0; k < 70; k++) this.pts.push({ x: Math.random(), y: Math.random(), v: 0.004 + Math.random() * 0.012, h: 4 + Math.random() * 16, up: Math.random() > 0.45 }); },
+  frame(dt) {
+    const { ctx, W, H } = fitCanvas($("#bgfx")); ctx.clearRect(0, 0, W, H); if (PAL.light) return;
+    for (const p of this.pts) { p.y -= p.v * dt; if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); } ctx.fillStyle = hexA(p.up ? PAL.up : PAL.dn, 0.05); ctx.fillRect(p.x * W, p.y * H, 3, p.h); }
+  },
+};
+
+/* ============================================================
+   TABS + LOOP
+============================================================ */
+let TAB = "replay";
+function setTab(t) {
+  TAB = t; $$("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === t));
+  $$(".view").forEach(v => v.classList.remove("on"));
+  if (t === "replay" || t === "dojo") {
+    $("#v-chart").classList.add("on");
+    const was = Replay.mode; Replay.mode = t;
+    if (t === "dojo" && was !== "dojo") Dojo.enter();
+    if (t === "replay" && was === "dojo") { Dojo.exit(); Replay.load("textbook"); }
+  } else $("#v-" + t).classList.add("on");
+  if (t === "lab" && !Lab.res) Lab.run(); else if (t === "lab") Lab.redraw();
+  if (t === "grader") Grader.render();
+  if (t !== "replay" && t !== "dojo") { try { history.replaceState(null, "", "#tab=" + t); } catch (e) {} } else Replay.writeHash();
+  Replay.dirty = true;
+}
+$$("#tabs button").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+let lastF = now();
+function loop() {
+  const t = now(); const dt = Math.min(0.05, (t - lastF) / 1000); lastF = t;
+  try {
+    BG.frame(dt);
+    if ($("#v-chart").classList.contains("on")) Replay.frame(dt);
+    Lab.frame(); Fractal.frame(dt); Grader.frame(dt);
+  } catch (err) { console.error("frame error", err); }
+  requestAnimationFrame(loop);
+}
+function boot() {
+  Replay.init(); Lab.init(); Fractal.init(); Grader.init(); BG.init();
+  const H = Object.fromEntries(location.hash.replace(/^#/, "").split("&").filter(Boolean).map(kv => kv.split("=")));
+  let sKey = (H.s || "textbook").replace(/^r:.*/, "random"); const seedH = +H.seed || 7;
+  if (!NEST.TEMPLATES[sKey] && sKey !== "random") sKey = "textbook";
+  Replay.load(sKey, seedH);
+  if (H.tab && H.tab !== "replay") setTimeout(() => setTab(H.tab), 50);
+  window.addEventListener("resize", () => { Replay.dirty = true; });
+  requestAnimationFrame(loop);
+  setTimeout(() => { $("#splash").classList.add("out"); Replay.playing = true; Replay.syncPlay(); }, 1700);
+  $("#splash").onclick = () => $("#splash").classList.add("out");
+  console.log("NEST cockpit ready", Replay.m.N, Replay.run.ev.length);
+  window.addEventListener("error", (e) => console.error("NEST error:", e.message, e.lineno));
+
+}
+boot();
+</script>
+</body>
+</html>
