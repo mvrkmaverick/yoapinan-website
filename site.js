@@ -117,6 +117,7 @@
     { key: "market-ideas", label: "Market Ideas", href: "market-ideas.html" },
     { key: "field-notes", label: "Field Notes", href: "field-notes.html" },
     { key: "track-record", label: "Track Record", href: "mvrkmanagement.html" },
+    { key: "nest", label: "NEST Cockpit", href: "nest.html" },
     { key: "about", label: "เกี่ยวกับผม", href: "about.html" },
     { key: "course", label: "คอร์สเรียน", href: "course.html" }
   ];
