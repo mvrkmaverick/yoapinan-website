@@ -170,6 +170,7 @@ table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:va
 .agn{font-size:15px;white-space:nowrap}.agm{margin-left:auto;font-family:var(--mono);font-size:15px;font-weight:800;white-space:nowrap}.agm small{font-size:12px;opacity:.9}
 .ag2{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:6px;padding-left:24px}
 .mc2{background:rgba(127,140,160,.1);border-radius:6px;padding:3px 5px;text-align:center}.mc2 span{display:block;font-size:10.5px;color:var(--mut)}.mc2 b{font-family:var(--mono);font-size:13px;color:var(--txt)}
+.mc2.on{outline:1.5px solid var(--gold);background:rgba(255,209,102,.14)}
 .ag3{font-size:11.5px;color:var(--mut);padding-left:24px;margin-top:4px}
 .opn{font-size:11px!important}
 details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;margin-bottom:8px}details.rnd summary{cursor:pointer;font-weight:800;font-size:13px}
@@ -329,7 +330,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
   <h3>บัญชีจำลอง</h3>
   <div class="ctl"><label>เงินทุน (บาท)</label><output id="acCapO"></output><input type="number" id="acCap" min="10000" step="10000" style="grid-column:1/-1" class="sel"></div>
   <div class="ctl"><label>ความเสี่ยงต่อไม้ (% ของทุน)</label><output id="acRptO"></output><input type="range" id="acRpt" min="0.25" max="5" step="0.25"></div>
-  <div class="ctl"><label>รวมความเสี่ยงไม้ที่เปิดอยู่สูงสุด (heat)</label><output id="acHeatO"></output><select class="sel" id="acHeat" style="grid-column:1/-1"><option value="5">5%</option><option value="8">8%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option><option value="0">ไม่จำกัด</option></select></div><div class="note">1 R = เงินที่ยอมเสียถ้าโดน SL = ทุน × % เสี่ยงต่อไม้ · heat = ผลรวม % เสี่ยงของทุกไม้ที่ถืออยู่พร้อมกัน ถ้าเกินจะข้ามสัญญาณใหม่ · ใช้เงินได้ไม่เกิน 100% ของทุน (ไม่กู้) · ใช้กับพอร์ตหลายหุ้นใน AI LAB</div>
+  <div class="ctl"><label>วิธีคิดขนาดไม้ (พอร์ตหลายหุ้น)</label><output></output><select class="sel" id="acSz" style="grid-column:1/-1"><option value="alloc">ใช้เงินให้เต็ม — แบ่งเงินต่อหุ้น</option><option value="risk">เสี่ยงคงที่ต่อไม้ (RPT)</option></select></div><div class="ctl" id="acAlW"><label>เงินต่อหุ้นสูงสุด</label><output id="acAlO"></output><select class="sel" id="acAl" style="grid-column:1/-1"><option value="10">10% (≈10 ตัว)</option><option value="15">15%</option><option value="20">20% (≈5 ตัว)</option><option value="25">25%</option><option value="33">33% (≈3 ตัว)</option></select></div><div class="ctl"><label>รวมความเสี่ยงไม้ที่เปิดอยู่สูงสุด (open risk)</label><output id="acHeatO"></output><select class="sel" id="acHeat" style="grid-column:1/-1"><option value="5">5%</option><option value="8">8%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option><option value="0">ไม่จำกัด</option></select></div><div class="note">1 R = เงินที่ยอมเสียถ้าโดน SL = ทุน × % เสี่ยงต่อไม้ · heat = ผลรวม % เสี่ยงของทุกไม้ที่ถืออยู่พร้อมกัน ถ้าเกินจะข้ามสัญญาณใหม่ · ใช้เงินได้ไม่เกิน 100% ของทุน (ไม่กู้) · ใช้กับพอร์ตหลายหุ้นใน AI LAB</div>
 </div></div>
 <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
 <main>
@@ -534,6 +535,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
   };
   const TYPES = Object.keys(TEMPLATES);
 
+  let STAGGER = false;
   function build(blocks, rng) {
     const A = []; let t = 0; const metas = []; const VB = rng.r(0.82, 1.28);
     const push = (dt, p, sg) => { t += Math.max(1, Math.round(dt)); A.push([t, p, sg]); return t; };
@@ -559,7 +561,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
         L = B * 0.75; meta.tBase0 = t;
       } else {
         B = bi === 0 ? 100 : last() * rng.r(0.55, 0.72);
-        if (bi === 0) { A.push([0, B * rng.r(1.7, 2.1), 0.012]); P(rng.r(95, 110), B * rng.r(1.3, 1.45), 0.013); P(rng.r(85, 95), B * rng.r(0.97, 1.0), 0.012); }
+        if (bi === 0) { const B0 = B * rng.r(1.7, 2.1); A.push([0, B0, 0.012]); if (STAGGER) { const L = rng.i(0, 5); for (let j = 0; j < L; j++) { P(rng.r(25, 70), B0 * rng.r(0.9, 1.1), 0.014); } } P(rng.r(95, 110), B * rng.r(1.3, 1.45), 0.013); P(rng.r(85, 95), B * rng.r(0.97, 1.0), 0.012); }
         else { P(rng.r(40, 60), last() * rng.r(0.76, 0.86), 0.013); P(rng.r(10, 18), last() * rng.r(1.05, 1.1), 0.012); P(rng.r(40, 60), B, 0.013); }
         P(rng.r(28, 42), B * rng.r(1.0, 1.03), 0.009); meta.tBase0 = t; L = B;
       }
@@ -1025,11 +1027,12 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
     const m = { o, h, l, c, v, N, seed, world: pure ? "random" : "harsh", blocks: [pure ? "random" : "harsh"], regimes: regs.map(([i, k]) => ({ i, k, name: REG[k].name })) };
     indicators(m); m.run = runEngine(m); m.tpl = pure ? "random" : "harsh"; return m;
   }
-  function genWorld(world, seed, first) {
+  function genWorld(world, seed, first, opt) {
     if (world === "harsh") return genHarsh(seed, false);
     if (world === "random") return genHarsh(seed, true);
-    if (world === "mixed") { const r = makeRng(seed * 13 + 5); const u = r.u(); return u < 0.4 ? genScenario("random", seed) : u < 0.8 ? genHarsh(seed, false) : genHarsh(seed, true); }
-    return genScenario(first || "random", seed);
+    const stag = (m) => m;
+    if (world === "mixed") { const r = makeRng(seed * 13 + 5); const u = r.u(); if (u < 0.4) { STAGGER = !!(opt && opt.stagger); try { return genScenario("random", seed); } finally { STAGGER = false; } } return u < 0.8 ? genHarsh(seed, false) : genHarsh(seed, true); }
+    STAGGER = !!(opt && opt.stagger); try { return genScenario(first || "random", seed); } finally { STAGGER = false; }
   }
   // ---------- money: R -> baht with risk-per-trade compounding ----------
   function statsFromTrades(trades, opt) {
@@ -1217,7 +1220,7 @@ const LABCORE = (function () {
     const mk = [];
     for (let k = 0; k < K; k++) {
       const seed = (opt.seed || 1) * 100 + k * 7 + 1;
-      const m = NEST.genWorld(world, seed); m.seedK = seed;
+      const m = NEST.genWorld(world, seed, undefined, { stagger: K > 8 }); m.seedK = seed;
       const M = { m, run: m.run, seed, t0: 232 };
       const bh = m.c[m.N - 1] / m.c[232] - 1;
       mk.push({ M, m, seed, world: m.world, bh, name: m.world === "normal" ? m.blocks.map(b => NEST.TEMPLATES[b].name).join(" → ") : (m.regimes || []).map(r => r.name).slice(0, 5).join(" → ") });
@@ -1234,10 +1237,10 @@ const LABCORE = (function () {
       return { P, res, eq, eqR, dd, trades, tot, maxQ: Math.max(...res.map(r => r.maxQ)) };
     });
     // ---- portfolio: many stocks, fixed risk per trade, total open risk (heat) cap, no leverage (exposure <= 100%) ----
-    const heat = (opt.heat || 0) / 100;
+    const heat = (opt.heat || 0) / 100, allocMode = opt.sizing === "alloc", alloc = (opt.alloc || 20) / 100;
     agents.forEach(A => {
       const cand = [];
-      A.res.forEach((r, k) => r.trades.forEach(t => { const slp = (t.p0 && t.sl0 > 0 && t.p0 > t.sl0) ? (t.p0 - t.sl0) / t.p0 : 0.15; cand.push({ k, t, i0: t.i0, i1: t.i1, risk: rpt * (t.maxQ || 1), expo: Math.min(1, rpt * (t.maxQ || 1) / Math.max(0.02, slp)) }); }));
+      A.res.forEach((r, k) => r.trades.forEach(t => { const slp = (t.p0 && t.sl0 > 0 && t.p0 > t.sl0) ? (t.p0 - t.sl0) / t.p0 : 0.15; cand.push({ k, t, i0: t.i0, i1: t.i1, slp: Math.max(0.02, slp), mq: t.maxQ || 1, risk: rpt * (t.maxQ || 1), expo: Math.min(1, rpt * (t.maxQ || 1) / Math.max(0.02, slp)) }); }));
       cand.sort((a, b) => a.i0 - b.i0 || hsh(a.k, a.i0) - hsh(b.k, b.i0));
       const eq = new Float32Array(maxN), util = new Float32Array(maxN), open = [], taken = []; let ci = 0, skipped = 0, realized = 0;
       for (let i = 0; i < maxN; i++) {
@@ -1245,9 +1248,18 @@ const LABCORE = (function () {
         const eqPrev = i ? eq[i - 1] : cap;
         while (ci < cand.length && cand[ci].i0 <= i) { const c = cand[ci++]; if (c.i0 < i) continue;
           const rsk = open.reduce((s, o) => s + o.risk, 0), ex = open.reduce((s, o) => s + o.expo, 0);
-          if ((heat > 0 && rsk + c.risk > heat + 1e-9) || ex + c.expo > 1 + 1e-9) { skipped++; continue; }
+          let size;
+          if (allocMode) {
+            // fill capital: each stock gets up to `alloc` of equity (full position incl. adds), limited by free cash and remaining open-risk budget
+            let a = Math.min(alloc, 1 - ex); if (heat > 0) a = Math.min(a, (heat - rsk) / c.slp);
+            if (a < 0.03) { skipped++; continue; }
+            c.expo = a; c.risk = a * c.slp; size = eqPrev * a * c.slp / c.mq;
+          } else {
+            if ((heat > 0 && rsk + c.risk > heat + 1e-9) || ex + c.expo > 1 + 1e-9) { skipped++; continue; }
+            size = eqPrev * rpt;
+          }
           const er = A.res[c.k].eqR, base = c.i0 > 0 ? er[c.i0 - 1] : 0, Rend = er[Math.min(c.i1, mk[c.k].m.N - 1)] - base;
-          const o = Object.assign({}, c, { size: eqPrev * rpt, base, er, Rend, N: mk[c.k].m.N }); open.push(o); taken.push(Object.assign({ k: c.k, pnl: o.size * c.t.R }, c.t)); }
+          const o = Object.assign({}, c, { size, base, er, Rend, N: mk[c.k].m.N }); open.push(o); taken.push(Object.assign({ k: c.k, pnl: o.size * c.t.R }, c.t)); }
         let v = cap + realized, u = 0; for (const o of open) { const ii = Math.min(i, o.N - 1); v += o.size * (o.er[ii] - o.base); u += o.expo; }
         eq[i] = v; util[i] = u;
       }
@@ -1339,7 +1351,8 @@ const now = () => performance.now();
 let _FF = null; const FF = () => _FF || (_FF = getComputedStyle(document.body).fontFamily || "sans-serif");
 
 // ---------- account (money) ----------
-const ACCT = { capital: 1000000, rpt: 1, heat: 10 };
+const ACCT = { capital: 1000000, rpt: 1, heat: 10, sizing: "alloc", alloc: 20 };
+try { const _a = JSON.parse(localStorage.getItem("nest-acct") || "{}"); if (!_a.sizing) { ACCT.sizing = "alloc"; ACCT.alloc = 20; } } catch (e) {}
 try { Object.assign(ACCT, JSON.parse(localStorage.getItem("nest-acct") || "{}")); } catch (e) {}
 const fmtBal = (v) => "฿" + Math.round(v).toLocaleString("en-US");
 const fmtPnl = (v) => (!isFinite(v) ? "—" : (v >= 0 ? "+" : "−") + "฿" + Math.abs(Math.round(v)).toLocaleString("en-US"));
@@ -1347,6 +1360,10 @@ function acctUI() {
   const cap = $("#acCap"), rpt = $("#acRpt");
   const sync = () => { $("#acCapO").textContent = fmtBal(ACCT.capital); $("#acRptO").textContent = ACCT.rpt + "%"; cap.value = ACCT.capital; rpt.value = ACCT.rpt; };
   const save = () => { try { localStorage.setItem("nest-acct", JSON.stringify(ACCT)); } catch (e) {} if (Replay.m) { Replay.updatePanels(true); if (Replay.mode === "dojo") Dojo.paint(); } if (typeof AILab !== "undefined") { AILab.money(); AILab.lastBoard = 0; } };
+  const szSync = () => { $("#acSz").value = ACCT.sizing; $("#acAl").value = String(ACCT.alloc); $("#acAlO").textContent = ACCT.alloc + "%"; $("#acAlW").style.display = ACCT.sizing === "alloc" ? "" : "none"; };
+  $("#acSz").onchange = (e) => { ACCT.sizing = e.target.value; szSync(); save(); };
+  $("#acAl").onchange = (e) => { ACCT.alloc = +e.target.value; szSync(); save(); };
+  szSync();
   $("#acHeat").value = String(ACCT.heat); $("#acHeatO").textContent = ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด";
   $("#acHeat").onchange = (e) => { ACCT.heat = +e.target.value; $("#acHeatO").textContent = ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด"; save(); };
   cap.onchange = () => { ACCT.capital = Math.max(10000, +cap.value || 1e6); sync(); save(); };
@@ -2772,7 +2789,7 @@ const AILab = {
       try {
         this.roundNo++;
         const seed = (this.roundNo * 7919 + { normal: 0, harsh: 101, random: 211, mixed: 307 }[this.world] + (this.baseSeed || (this.baseSeed = 1 + Math.floor(Math.random() * 9000)))) % 1000000;
-        this.rd = LABCORE.round({ K: this.K, world: this.world, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat }, NEST, Dojo, Book);
+        this.rd = LABCORE.round({ K: this.K, world: this.world, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat, sizing: ACCT.sizing, alloc: ACCT.alloc }, NEST, Dojo, Book);
         this.prep(); this.t = 232; this.fed = 0; this.bubbles = []; this.flashes = []; this.sel = -1; $("#alFeed").innerHTML = ""; $("#alSel").classList.add("hidden"); this.setFollow(this.follow);
         Object.keys(LABCORE.OBS).forEach(k => { const el = $("#obs_" + k); if (el) el.textContent = "รอดูอยู่…"; });
         this.playing = true; $("#alPlay").textContent = "❚❚"; this.finished = false;
@@ -2852,7 +2869,7 @@ const AILab = {
     const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : "—", sg = (v, d) => isFinite(v) ? (v >= 0 ? "+" : "") + v.toFixed(d) : "—";
     const WN = { normal: "ปกติ", harsh: "โหด", random: "สุ่ม", mixed: "ผสม" }, worlds = [...new Set(R.map(r => WN[r.world] || r.world))].join(", ");
     const sen = byK.SENSEI, top = rows[0];
-    $("#alRunBody").innerHTML = `<div class="note" style="margin-bottom:6px">${R.length} รอบ · โลก: ${worlds} · รอบละ ${this.K} หุ้น · ทุน ${fmtBal(ACCT.capital)} · เสี่ยง ${ACCT.rpt}%/ไม้ · รวมความเสี่ยงไม้ที่เปิดอยู่ไม่เกิน ${ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด"} · ใช้เงินไม่เกิน 100% (ไม่กู้) · เรียงตาม Calmar ค่ากลาง</div>
+    $("#alRunBody").innerHTML = `<div class="note" style="margin-bottom:6px">${R.length} รอบ · โลก: ${worlds} · รอบละ ${this.K} หุ้น · ทุน ${fmtBal(ACCT.capital)} · ${ACCT.sizing === "alloc" ? "ใช้เงินให้เต็ม: หุ้นละไม่เกิน " + ACCT.alloc + "% ของพอร์ต" : "เสี่ยง " + ACCT.rpt + "%/ไม้"} · open risk รวมไม่เกิน ${ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด"} · ใช้เงินไม่เกิน 100% (ไม่กู้) · เรียงตาม Calmar ค่ากลาง</div>
       <table class="mini"><tr><th></th><th>AI</th><th>กำไรเฉลี่ย/รอบ</th><th>MaxDD เฉลี่ย</th><th>Calmar (ค่ากลาง)</th><th>Sharpe</th><th>@VaR 6.5% /ปี</th><th>ใช้เงินเฉลี่ย</th><th>ข้ามเพราะเต็ม</th><th>ชนะรอบ</th><th>ตามกฎ</th></tr>` +
       rows.map((o, j) => `<tr><td>${j + 1}</td><td><span class="dot2" style="background:${o.col}"></span>${o.name}</td><td style="color:${avg(o.ret) >= 0 ? PAL.buy : PAL.stop}">${sg(avg(o.ret), 1)}% (${fmtPnl(avg(o.pnl))})</td><td>${f2(avg(o.dd), 1)}%</td><td><b>${f2(med(o.cal), 2)}</b></td><td>${f2(med(o.sh), 2)}</td><td>${sg(avg(o.nc), 1)}%</td><td>${f2(avg(o.util), 0)}%</td><td>${f2(avg(o.skip), 0)}/รอบ</td><td>${o.win}/${R.length}</td><td>${f2(avg(o.disc), 0)}%</td></tr>`).join("") + `</table>
       <div class="fb"><b style="color:${LABCORE.OBS.CLAUDE.col}">Claude</b> ที่ 1 ตาม Calmar: <b>${top.name}</b> (${f2(med(top.cal), 2)})${sen && top !== sen ? ` · ระบบ (SENSEI) Calmar ${f2(med(sen.cal), 2)} อันดับ ${rows.indexOf(sen) + 1}` : ""} · ดูรายละเอียดแต่ละรอบที่ "ผลจบรอบ 📊" · ต้องการหลักฐานว่าควรปรับกฎไหม ใช้ "ข้อเสนอ AI 🔬"</div>`;
@@ -2869,15 +2886,19 @@ const AILab = {
       const decs = A.res.reduce((s, r) => s.concat(r.dec.filter(d => d.i <= t)), []), ok = decs.filter(d => d.g !== "bad").length;
       const rs = t - 232 >= 60 ? NEST.riskStats(Array.from(A.eqR.subarray(232, t + 1)), ACCT) : null;
       return { A, eq, pnl: eq - cap, ret: (eq / cap - 1) * 100, pf: gl > 0 ? gp / gl : (gp > 0 ? Infinity : NaN), dd: dd * 100, openN, disc: decs.length ? ok / decs.length * 100 : 100, n: cl.length, rs }; });
-    const key = (r) => this.sortBy === "money" ? r.eq : this.sortBy === "darwin" ? (r.rs && r.rs.norm ? r.rs.norm.cagr : -1e9) : (r.rs && isFinite(r.rs.calmar) ? r.rs.calmar : (r.rs && r.rs.calmar === Infinity ? 1e9 : -1e9));
-    rows.sort((a, b) => key(b) - key(a));
+    const ready = rows.some(r => r.rs), sb = ready ? this.sortBy : "money";
+    const key = (r) => sb === "money" ? r.eq : sb === "darwin" ? (r.rs && r.rs.norm ? r.rs.norm.cagr : -1e9) : (r.rs && isFinite(r.rs.calmar) ? r.rs.calmar : (r.rs && r.rs.calmar === Infinity ? 1e9 : -1e9));
+    rows.sort((a, b) => key(b) - key(a) || b.eq - a.eq);
     const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : (v === Infinity ? "∞" : "—");
     const pfT = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
-    $("#alBoard").innerHTML = rows.map((r, j) => { const c = this.cum[r.A.P.k], pc = (v) => v >= 0 ? PAL.buy : PAL.stop;
-      const cell = (k, v, col) => `<div class="mc2"><span>${k}</span><b${col ? ` style="color:${col}"` : ""}>${v}</b></div>`;
+    const hdr = `<div class="note" style="margin:0 0 4px">เรียงตาม: <b style="color:${PAL.gold}">${{ calmar: "Calmar (ผลตอบแทนต่อปี ÷ MaxDD)", darwin: "ผลตอบแทนเมื่อปรับความเสี่ยงเท่ากัน (VaR 6.5%/เดือน)", money: "กำไรเป็นเงิน" }[sb]}</b>${!ready && this.sortBy !== "money" ? " · ข้อมูลยังน้อย (รอ ≥ 60 แท่ง) ใช้กำไรเป็นเงินไปก่อน" : ""}</div>`;
+    $("#alBoard").innerHTML = hdr + rows.map((r, j) => { const c = this.cum[r.A.P.k], pc = (v) => v >= 0 ? PAL.buy : PAL.stop;
+      const cell = (k, v, col, on) => `<div class="mc2${on ? " on" : ""}"><span>${k}</span><b${col ? ` style="color:${col}"` : ""}>${v}</b></div>`;
+      const cal = r.rs ? f2(r.rs.calmar, 2) : "—", dv = r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—";
+      const big = sb === "calmar" ? `<span class="agm">Calmar ${cal} <small style="color:${pc(r.pnl)}">${fmtPnl(r.pnl)}</small></span>` : sb === "darwin" ? `<span class="agm" style="color:${r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : PAL.mut}">${dv} <small>@VaR6.5 · ${fmtPnl(r.pnl)}</small></span>` : `<span class="agm" style="color:${pc(r.pnl)}">${fmtPnl(r.pnl)} <small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}%</small></span>`;
       return `<div class="agrow" data-a="${r.A.idx}" title="${r.A.P.th} — คลิกเพื่อดูความคิด" style="cursor:pointer${r.A.idx === this.follow ? `;background:${hexA(r.A.P.col, 0.12)}` : ""}">
-        <div class="ag1"><span class="rk">${j + 1}</span><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><b class="agn">${r.A.P.name}</b>${r.openN ? `<span class="opn">ถือ ${r.openN}</span>` : ""}<span class="agm" style="color:${pc(r.pnl)}">${fmtPnl(r.pnl)} <small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}%</small></span></div>
-        <div class="ag2">${cell("Calmar", r.rs ? f2(r.rs.calmar, 2) : "—")}${cell("MaxDD", r.dd.toFixed(1) + "%")}${cell("@VaR6.5", r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—", r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : null)}${cell("PF", pfT(r.pf))}${cell("ใช้เงิน", (r.A.util ? (r.A.util[t] * 100).toFixed(0) : "—") + "%")}${cell("ตามกฎ", r.disc.toFixed(0) + "%")}</div>
+        <div class="ag1"><span class="rk">${j + 1}</span><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><b class="agn">${r.A.P.name}</b>${r.openN ? `<span class="opn">ถือ ${r.openN}</span>` : ""}${big}</div>
+        <div class="ag2">${cell("Calmar", cal, null, sb === "calmar")}${cell("MaxDD", r.dd.toFixed(1) + "%")}${cell("@VaR6.5", dv, r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : null, sb === "darwin")}${cell("PF", pfT(r.pf))}${cell("ใช้เงิน", (r.A.util ? (r.A.util[t] * 100).toFixed(0) : "—") + "%")}${cell("ตามกฎ", r.disc.toFixed(0) + "%")}</div>
         ${c ? `<div class="ag3">สะสม ${c.n} รอบ · เฉลี่ย ${c.ret / c.n >= 0 ? "+" : ""}${(c.ret / c.n).toFixed(1)}%/รอบ</div>` : ""}</div>`; }).join("");
   },
   // ---------- 3D ----------
@@ -3011,7 +3032,7 @@ const Research = {
     setTimeout(() => {
       try {
         const seed = 700000 + this.D.rounds * 13 + { normal: 0, harsh: 3, random: 7 }[w];
-        const rd = LABCORE.round({ K: +($("#rsK") ? $("#rsK").value : 20), world: w, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat }, NEST, Dojo, Book);
+        const rd = LABCORE.round({ K: +($("#rsK") ? $("#rsK").value : 20), world: w, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat, sizing: ACCT.sizing, alloc: ACCT.alloc }, NEST, Dojo, Book);
         const W = this.D.byW[w] = this.D.byW[w] || { rounds: 0, p: {} }; W.rounds++;
         rd.agents.forEach(A => { const rs = NEST.riskStats(Array.from(A.eqR.subarray(232, rd.maxN)), ACCT); if (!rs) return; const P = W.p[A.P.k] = W.p[A.P.k] || { cal: [], cagr: [], dd: [], nc: [], ret: [] };
           this.push(P.cal, isFinite(rs.calmar) ? rs.calmar : 0); this.push(P.cagr, rs.cagr); this.push(P.dd, rs.dd); this.push(P.ret, rs.ret); if (rs.norm) this.push(P.nc, rs.norm.cagr); });
