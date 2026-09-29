@@ -1999,7 +1999,7 @@ const Replay = {
 ============================================================ */
 const Book = {
   reset(m, run) {
-    this.m = m; this.pos = null; this.real = 0; this.marks = []; this.slHist = []; this.stepped = 231; this.trades = 0; this.tlog = []; this.rpath = new Float32Array(m.N);
+    this.m = m; this.run = run; this.pos = null; this.real = 0; this.marks = []; this.slHist = []; this.stepped = 231; this.trades = 0; this.tlog = []; this.rpath = new Float32Array(m.N);
     this.noopLift = new Set(run.ev.filter(e => e.type === "SL_LIFT" && e.noop).map(e => e.i));
     this.exitBars = [0, 1, 2].map(k => new Set(run.ev.filter(e => e.type === "TP" + (k + 1) + "_EXIT").map(e => e.i)));
   },
@@ -2027,7 +2027,7 @@ const Book = {
   arm(i, k, mode) {
     const P = this.pos; if (!P) return; const m = this.m; this.ensureTr();
     const T = P.tr[k]; if (!T.open || T.mode) return; T.mode = mode;
-    if (mode === "sell") { this.sellQ(i, T.q, m.c[i]); T.open = false; }
+    if (mode === "sell") { const S = this.run && this.run.snap[i], lv = S && S.TP ? S.TP[k] : NaN, px = isFinite(lv) && m.h[i] >= lv ? Math.max(lv, m.o[i]) : m.c[i]; this.sellQ(i, T.q, px); T.open = false; } // limit order at the fibo target (gap above → fills at the open)
     if (mode === "trail") { T.hh = m.h[i]; T.trail = m.h[i] - 2.5 * m.atr[i]; if (m.c[i] < T.trail && !this.exitBars[k].has(i)) { this.sellQ(i, T.q, m.c[i]); T.open = false; } }
   },
   sellTranche(i, k) { const P = this.pos; if (!P) return; if (!P.tr) { this.sellQ(i, this.qty() / 3, this.m.c[i]); return; } const T = P.tr[k]; if (T.open) { this.sellQ(i, T.q, this.m.c[i]); T.open = false; } },
