@@ -2868,7 +2868,7 @@ const AILab = {
   startSet() { this.run = []; this.scope = this.fast ? "set" : "round"; if ($("#alScope")) $("#alScope").value = this.scope; this.newRound(); },
   // one aggregation for the whole test set — used by BOTH the leaderboard ("ทั้งชุด") and the end-of-set summary
   agg() {
-    const R = this.run, byK = {}, avg = (a) => { const b = a.filter(isFinite); return b.length ? b.reduce((s, x) => s + x, 0) / b.length : NaN; }, med = (a) => { const b = a.filter(isFinite).sort((x, y) => x - y); return b.length ? b[b.length >> 1] : NaN; };
+    const R = this.run, byK = {}, avg = (a) => { const b = a.filter(isFinite); return b.length ? b.reduce((s, x) => s + x, 0) / b.length : NaN; }, med = (a) => { const b = a.filter(isFinite).sort((x, y) => x - y), n = b.length; return !n ? NaN : n % 2 ? b[n >> 1] : (b[n / 2 - 1] + b[n / 2]) / 2; };
     R.forEach(r => r.fin.forEach(f => { const o = byK[f.k] = byK[f.k] || { k: f.k, name: f.name, col: f.col, ret: [], pnl: [], dd: [], cal: [], cagr: [], sh: [], nc: [], pf: [], disc: [], util: [], skip: [], win: 0 }; ["ret", "pnl", "dd", "cal", "cagr", "sh", "nc", "pf", "disc", "util", "skip"].forEach(x => o[x].push(f[x])); }));
     R.forEach(r => { const best = r.fin.slice().sort((a, b) => (isFinite(b.cal) ? b.cal : -1e9) - (isFinite(a.cal) ? a.cal : -1e9))[0]; if (best) byK[best.k].win++; });
     const rows = Object.values(byK).sort((a, b) => (isFinite(med(b.cal)) ? med(b.cal) : -1e9) - (isFinite(med(a.cal)) ? med(a.cal) : -1e9));
@@ -2947,7 +2947,7 @@ const AILab = {
     $("#alSumL").innerHTML = lines + `<div class="note" style="margin-top:6px">หุ้น ${rd.upN}/${rd.mk.length} ตัวจบสูงกว่าตอนเริ่ม · ซื้อถือ 100% เฉลี่ย ${rd.bhAvg >= 0 ? "+" : ""}${rd.bhAvg.toFixed(0)}% ต่อหุ้น (ไม่ใช่การเสี่ยงแบบ 1%/ไม้ เทียบกันตรงๆ ไม่ได้)</div>`;
     this.hist.unshift({ no: this.roundNo, world: this.world, html: `<table class="mini">${$("#alSumT").innerHTML}</table>${$("#alSumL").innerHTML}` }); if (this.hist.length > 30) this.hist.pop();
     this.renderRounds();
-    Research.ingest(rd, this.world);
+    Research.ingest(rd, this.world, { world: this.world, K: rd.mk.length, sizing: ACCT.sizing, alloc: ACCT.alloc, rpt: ACCT.rpt, heat: ACCT.heat });
     // no per-round window: keep the result in "ผลจบรอบ", summarise once when the test set is done
     this.run.push({ no: this.roundNo, world: this.world, fin: fin.map(f => ({ util: f.A.utilAvg, skip: f.A.skipped, k: f.A.P.k, name: f.A.P.name, col: f.A.P.col, ret: f.ret, pnl: f.pnl, dd: f.rs ? f.rs.dd : f.dd, cal: f.rs ? f.rs.calmar : NaN, cagr: f.rs ? f.rs.cagr : NaN, sh: f.rs ? f.rs.sharpe : NaN, nc: f.rs && f.rs.norm ? f.rs.norm.cagr : NaN, pf: f.pf, disc: f.disc })) });
     this.addFeed({ who: "CLAUDE", text: `จบรอบ ${this.roundNo} (${this.run.length}${this.runLimit ? "/" + this.runLimit : ""} ของชุดนี้) · ดูตารางได้ที่ "ผลจบรอบ 📊"`, k: -1 });
@@ -3124,20 +3124,25 @@ const AILab = {
 ============================================================ */
 const Research = {
   on: false, D: null,
-  load() { try { this.D = JSON.parse(localStorage.getItem("nest-research") || "null"); } catch (e) { this.D = null; } if (!this.D || this.D.v !== 3) this.D = { v: 3, rounds: 0, byW: {}, dev: {} }; },
+  load() { try { this.D = JSON.parse(localStorage.getItem("nest-research") || "null"); } catch (e) { this.D = null; } if (!this.D || this.D.v !== 4) this.D = { v: 4, rounds: 0, byW: {}, dev: {} }; },
   save() { try { localStorage.setItem("nest-research", JSON.stringify(this.D)); } catch (e) {} },
   init() {
     this.load();
-    $("#rsReset").onclick = () => { if (confirm("ล้างผลวิจัยสะสมทั้งหมด?")) { this.D = { v: 3, rounds: 0, byW: {}, dev: {} }; this.save(); this.render(); } };
+    $("#rsReset").onclick = () => { if (confirm("ล้างผลวิจัยสะสมทั้งหมด?")) { this.D = { v: 4, rounds: 0, byW: {}, dev: {} }; this.save(); this.render(); } };
     $("#rsCopy").onclick = () => { const t = $("#rsBody").innerText; if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => { $("#rsCopy").textContent = "คัดลอกแล้ว ✓"; setTimeout(() => $("#rsCopy").textContent = "คัดลอกรายงาน", 1500); }); };
     if ($("#rsClose")) $("#rsClose").onclick = () => $("#rsDone").classList.add("hidden");
     this.render();
   },
   push(a, x, cap) { a.push(x); if (a.length > (cap || 400)) a.shift(); },
   // every round finished in AI LAB (watched or fast) is ingested here — one dataset for the whole page
-  ingest(rd, world) {
+  // performance is only comparable within the SAME settings (world · stocks · sizing · open risk) → one column per setting
+  cfgKey(c) { return [c.world, c.K, c.sizing === "alloc" ? "A" + c.alloc : "R" + c.rpt, "H" + c.heat].join("|"); },
+  cfgLabel(c) { const WN = { normal: "ปกติ", harsh: "โหด", random: "สุ่ม", mixed: "ผสม 3 โลก" }; return `${WN[c.world] || c.world} · ${c.K} หุ้น · ${c.sizing === "alloc" ? "แบ่งเงิน " + c.alloc + "%" : "RPT " + c.rpt + "%"} · open risk ${c.heat ? c.heat + "%" : "∞"}`; },
+  curCfg() { return { world: AILab.world, K: AILab.K, sizing: ACCT.sizing, alloc: ACCT.alloc, rpt: ACCT.rpt, heat: ACCT.heat }; },
+  ingest(rd, world, cfg) {
     try {
-      const W = this.D.byW[world] = this.D.byW[world] || { rounds: 0, p: {} }; W.rounds++;
+      cfg = cfg || Object.assign(this.curCfg(), { world }); const ck = this.cfgKey(cfg);
+      const W = this.D.byW[ck] = this.D.byW[ck] || { rounds: 0, p: {}, world: cfg.world, label: this.cfgLabel(cfg) }; W.rounds++;
       rd.agents.forEach(A => { const rs = NEST.riskStats(Array.from(A.eqR.subarray(232, rd.maxN)), ACCT); if (!rs) return; const P = W.p[A.P.k] = W.p[A.P.k] || { cal: [], cagr: [], dd: [], nc: [], ret: [] };
         this.push(P.cal, isFinite(rs.calmar) ? rs.calmar : 0); this.push(P.cagr, rs.cagr); this.push(P.dd, rs.dd); this.push(P.ret, rs.ret); if (rs.norm) this.push(P.nc, rs.norm.cagr); });
       // counterfactual sample: what did breaking each rule cost? (grouped by each chart's own world)
@@ -3152,7 +3157,7 @@ const Research = {
       this.D.rounds++; this.save(); this.render();
     } catch (err) { console.error("research ingest error", err); }
   },
-  med(a) { const b = a.filter(isFinite).slice().sort((x, y) => x - y); return b.length ? b[b.length >> 1] : NaN; },
+  med(a) { const b = a.filter(isFinite).slice().sort((x, y) => x - y), n = b.length; return !n ? NaN : n % 2 ? b[n >> 1] : (b[n / 2 - 1] + b[n / 2]) / 2; },
   avg(a) { return a.length ? a.reduce((s, x) => s + x, 0) / a.length : NaN; },
   opinions() {
     const out = [], D = this.D, WN = { normal: "ปกติ", harsh: "โหด", random: "สุ่ม" };
@@ -3168,21 +3173,21 @@ const Research = {
     return out.sort((a, b) => b.score - a.score);
   },
   render() {
-    const D = this.D, WN = { normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม", mixed: "ผสม 3 โลก" }, f = (v, d) => isFinite(v) ? v.toFixed(d) : "—", WS = ["normal", "harsh", "random", "mixed"].filter(w => D.byW[w]);
+    const D = this.D, WN = { normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม", mixed: "ผสม 3 โลก" }, f = (v, d) => isFinite(v) ? v.toFixed(d) : "—", cur = this.cfgKey(this.curCfg()), WS = Object.keys(D.byW).sort((a, b) => (b === cur) - (a === cur) || D.byW[b].rounds - D.byW[a].rounds).slice(0, 4), LB = (w) => (D.byW[w].label || WN[w] || w) + (w === cur ? " ← ค่าที่ตั้งอยู่" : "");
     $("#rsStat").textContent = `สะสม ${D.rounds} รอบ จากทุกชุดที่เคยเทส (ไม่ใช่เฉพาะชุดล่าสุด — leaderboard/สรุปชุดเทส นับเฉพาะชุดล่าสุด) · กด "ล้างผล" เพื่อเริ่มนับใหม่`;
     if (!D.rounds) { $("#rsBody").innerHTML = `<div class="note">ยังไม่มีข้อมูล — หน้านี้สรุปจากทุกรอบที่เทสด้านบน (ใช้โลก/จำนวนหุ้น/จำนวนรอบ จากแถบด้านบนชุดเดียวกัน) · ถ้าไม่อยากนั่งดู กด "⚡ รันเร็ว" · ผลสะสมเก็บไว้ในเครื่องนี้</div>`; return; }
     const names = Object.fromEntries(LABCORE.PERSONAS.map(P => [P.k, P.name]));
-    let html = `<h4 class="rsh">1 · ใครเก่งจริงเมื่อเทียบกับ drawdown (Calmar ค่ากลาง · CAGR · MaxDD เฉลี่ย · ไม่กู้) — สะสม ${D.rounds} รอบ</h4><table class="mini"><tr><th>AI</th>${WS.map(w => `<th>${WN[w]} (${D.byW[w] ? D.byW[w].rounds : 0})</th>`).join("")}</tr>`;
+    let html = `<h4 class="rsh">1 · ใครเก่งจริงเมื่อเทียบกับ drawdown (Calmar ค่ากลาง · CAGR · MaxDD เฉลี่ย · ไม่กู้) — สะสม ${D.rounds} รอบ</h4><table class="mini"><tr><th>AI</th>${WS.map(w => `<th>${LB(w)} · ${D.byW[w].rounds} รอบ</th>`).join("")}</tr>`;
     LABCORE.PERSONAS.forEach(P => { html += `<tr><td>${P.name}</td>${WS.map(w => { const X = D.byW[w] && D.byW[w].p[P.k]; return `<td>${X ? `Calmar ${f(this.med(X.cal), 2)} · ${f(this.avg(X.cagr), 1)}%/ปี · DD ${f(this.avg(X.dd), 1)}%` : "—"}</td>`; }).join("")}</tr>`; });
     html += `</table>`;
     const ops = this.opinions(), grp = (k) => ops.filter(o => o.kind === k);
     const card = (o, tone) => `<div class="rsop" style="--rc:var(--${tone})"><div><b>${AILab.QT[o.type.replace("k", "1")] || o.type}</b> · กฎ: "${o.sys}" · ถ้าแหกเป็น "<b>${o.opt}</b>" <span class="note">(${o.who})</span></div><div class="note">${o.ev}</div></div>`;
     const sec = (title, arr, tone, empty) => `<h4 class="rsh">${title}</h4>` + (arr.length ? arr.slice(0, 8).map(o => card(o, tone)).join("") : `<div class="note">${empty}</div>`);
     // system-level opinions
-    const sys = []; const S = (w) => D.byW[w] && D.byW[w].p.SENSEI;
-    if (S("harsh") && S("harsh").cal.length >= 5 && this.med(S("harsh").cal) <= 0.05) sys.push(`ในโลกโหด (ไม่มีทรงสำเร็จรูป) ระบบ Calmar ค่ากลาง ${f(this.med(S("harsh").cal), 2)} → ยังไม่เห็น edge ในตลาดที่ไม่เป็นเทรนด์ชัด · เสนอ: ทดสอบกับกราฟจริงของหุ้นที่คุณเทรด (CSV) และพิจารณาลด RPT ช่วงตลาดไซด์เวย์`);
-    WS.forEach(w => { const sw = S(w); if (!sw || sw.cal.length < 5) return; const sC = this.med(sw.cal), sG = this.avg(sw.cagr); LABCORE.PERSONAS.forEach(P => { const X = D.byW[w].p[P.k]; if (P.k !== "SENSEI" && P.k !== "MONKEY" && X && X.cal.length >= 5 && this.med(X.cal) > sC * 1.15 + 0.05 && this.avg(X.cagr) >= sG * 0.8) sys.push(`${WN[w]}: ${P.name} (${P.th}) Calmar ${f(this.med(X.cal), 2)} vs ระบบ ${f(sC, 2)} · CAGR ${f(this.avg(X.cagr), 1)}% vs ${f(sG, 1)}% → ดูหัวข้อ 3–4 ว่าจุดไหนที่เขาเห็นต่างแล้วได้ (ยังต้องดูว่าชนะทุกโลกไหม)`); }); });
-    const fo = D.byW.normal && D.byW.normal.p.FOMO, se = S("normal"); if (fo && se && this.avg(fo.ret) > this.avg(se.ret) && this.med(fo.cal) < this.med(se.cal)) sys.push(`FOMO กำไรดิบมากกว่าระบบ (${f(this.avg(fo.ret), 0)}% vs ${f(this.avg(se.ret), 0)}%) แต่ Calmar แพ้ (${f(this.med(fo.cal), 2)} vs ${f(this.med(se.cal), 2)}) → กำไรมาจากการเสี่ยงมากกว่า ไม่ใช่ edge`);
+    const sys = []; const S = (w) => D.byW[w] && D.byW[w].p.SENSEI; const ofW = (x) => WS.filter(w => (D.byW[w].world || w) === x);
+    ofW("harsh").forEach(hw => { if (S(hw).cal.length >= 5 && this.med(S(hw).cal) <= 0.05) sys.push(`${LB(hw)}: ระบบ Calmar ค่ากลาง ${f(this.med(S(hw).cal), 2)} → ยังไม่เห็น edge ในตลาดที่ไม่เป็นเทรนด์ชัด · เสนอ: ทดสอบกับกราฟจริงของหุ้นที่คุณเทรด (CSV) และพิจารณาลด RPT ช่วงตลาดไซด์เวย์`); });
+    WS.forEach(w => { const sw = S(w); if (!sw || sw.cal.length < 5) return; const sC = this.med(sw.cal), sG = this.avg(sw.cagr); LABCORE.PERSONAS.forEach(P => { const X = D.byW[w].p[P.k]; if (P.k !== "SENSEI" && P.k !== "MONKEY" && X && X.cal.length >= 5 && this.med(X.cal) > sC * 1.15 + 0.05 && this.avg(X.cagr) >= sG * 0.8) sys.push(`${LB(w)}: ${P.name} (${P.th}) Calmar ${f(this.med(X.cal), 2)} vs ระบบ ${f(sC, 2)} · CAGR ${f(this.avg(X.cagr), 1)}% vs ${f(sG, 1)}% → ดูหัวข้อ 3–4 ว่าจุดไหนที่เขาเห็นต่างแล้วได้ (ยังต้องดูว่าชนะทุกโลกไหม)`); }); });
+    ofW("normal").forEach(nw => { const fo = D.byW[nw].p.FOMO, se = S(nw); if (fo && se && this.avg(fo.ret) > this.avg(se.ret) && this.med(fo.cal) < this.med(se.cal)) sys.push(`FOMO กำไรดิบมากกว่าระบบ (${f(this.avg(fo.ret), 0)}% vs ${f(this.avg(se.ret), 0)}%) แต่ Calmar แพ้ (${f(this.med(fo.cal), 2)} vs ${f(this.med(se.cal), 2)}) → กำไรมาจากการเสี่ยงมากกว่า ไม่ใช่ edge`); });
     html += `<h4 class="rsh">2 · ความเห็นต่อระบบโดยรวม</h4>` + (sys.length ? sys.map(t => `<div class="rsop" style="--rc:var(--gold)">${t}</div>`).join("") : `<div class="note">ยังไม่มีข้อสังเกตระดับระบบ (ต้องการอย่างน้อย 5 รอบต่อโลก)</div>`);
     html += sec("3 · กฎที่ควรยึดไว้ (แหกแล้วเสียทุกโลก)", grp("keep"), "buy", "ยังไม่มีข้อที่ชัดพอ");
     html += sec("4 · กฎที่น่าทบทวน (แหกแล้วได้อย่างสม่ำเสมอ ≥ 2 โลก)", grp("rethink"), "stop", "ยังไม่พบ — แปลว่ายังไม่มีหลักฐานว่าควรเปลี่ยนกฎข้อไหน");
