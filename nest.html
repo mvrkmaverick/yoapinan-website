@@ -329,7 +329,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
   <h3>บัญชีจำลอง</h3>
   <div class="ctl"><label>เงินทุน (บาท)</label><output id="acCapO"></output><input type="number" id="acCap" min="10000" step="10000" style="grid-column:1/-1" class="sel"></div>
   <div class="ctl"><label>ความเสี่ยงต่อไม้ (% ของทุน)</label><output id="acRptO"></output><input type="range" id="acRpt" min="0.25" max="5" step="0.25"></div>
-  <div class="note">1 R = เงินที่ยอมเสียถ้าโดน SL = ทุน × % นี้ · ไม้ครึ่ง = ครึ่ง R · ใช้คิดเงินทุกหน้า</div>
+  <div class="ctl"><label>รวมความเสี่ยงไม้ที่เปิดอยู่สูงสุด (heat)</label><output id="acHeatO"></output><select class="sel" id="acHeat" style="grid-column:1/-1"><option value="5">5%</option><option value="8">8%</option><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option><option value="0">ไม่จำกัด</option></select></div><div class="note">1 R = เงินที่ยอมเสียถ้าโดน SL = ทุน × % เสี่ยงต่อไม้ · heat = ผลรวม % เสี่ยงของทุกไม้ที่ถืออยู่พร้อมกัน ถ้าเกินจะข้ามสัญญาณใหม่ · ใช้เงินได้ไม่เกิน 100% ของทุน (ไม่กู้) · ใช้กับพอร์ตหลายหุ้นใน AI LAB</div>
 </div></div>
 <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
 <main>
@@ -394,7 +394,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
       <div class="card alfeedc"><h3>AI เถียงกัน · ตรวจ · ค้าน<span class="sp"></span><button class="chip on" id="alTabFeed">สด</button><button class="chip" id="alTabMind">ความคิด AI 🧠</button><button class="chip" id="alTabRounds">ผลจบรอบ 📊</button><button class="chip" id="alTabRes">ข้อเสนอ AI 🔬</button><button class="chip" id="alTabNote">สมุดทดลอง Claude</button><button class="chip" id="alBig" title="ขยายแผงนี้">⤢</button></h3>
         <div class="log" id="alFeed"></div><div class="log hidden" id="alNote"></div>
         <div class="log hidden" id="alRounds"></div>
-        <div class="hidden" id="alRes" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="row" style="align-items:center;margin-bottom:6px"><button class="chip" id="rsGo">▶ เริ่มวิจัยต่อเนื่อง</button><select class="sel" id="rsLimit"><option value="10">10 รอบ</option><option value="30" selected>30 รอบ</option><option value="100">100 รอบ</option><option value="0">ไม่จำกัด</option></select><button class="chip" id="rsCopy">คัดลอกรายงาน</button><button class="chip" id="rsReset">ล้างผล</button><span class="note" id="rsStat" style="margin-left:6px"></span></div><div class="log" id="rsBody" style="min-height:140px"></div></div>
+        <div class="hidden" id="alRes" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="row" style="align-items:center;margin-bottom:6px"><button class="chip" id="rsGo">▶ เริ่มวิจัยต่อเนื่อง</button><select class="sel" id="rsK" title="หุ้นต่อรอบ"><option value="8">8 หุ้น</option><option value="20" selected>20 หุ้น</option><option value="30">30 หุ้น</option></select><select class="sel" id="rsLimit"><option value="10">10 รอบ</option><option value="30" selected>30 รอบ</option><option value="100">100 รอบ</option><option value="0">ไม่จำกัด</option></select><button class="chip" id="rsCopy">คัดลอกรายงาน</button><button class="chip" id="rsReset">ล้างผล</button><span class="note" id="rsStat" style="margin-left:6px"></span></div><div class="log" id="rsBody" style="min-height:140px"></div></div>
         <div class="hidden" id="alMind" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="scen" id="alMindCtl" style="margin-bottom:6px"></div><div class="note" id="alMindHead" style="margin-bottom:6px"></div><div class="log" id="alMindList"></div></div>
         <div class="note" style="margin-top:4px">ข้อความสร้างจากตัวเลขจริงของการจำลองด้วยกฎที่ Claude เขียน (ไม่ใช่ AI คุยกันสด) · สมุดทดลอง = สิ่งที่ Claude ทดสอบจริง</div></div>
     </div>
@@ -1233,6 +1233,29 @@ const LABCORE = (function () {
       trades.sort((a, b) => a.i1 - b.i1);
       return { P, res, eq, eqR, dd, trades, tot, maxQ: Math.max(...res.map(r => r.maxQ)) };
     });
+    // ---- portfolio: many stocks, fixed risk per trade, total open risk (heat) cap, no leverage (exposure <= 100%) ----
+    const heat = (opt.heat || 0) / 100;
+    agents.forEach(A => {
+      const cand = [];
+      A.res.forEach((r, k) => r.trades.forEach(t => { const slp = (t.p0 && t.sl0 > 0 && t.p0 > t.sl0) ? (t.p0 - t.sl0) / t.p0 : 0.15; cand.push({ k, t, i0: t.i0, i1: t.i1, risk: rpt * (t.maxQ || 1), expo: Math.min(1, rpt * (t.maxQ || 1) / Math.max(0.02, slp)) }); }));
+      cand.sort((a, b) => a.i0 - b.i0 || hsh(a.k, a.i0) - hsh(b.k, b.i0));
+      const eq = new Float32Array(maxN), util = new Float32Array(maxN), open = [], taken = []; let ci = 0, skipped = 0, realized = 0;
+      for (let i = 0; i < maxN; i++) {
+        for (let j = open.length - 1; j >= 0; j--) { const o = open[j]; if (o.i1 < i) { realized += o.size * o.Rend; open.splice(j, 1); } }
+        const eqPrev = i ? eq[i - 1] : cap;
+        while (ci < cand.length && cand[ci].i0 <= i) { const c = cand[ci++]; if (c.i0 < i) continue;
+          const rsk = open.reduce((s, o) => s + o.risk, 0), ex = open.reduce((s, o) => s + o.expo, 0);
+          if ((heat > 0 && rsk + c.risk > heat + 1e-9) || ex + c.expo > 1 + 1e-9) { skipped++; continue; }
+          const er = A.res[c.k].eqR, base = c.i0 > 0 ? er[c.i0 - 1] : 0, Rend = er[Math.min(c.i1, mk[c.k].m.N - 1)] - base;
+          const o = Object.assign({}, c, { size: eqPrev * rpt, base, er, Rend, N: mk[c.k].m.N }); open.push(o); taken.push(Object.assign({ k: c.k, pnl: o.size * c.t.R }, c.t)); }
+        let v = cap + realized, u = 0; for (const o of open) { const ii = Math.min(i, o.N - 1); v += o.size * (o.er[ii] - o.base); u += o.expo; }
+        eq[i] = v; util[i] = u;
+      }
+      A.eqRraw = A.eqR; A.eqR = new Float32Array(maxN); for (let i = 0; i < maxN; i++) A.eqR[i] = (eq[i] / cap - 1) / rpt;
+      A.eq = eq; let pk = cap; for (let i = 0; i < maxN; i++) { pk = Math.max(pk, eq[i]); A.dd[i] = 1 - eq[i] / pk; }
+      A.tradesAll = A.trades; A.trades = taken.sort((a, b) => a.i1 - b.i1); A.skipped = skipped; A.util = util;
+      let us = 0, un = 0; for (let i = 232; i < maxN; i++) { us += util[i]; un++; } A.utilAvg = un ? us / un * 100 : 0;
+    });
     const sysA = agents[0];
     const msgs = [];
     const say = (t, who, text, k, tag) => msgs.push({ t, who, text, k, tag: tag || "" });
@@ -1316,7 +1339,7 @@ const now = () => performance.now();
 let _FF = null; const FF = () => _FF || (_FF = getComputedStyle(document.body).fontFamily || "sans-serif");
 
 // ---------- account (money) ----------
-const ACCT = { capital: 1000000, rpt: 1 };
+const ACCT = { capital: 1000000, rpt: 1, heat: 10 };
 try { Object.assign(ACCT, JSON.parse(localStorage.getItem("nest-acct") || "{}")); } catch (e) {}
 const fmtBal = (v) => "฿" + Math.round(v).toLocaleString("en-US");
 const fmtPnl = (v) => (!isFinite(v) ? "—" : (v >= 0 ? "+" : "−") + "฿" + Math.abs(Math.round(v)).toLocaleString("en-US"));
@@ -1324,6 +1347,8 @@ function acctUI() {
   const cap = $("#acCap"), rpt = $("#acRpt");
   const sync = () => { $("#acCapO").textContent = fmtBal(ACCT.capital); $("#acRptO").textContent = ACCT.rpt + "%"; cap.value = ACCT.capital; rpt.value = ACCT.rpt; };
   const save = () => { try { localStorage.setItem("nest-acct", JSON.stringify(ACCT)); } catch (e) {} if (Replay.m) { Replay.updatePanels(true); if (Replay.mode === "dojo") Dojo.paint(); } if (typeof AILab !== "undefined") { AILab.money(); AILab.lastBoard = 0; } };
+  $("#acHeat").value = String(ACCT.heat); $("#acHeatO").textContent = ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด";
+  $("#acHeat").onchange = (e) => { ACCT.heat = +e.target.value; $("#acHeatO").textContent = ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด"; save(); };
   cap.onchange = () => { ACCT.capital = Math.max(10000, +cap.value || 1e6); sync(); save(); };
   rpt.oninput = () => { ACCT.rpt = +rpt.value; sync(); save(); };
   $("#acctBtn").onclick = (e) => { e.stopPropagation(); $("#acctPop").classList.toggle("hidden"); };
@@ -1940,7 +1965,7 @@ const Book = {
     const p = this.m.c[i];
     if (this.pos) { this.add(i, q); return; }
     this.pos = Object.assign({ lots: [{ q, p }], sl, rRef: Math.max(rRef || p - sl, p * 0.01), tr: null, scaled: q >= 1, lifted: false, chase: false, restTrail: false, entryI: i }, opt || {}); this.trades++;
-    this.marks.push({ i, p, t: "B", q }); this.slHist.push([i, sl]); this.tlog.push({ i0: i, r0: this.real, maxQ: q, i1: -1, R: NaN });
+    this.marks.push({ i, p, t: "B", q }); this.slHist.push([i, sl]); this.tlog.push({ i0: i, r0: this.real, maxQ: q, q0: q, p0: p, sl0: sl, i1: -1, R: NaN });
   },
   add(i, q) { if (!this.pos) return; const p = this.m.c[i]; this.pos.lots.push({ q, p }); this.marks.push({ i, p, t: "A", q }); const T = this.tlog[this.tlog.length - 1]; if (T) T.maxQ = Math.max(T.maxQ, this.qty()); },
   setSL(i, sl) { if (!this.pos || !isFinite(sl) || sl === this.pos.sl) return; this.pos.sl = sl; this.slHist.push([i, sl]); },
@@ -1976,7 +2001,7 @@ const Book = {
   pathTo(i) { const p = []; for (let j = 232; j <= i; j++) p.push(j <= this.stepped ? this.rpath[j] : this.real + this.openR(j)); return p; },
   openR(i) { return this.pos ? this.pos.lots.reduce((s, x) => s + x.q * (this.m.c[i] - x.p), 0) / this.pos.rRef : 0; },
   total(i) { return this.real + this.openR(i); },
-  tradeList(i) { return this.tlog.map(T => T.i1 >= 0 ? { i0: T.i0, i1: T.i1, R: T.R, maxQ: T.maxQ } : { i0: T.i0, i1: i, R: this.total(i) - T.r0, maxQ: T.maxQ, open: true }); },
+  tradeList(i) { return this.tlog.map(T => Object.assign(T.i1 >= 0 ? { i0: T.i0, i1: T.i1, R: T.R } : { i0: T.i0, i1: i, R: this.total(i) - T.r0, open: true }, { maxQ: T.maxQ, q0: T.q0, p0: T.p0, sl0: T.sl0 })); },
 };
 
 const GRADE = { ok: { s: "✓", t: "ตรงระบบ", c: "buy" }, acc: { s: "≈", t: "ไม่ผิดกฎ", c: "gold" }, bad: { s: "✕", t: "ผิดกฎ", c: "stop" } };
@@ -2653,7 +2678,7 @@ const AILab = {
     const ctl = $("#alCtl");
     const W = [["normal", "โลกปกติ"], ["harsh", "โลกโหด"], ["random", "สุ่มล้วน"], ["mixed", "ผสม 3 โลก"]];
     ctl.innerHTML = W.map(([k, t]) => `<button class="chip${k === this.world ? " on" : ""}" data-w="${k}"><span class="dot" style="--c:${this.wcol(k)}"></span>${t}</button>`).join("") +
-      `<select class="sel" id="alK" title="จำนวนหุ้นต่อรอบ"><option value="4">4 หุ้น</option><option value="8" selected>8 หุ้น</option><option value="12">12 หุ้น</option></select>
+      `<select class="sel" id="alK" title="จำนวนหุ้นต่อรอบ"><option value="4">4 หุ้น</option><option value="8" selected>8 หุ้น</option><option value="12">12 หุ้น</option><option value="20">20 หุ้น</option><option value="30">30 หุ้น</option><option value="50">50 หุ้น</option></select>
       <select class="sel" id="alSpd"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="10">10×</option></select>
       <button class="chip" id="alPlay">❚❚</button><button class="chip" id="alNew">เริ่มชุดใหม่ ⟳</button><select class="sel" id="alLimit" title="จำนวนรอบต่อชุดเทส · สรุปรวมตอนจบชุด"><option value="3">3 รอบ</option><option value="5" selected>5 รอบ</option><option value="10">10 รอบ</option><option value="0">ไม่จำกัด</option></select>
       <span class="sp"></span>
@@ -2747,7 +2772,7 @@ const AILab = {
       try {
         this.roundNo++;
         const seed = (this.roundNo * 7919 + { normal: 0, harsh: 101, random: 211, mixed: 307 }[this.world] + (this.baseSeed || (this.baseSeed = 1 + Math.floor(Math.random() * 9000)))) % 1000000;
-        this.rd = LABCORE.round({ K: this.K, world: this.world, seed, capital: ACCT.capital, rpt: ACCT.rpt }, NEST, Dojo, Book);
+        this.rd = LABCORE.round({ K: this.K, world: this.world, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat }, NEST, Dojo, Book);
         this.prep(); this.t = 232; this.fed = 0; this.bubbles = []; this.flashes = []; this.sel = -1; $("#alFeed").innerHTML = ""; $("#alSel").classList.add("hidden"); this.setFollow(this.follow);
         Object.keys(LABCORE.OBS).forEach(k => { const el = $("#obs_" + k); if (el) el.textContent = "รอดูอยู่…"; });
         this.playing = true; $("#alPlay").textContent = "❚❚"; this.finished = false;
@@ -2814,22 +2839,22 @@ const AILab = {
     this.renderRounds();
     if (Research.on) { this.newRound(); return; }
     // no per-round window: keep the result in "ผลจบรอบ", summarise once when the test set is done
-    this.run.push({ no: this.roundNo, world: this.world, fin: fin.map(f => ({ k: f.A.P.k, name: f.A.P.name, col: f.A.P.col, ret: f.ret, pnl: f.pnl, dd: f.rs ? f.rs.dd : f.dd, cal: f.rs ? f.rs.calmar : NaN, sh: f.rs ? f.rs.sharpe : NaN, nc: f.rs && f.rs.norm ? f.rs.norm.cagr : NaN, pf: f.pf, disc: f.disc })) });
+    this.run.push({ no: this.roundNo, world: this.world, fin: fin.map(f => ({ util: f.A.utilAvg, skip: f.A.skipped, k: f.A.P.k, name: f.A.P.name, col: f.A.P.col, ret: f.ret, pnl: f.pnl, dd: f.rs ? f.rs.dd : f.dd, cal: f.rs ? f.rs.calmar : NaN, sh: f.rs ? f.rs.sharpe : NaN, nc: f.rs && f.rs.norm ? f.rs.norm.cagr : NaN, pf: f.pf, disc: f.disc })) });
     this.addFeed({ who: "CLAUDE", text: `จบรอบ ${this.roundNo} (${this.run.length}${this.runLimit ? "/" + this.runLimit : ""} ของชุดนี้) · ดูตารางได้ที่ "ผลจบรอบ 📊"`, k: -1 });
     if (this.runLimit && this.run.length >= this.runLimit) { this.showRunSummary(); return; }
     setTimeout(() => { if ($("#v-ailab").classList.contains("on") && this.finished) this.newRound(); }, 1500);
   },
   showRunSummary() {
     const R = this.run, byK = {}, avg = (a) => { const b = a.filter(isFinite); return b.length ? b.reduce((s, x) => s + x, 0) / b.length : NaN; }, med = (a) => { const b = a.filter(isFinite).sort((x, y) => x - y); return b.length ? b[b.length >> 1] : NaN; };
-    R.forEach(r => r.fin.forEach(f => { const o = byK[f.k] = byK[f.k] || { name: f.name, col: f.col, ret: [], pnl: [], dd: [], cal: [], sh: [], nc: [], pf: [], disc: [], win: 0 }; ["ret", "pnl", "dd", "cal", "sh", "nc", "pf", "disc"].forEach(x => o[x].push(f[x])); }));
+    R.forEach(r => r.fin.forEach(f => { const o = byK[f.k] = byK[f.k] || { name: f.name, col: f.col, ret: [], pnl: [], dd: [], cal: [], sh: [], nc: [], pf: [], disc: [], util: [], skip: [], win: 0 }; ["ret", "pnl", "dd", "cal", "sh", "nc", "pf", "disc", "util", "skip"].forEach(x => o[x].push(f[x])); }));
     R.forEach(r => { const best = r.fin.slice().sort((a, b) => (isFinite(b.cal) ? b.cal : -1e9) - (isFinite(a.cal) ? a.cal : -1e9))[0]; if (best) byK[best.k].win++; });
     const rows = Object.values(byK).sort((a, b) => (isFinite(med(b.cal)) ? med(b.cal) : -1e9) - (isFinite(med(a.cal)) ? med(a.cal) : -1e9));
     const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : "—", sg = (v, d) => isFinite(v) ? (v >= 0 ? "+" : "") + v.toFixed(d) : "—";
     const WN = { normal: "ปกติ", harsh: "โหด", random: "สุ่ม", mixed: "ผสม" }, worlds = [...new Set(R.map(r => WN[r.world] || r.world))].join(", ");
     const sen = byK.SENSEI, top = rows[0];
-    $("#alRunBody").innerHTML = `<div class="note" style="margin-bottom:6px">${R.length} รอบ · โลก: ${worlds} · รอบละ ${this.K} หุ้น · ทุน ${fmtBal(ACCT.capital)} เสี่ยง ${ACCT.rpt}%/ไม้ · เรียงตาม Calmar ค่ากลาง</div>
-      <table class="mini"><tr><th></th><th>AI</th><th>กำไรเฉลี่ย/รอบ</th><th>MaxDD เฉลี่ย</th><th>Calmar (ค่ากลาง)</th><th>Sharpe</th><th>@VaR 6.5% /ปี</th><th>ชนะรอบ</th><th>ตามกฎ</th></tr>` +
-      rows.map((o, j) => `<tr><td>${j + 1}</td><td><span class="dot2" style="background:${o.col}"></span>${o.name}</td><td style="color:${avg(o.ret) >= 0 ? PAL.buy : PAL.stop}">${sg(avg(o.ret), 1)}% (${fmtPnl(avg(o.pnl))})</td><td>${f2(avg(o.dd), 1)}%</td><td><b>${f2(med(o.cal), 2)}</b></td><td>${f2(med(o.sh), 2)}</td><td>${sg(avg(o.nc), 1)}%</td><td>${o.win}/${R.length}</td><td>${f2(avg(o.disc), 0)}%</td></tr>`).join("") + `</table>
+    $("#alRunBody").innerHTML = `<div class="note" style="margin-bottom:6px">${R.length} รอบ · โลก: ${worlds} · รอบละ ${this.K} หุ้น · ทุน ${fmtBal(ACCT.capital)} · เสี่ยง ${ACCT.rpt}%/ไม้ · รวมความเสี่ยงไม้ที่เปิดอยู่ไม่เกิน ${ACCT.heat ? ACCT.heat + "%" : "ไม่จำกัด"} · ใช้เงินไม่เกิน 100% (ไม่กู้) · เรียงตาม Calmar ค่ากลาง</div>
+      <table class="mini"><tr><th></th><th>AI</th><th>กำไรเฉลี่ย/รอบ</th><th>MaxDD เฉลี่ย</th><th>Calmar (ค่ากลาง)</th><th>Sharpe</th><th>@VaR 6.5% /ปี</th><th>ใช้เงินเฉลี่ย</th><th>ข้ามเพราะเต็ม</th><th>ชนะรอบ</th><th>ตามกฎ</th></tr>` +
+      rows.map((o, j) => `<tr><td>${j + 1}</td><td><span class="dot2" style="background:${o.col}"></span>${o.name}</td><td style="color:${avg(o.ret) >= 0 ? PAL.buy : PAL.stop}">${sg(avg(o.ret), 1)}% (${fmtPnl(avg(o.pnl))})</td><td>${f2(avg(o.dd), 1)}%</td><td><b>${f2(med(o.cal), 2)}</b></td><td>${f2(med(o.sh), 2)}</td><td>${sg(avg(o.nc), 1)}%</td><td>${f2(avg(o.util), 0)}%</td><td>${f2(avg(o.skip), 0)}/รอบ</td><td>${o.win}/${R.length}</td><td>${f2(avg(o.disc), 0)}%</td></tr>`).join("") + `</table>
       <div class="fb"><b style="color:${LABCORE.OBS.CLAUDE.col}">Claude</b> ที่ 1 ตาม Calmar: <b>${top.name}</b> (${f2(med(top.cal), 2)})${sen && top !== sen ? ` · ระบบ (SENSEI) Calmar ${f2(med(sen.cal), 2)} อันดับ ${rows.indexOf(sen) + 1}` : ""} · ดูรายละเอียดแต่ละรอบที่ "ผลจบรอบ 📊" · ต้องการหลักฐานว่าควรปรับกฎไหม ใช้ "ข้อเสนอ AI 🔬"</div>`;
     $("#alRun").classList.remove("hidden");
   },
@@ -2852,7 +2877,7 @@ const AILab = {
       const cell = (k, v, col) => `<div class="mc2"><span>${k}</span><b${col ? ` style="color:${col}"` : ""}>${v}</b></div>`;
       return `<div class="agrow" data-a="${r.A.idx}" title="${r.A.P.th} — คลิกเพื่อดูความคิด" style="cursor:pointer${r.A.idx === this.follow ? `;background:${hexA(r.A.P.col, 0.12)}` : ""}">
         <div class="ag1"><span class="rk">${j + 1}</span><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><b class="agn">${r.A.P.name}</b>${r.openN ? `<span class="opn">ถือ ${r.openN}</span>` : ""}<span class="agm" style="color:${pc(r.pnl)}">${fmtPnl(r.pnl)} <small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}%</small></span></div>
-        <div class="ag2">${cell("Calmar", r.rs ? f2(r.rs.calmar, 2) : "—")}${cell("MaxDD", r.dd.toFixed(1) + "%")}${cell("@VaR6.5", r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—", r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : null)}${cell("PF", pfT(r.pf))}${cell("Sharpe", r.rs ? f2(r.rs.sharpe, 2) : "—")}${cell("ตามกฎ", r.disc.toFixed(0) + "%")}</div>
+        <div class="ag2">${cell("Calmar", r.rs ? f2(r.rs.calmar, 2) : "—")}${cell("MaxDD", r.dd.toFixed(1) + "%")}${cell("@VaR6.5", r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—", r.rs && r.rs.norm ? pc(r.rs.norm.cagr) : null)}${cell("PF", pfT(r.pf))}${cell("ใช้เงิน", (r.A.util ? (r.A.util[t] * 100).toFixed(0) : "—") + "%")}${cell("ตามกฎ", r.disc.toFixed(0) + "%")}</div>
         ${c ? `<div class="ag3">สะสม ${c.n} รอบ · เฉลี่ย ${c.ret / c.n >= 0 ? "+" : ""}${(c.ret / c.n).toFixed(1)}%/รอบ</div>` : ""}</div>`; }).join("");
   },
   // ---------- 3D ----------
@@ -2861,7 +2886,7 @@ const AILab = {
     const x1 = x * cy + z * sy, z1 = -x * sy + z * cy; const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
     const s = P.F / (this.dist + z2); return { x: P.cx + x1 * s, y: P.cy - y2 * s, s, z: z2 };
   },
-  layerZ(k) { const K = this.rd.mk.length, sp = K > 8 ? 0.24 : 0.32; return (k - (K - 1) / 2) * sp; },
+  layerZ(k) { const K = this.rd.mk.length, sp = K > 30 ? 0.06 : K > 20 ? 0.09 : K > 12 ? 0.13 : K > 8 ? 0.24 : 0.32; return (k - (K - 1) / 2) * sp; },
   X(i) { return (i - 232) / (this.rd.maxN - 232) * 2.4 - 1.2; },
   Yp(x, p) { return (Math.log(p) - x.lo) / Math.max(1e-6, x.hi - x.lo) * 0.62; },
   draw3d(dt) {
@@ -2924,7 +2949,7 @@ const AILab = {
   },
   draw2d(dt) {
     const { ctx, W, H } = fitCanvas($("#al3d")); ctx.clearRect(0, 0, W, H);
-    const rd = this.rd, K = rd.mk.length, cols = K <= 4 ? 2 : K <= 8 ? 4 : 4, rows = Math.ceil(K / cols), gw = W / cols, gh = H / rows, t = this.t;
+    const rd = this.rd, K = rd.mk.length, cols = K <= 4 ? 2 : K <= 8 ? 4 : K <= 12 ? 4 : K <= 20 ? 5 : K <= 30 ? 6 : 10, rows = Math.ceil(K / cols), gw = W / cols, gh = H / rows, t = this.t;
     this._cells = [];
     rd.mk.forEach((x, k) => {
       const m = x.m, cx0 = (k % cols) * gw + 8, cy0 = Math.floor(k / cols) * gh + 8, w = gw - 16, h = gh - 16, sel = this.sel === k;
@@ -2986,7 +3011,7 @@ const Research = {
     setTimeout(() => {
       try {
         const seed = 700000 + this.D.rounds * 13 + { normal: 0, harsh: 3, random: 7 }[w];
-        const rd = LABCORE.round({ K: 8, world: w, seed, capital: ACCT.capital, rpt: ACCT.rpt }, NEST, Dojo, Book);
+        const rd = LABCORE.round({ K: +($("#rsK") ? $("#rsK").value : 20), world: w, seed, capital: ACCT.capital, rpt: ACCT.rpt, heat: ACCT.heat }, NEST, Dojo, Book);
         const W = this.D.byW[w] = this.D.byW[w] || { rounds: 0, p: {} }; W.rounds++;
         rd.agents.forEach(A => { const rs = NEST.riskStats(Array.from(A.eqR.subarray(232, rd.maxN)), ACCT); if (!rs) return; const P = W.p[A.P.k] = W.p[A.P.k] || { cal: [], cagr: [], dd: [], nc: [], ret: [] };
           this.push(P.cal, isFinite(rs.calmar) ? rs.calmar : 0); this.push(P.cagr, rs.cagr); this.push(P.dd, rs.dd); this.push(P.ret, rs.ret); if (rs.norm) this.push(P.nc, rs.norm.cagr); });
@@ -3022,7 +3047,7 @@ const Research = {
   },
   render() {
     const D = this.D, WN = { normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม" }, f = (v, d) => isFinite(v) ? v.toFixed(d) : "—";
-    $("#rsStat").textContent = this.on ? $("#rsStat").textContent : `สะสม ${D.rounds} รอบ (รอบละ 8 หุ้น · 9 AI)`;
+    $("#rsStat").textContent = this.on ? $("#rsStat").textContent : `สะสม ${D.rounds} รอบ (9 AI · ทุน/ความเสี่ยงตามปุ่ม ฿)`;
     if (!D.rounds) { $("#rsBody").innerHTML = `<div class="note">ยังไม่มีข้อมูล — กด "เริ่มวิจัยต่อเนื่อง" แล้ว AI จะรันรอบใหม่ไปเรื่อยๆ (สลับโลกปกติ/โหด/สุ่ม) เก็บหลักฐาน แล้วสรุปความเห็นต่อระบบของคุณ · ผลสะสมเก็บไว้ในเครื่องนี้ เปิดใหม่ก็รันต่อได้</div>`; return; }
     const names = Object.fromEntries(LABCORE.PERSONAS.map(P => [P.k, P.name]));
     let html = `<h4 class="rsh">1 · ใครเก่งจริงเมื่อปรับความเสี่ยง (Calmar ค่ากลาง · @VaR 6.5%/ปี เฉลี่ย)</h4><table class="mini"><tr><th>AI</th>${this.worlds.map(w => `<th>${WN[w]} (${D.byW[w] ? D.byW[w].rounds : 0})</th>`).join("")}</tr>`;
