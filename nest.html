@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NEST Cockpit · ฝึกระบบ Nested Wave 1-2 → Wave 3 | YoApinan</title>
-<meta name="description" content="จำลองตลาดแบบ interactive: ดูระบบ nested wave 1-2 → wave 3 ตัดสินใจทีละแท่ง ฝึกวินัยใน Dojo ทดสอบ 11 price patterns และ Monte Carlo — เพื่อการศึกษา">
+<meta name="description" content="จำลองตลาดแบบ interactive: ดูระบบ nested wave 1-2 → wave 3 ตัดสินใจทีละแท่ง ฝึกวินัยใน Dojo ทดสอบ 13 price patterns · โลกโหด · AI LAB ให้ AI หลายบุคลิกเล่นแข่งกัน · Monte Carlo — เพื่อการศึกษา">
 <meta property="og:title" content="NEST Cockpit · Nested Wave 1-2 → Wave 3">
 <meta property="og:description" content="เล่นตลาดจำลอง ตัดสินใจเอง คิดกำไรขาดทุนจริง เทียบกับระบบ · 13 price patterns · Dojo · Monte Carlo · Fractal">
 <meta property="og:image" content="https://www.yoapinan.com/nest-og.png">
@@ -139,6 +139,42 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
 .opt.mine{box-shadow:0 0 0 2px currentColor inset}
 .fb{margin-top:12px;font-size:13px;line-height:1.55;color:var(--mut)}
 .fb b{color:var(--txt)}
+/* ai lab */
+#v-ailab{grid-template-columns:1fr 410px;gap:14px;padding:14px}
+.labl{display:grid;grid-template-rows:auto 1fr 250px;gap:10px;min-height:0;min-width:0}
+.alhud{position:absolute;left:14px;top:10px;pointer-events:none}.alhud .note{max-width:560px}
+.alsel{position:absolute;left:14px;bottom:12px;right:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:var(--panel2);border:1px solid var(--line2);font-size:12.5px}
+.alsum{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);z-index:3}
+[data-theme=light] .alsum{background:rgba(230,236,246,.6)}
+.alsum .ocard{max-width:760px;text-align:left;padding:22px 26px}
+.alfeedc{display:flex;flex-direction:column;min-height:0}.alfeedc h3{margin-bottom:6px}.alfeedc h3 .sp{flex:1}.alfeedc .chip{padding:4px 10px;font-size:11px;letter-spacing:0}
+table.mini{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0}
+table.mini th{font-size:10px;letter-spacing:.1em;color:var(--mut);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line2)}
+table.mini td{padding:5px 6px;border-bottom:1px solid var(--line);font-family:var(--mono)}
+.dot2{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.agrow{display:flex;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--line)}
+.agrow .rk{width:16px;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.agrow .an{flex:1;min-width:0;font-size:13px}.agrow .an small{display:block;color:var(--dim);font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agrow .av{text-align:right;font-family:var(--mono);font-size:13px}.agrow .av small{display:block;font-size:10px;color:var(--mut);white-space:nowrap}
+.opn{font-size:10px;color:var(--buy);border:1px solid var(--buy);border-radius:6px;padding:0 4px;margin-left:4px}
+.obs{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--line)}.obs .od{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none}
+.obs .on{font-size:12.5px;font-weight:800}.obs .on small{font-weight:500;color:var(--dim);font-size:10.5px;margin-left:4px}.obs .ot{font-size:12px;color:var(--mut);line-height:1.45;margin-top:2px}
+.nb{border-left:3px solid var(--nc);padding:8px 10px;margin-bottom:8px;border-radius:0 10px 10px 0;background:rgba(127,140,160,.05)}
+.nbh{font-weight:800;font-size:13px;display:flex;gap:8px;align-items:baseline}.nba{margin-left:auto;font-size:10.5px;color:var(--nc);font-weight:800;text-align:right}
+.nbr{font-size:12px;color:var(--mut);line-height:1.5;margin-top:3px}.nbr b{color:var(--txt);font-weight:700;margin-right:4px}
+#acctPop{position:fixed;right:18px;top:64px;z-index:45}
+#alMind.hidden{display:none!important}
+.labl.big{grid-template-rows:auto 0.75fr 1.25fr}
+.mc{border:1px solid var(--line2);border-left:3px solid var(--mc);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:rgba(127,140,160,.04);animation:slin .4s ease}
+.mch{font-size:12.5px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}.mch .mood{margin-left:auto;font-size:10.5px;color:var(--mut)}
+.mcr{font-size:12px;color:var(--mut);line-height:1.5;margin-top:3px}.mcr b{color:var(--txt);font-weight:800;margin-right:6px;display:inline-block;min-width:58px}
+.mct{width:100%;border-collapse:collapse;margin:4px 0 2px;font-size:11.5px}.mct td{padding:3px 5px;border-bottom:1px solid var(--line);vertical-align:top}
+.mct td.tt{text-align:right;font-family:var(--mono);font-weight:800;white-space:nowrap}.mct tr.pick td{background:rgba(127,140,160,.1);color:var(--txt);font-weight:700}
+.mct tr.sysr td:first-child{color:var(--buy)}
+.tb{display:inline-block;font-size:10px;font-weight:700;border:1px solid var(--tc);color:var(--tc);border-radius:6px;padding:0 4px;margin:1px 2px 1px 0;white-space:nowrap}
+.mcr.cf{border-top:1px dashed var(--line2);padding-top:4px}
+.pos .big .R.money{font-size:25px}
+@media (max-width:1100px){#v-ailab{grid-template-columns:1fr;padding:8px}.labl{height:calc(100vh - 80px);min-height:620px;grid-template-rows:auto 1fr 220px}}
 /* lab */
 #v-lab{grid-template-columns:1fr 380px;gap:14px;padding:14px}
 .labmain{display:grid;grid-template-rows:1fr 190px;gap:12px;min-height:0}
@@ -246,11 +282,13 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
   <nav id="tabs">
     <button data-tab="replay" class="on">REPLAY</button>
     <button data-tab="dojo">DOJO</button>
+    <button data-tab="ailab">AI LAB</button>
     <button data-tab="lab">MONTE CARLO</button>
     <button data-tab="fractal">FRACTAL</button>
     <button data-tab="grader">GRADER</button>
   </nav>
   <div class="hright">
+    <button class="iconbtn" id="acctBtn" title="ทุนและความเสี่ยงต่อไม้">฿</button>
     <button class="iconbtn" id="aboutBtn" title="นี่คืออะไร / วิธีใช้">ⓘ</button>
     <button class="iconbtn" id="soundBtn" title="เสียง">🔇</button>
     <button class="iconbtn" id="themeBtn" title="สลับธีม">◐</button>
@@ -262,12 +300,21 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
   <h3>5 โหมด</h3><ul>
   <li><b>REPLAY</b> — ดู rule engine ตัดสินใจทีละแท่ง (ไม่เห็นอนาคต) บน 13 price patterns (ต่อกัน 2–3 รอบต่อตลาด) หรืออัปโหลด CSV ของหุ้นจริง</li>
   <li><b>DOJO</b> — ตลาดหยุดทุกจุดตัดสินใจ (4 ตัวเลือก) · ให้คะแนน ✓ ตรงระบบ / ≈ ไม่ผิดกฎ / ✕ ผิดกฎ · กำไรขาดทุนของคุณคิดจริงตามกราฟ เทียบกับระบบตอนจบ</li>
+  <li><b>AI LAB</b> — ดู AI 9 บุคลิก (ทำตามระบบ, FOMO, ขายหมู, ดื้อ, ไม่ตั้ง SL, ลิงสุ่ม ฯลฯ) เล่นหุ้นชุดเดียวกันพร้อมกันในมุมมอง 3D · ผู้ตรวจกฎ/นักค้าน/คุมความเสี่ยง คอยเถียง · มีสมุดทดลองของ Claude</li>
+  <li><b>โลก</b> — ปกติ (ทรงสำเร็จรูปสำหรับฝึกกฎ) · โหด (regime จริง: ขึ้น/ลง/ไซด์เวย์/ร่วงแรง) · สุ่มล้วน (ไม่มี edge) · ผสม</li>
+  <li><b>เงิน</b> — ทุกผลแปลงเป็นบาทและ % ตามทุนและความเสี่ยงต่อไม้ที่ตั้งเอง (ปุ่ม ฿ มุมขวาบน) พร้อม Profit Factor</li>
   <li><b>MONTE CARLO</b> — 1,000 อนาคตของพอร์ตจากสมมติฐาน win rate / R / RPT</li>
   <li><b>FRACTAL</b> — ซูมเข้า nest ทีละ degree ให้เห็นว่าทุกระดับคือทรงเดียวกัน</li>
   <li><b>GRADER</b> — เช็คหุ้นจริงกับ checklist ของระบบ</li></ul>
   <h3>ปุ่มลัด</h3><ul><li>Space เล่น/หยุด · ← → ทีละแท่ง · N ข้ามไป event ถัดไป · scroll ซูม · ลากเพื่อเลื่อน · ดับเบิลคลิกกลับไปตามราคา</li></ul>
   <div class="disc">ตลาดทั้งหมดในโหมด Replay/Dojo สร้างขึ้นด้วยคอมพิวเตอร์ (synthetic) เพื่ออธิบายกฎของระบบ ตัวเลข R ที่เห็นไม่ใช่ผลการเทรดจริงและไม่ได้บอกผลในอนาคต · เนื้อหาเพื่อการศึกษาเท่านั้น ไม่ใช่คำแนะนำการลงทุน · © <a href="https://www.yoapinan.com/" style="color:var(--gold)">YoApinan.com</a></div>
   <div style="margin-top:16px;text-align:right"><button class="bigbtn" id="aboutClose" style="padding:10px 20px;font-size:12px">เข้าใจแล้ว</button></div>
+</div></div>
+<div id="acctPop" class="hidden"><div class="card" style="width:300px">
+  <h3>บัญชีจำลอง</h3>
+  <div class="ctl"><label>เงินทุน (บาท)</label><output id="acCapO"></output><input type="number" id="acCap" min="10000" step="10000" style="grid-column:1/-1" class="sel"></div>
+  <div class="ctl"><label>ความเสี่ยงต่อไม้ (% ของทุน)</label><output id="acRptO"></output><input type="range" id="acRpt" min="0.25" max="5" step="0.25"></div>
+  <div class="note">1 R = เงินที่ยอมเสียถ้าโดน SL = ทุน × % นี้ · ไม้ครึ่ง = ครึ่ง R · ใช้คิดเงินทุกหน้า</div>
 </div></div>
 <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
 <main>
@@ -281,7 +328,7 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
         <div id="endcard"><div class="ocard"><h2 id="ecT">—</h2><p id="ecP">—</p><div class="row"><button class="bigbtn" id="ecNext" style="padding:10px 18px;font-size:12px">ตลาดสุ่มถัดไป ⟳</button><button class="ghost" id="ecAgain">ดูซ้ำ</button><button class="ghost" id="ecShare">🔗 แชร์</button></div></div></div>
         <div class="overlay hidden" id="dojoStart"><div class="ocard">
           <h2>DOJO</h2>
-          <p>ตลาดจะเล่นไปเรื่อยๆ แล้วหยุดทุกจุดที่ต้องตัดสินใจ — เฉพาะที่เกี่ยวกับ position ของคุณ<br>ทุกคำตอบได้เกรด <b style="color:var(--buy)">✓ ตรงระบบ</b> · <b style="color:var(--gold)">≈ ไม่ผิดกฎ</b> · <b style="color:var(--stop)">✕ ผิดกฎ</b><br>DISCIPLINE = ✓ + ≈ · <b>ไม่มีการเห็นอนาคต</b></p>
+          <p>ตลาดจะหยุดถามตลอดทาง — ทั้งจุดที่ระบบทำจริง และจุดหลอก (histogram พลิก · MACD ตัด 0 · ทะลุ high · PP · แท่งแดงยาว) และให้อ่านทรงเป็นระยะ · หน้าตาคำถามเหมือนกันหมด เดาจากคำถามไม่ได้<br>ทุกคำตอบได้เกรด <b style="color:var(--buy)">✓ ตรงระบบ</b> · <b style="color:var(--gold)">≈ ไม่ผิดกฎ</b> · <b style="color:var(--stop)">✕ ผิดกฎ</b><br>DISCIPLINE = ✓ + ≈ · <b>ไม่มีการเห็นอนาคต</b></p>
           <button class="bigbtn" id="dojoGo">เริ่มฝึก</button>
         </div></div>
       </div>
@@ -312,9 +359,29 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
           <div><div class="v" id="dYouR">0.00R</div><div class="k">YOUR P&amp;L</div></div></div>
           <div class="note" id="dPos" style="margin-top:10px;font-family:var(--mono)">ไม่มี position</div>
           <div class="note" id="dSys" style="margin-top:4px">SYSTEM P&amp;L: เฉลยตอนจบตลาด</div></div>
-        <div class="card" style="padding:10px 16px"><div class="toggle" id="hardT" style="margin-top:0"><span class="sw"></span>HARD · ซ่อนทุกอย่าง + ไม่มีตัวช่วย + คำถามหลอก + จับเวลา 15 วิ</div><div class="note" id="dLife" style="margin-top:8px"></div></div>
+        <div class="card" style="padding:10px 16px"><div class="row" style="align-items:center;gap:8px;margin-bottom:6px"><span class="note">ความถี่คำถาม</span><select class="sel" id="dFreq"><option value="key">จุดสำคัญ</option><option value="normal" selected>ปกติ (ถามตลอดทาง)</option><option value="dense">ถี่มาก</option></select></div><div class="toggle" id="hardT" style="margin-top:0"><span class="sw"></span>HARD · ซ่อนทุกอย่าง + ไม่มีตัวช่วย + คำถามหลอก + จับเวลา 15 วิ</div><div class="note" id="dLife" style="margin-top:8px"></div></div>
         <div class="card q" id="dq" style="flex:1;overflow:auto"><h3>DECISION</h3><div id="dqBody" class="fb">กด ▶ แล้วรอจุดตัดสินใจแรก…</div></div>
       </div>
+    </aside>
+  </section>
+
+  <!-- ===== AI LAB ===== -->
+  <section id="v-ailab" class="view">
+    <div class="labl">
+      <div class="scen" id="alCtl"></div>
+      <div class="panelc" id="alWrap"><canvas id="al3d"></canvas>
+        <div class="alhud"><div class="mkt" id="alInfo">—</div><div class="note">แต่ละแผ่น = หุ้น 1 ตัว · แผ่นทอง = เวลาที่กำลังเดิน · จุดสี = AI ที่ถืออยู่ · ลากหมุน · scroll ซูม · คลิกแผ่นเพื่อดู</div></div>
+        <div id="alSel" class="hidden alsel"><span id="alSelT"></span> <button class="chip" id="alOpen">เปิดใน REPLAY ↗</button></div>
+        <div id="alSum" class="hidden alsum"><div class="ocard"><h2>จบรอบ</h2><table class="mini" id="alSumT"></table><div id="alSumL"></div><div class="row" style="margin-top:12px"><button class="bigbtn" id="alSumNext" style="padding:10px 18px;font-size:12px">รอบถัดไป ⟳</button><button class="ghost" id="alSumNote">สมุดทดลอง Claude</button></div><div class="note" style="margin-top:8px">เริ่มรอบถัดไปอัตโนมัติใน 14 วิ</div></div></div>
+      </div>
+      <div class="card alfeedc"><h3>AI เถียงกัน · ตรวจ · ค้าน<span class="sp"></span><button class="chip on" id="alTabFeed">สด</button><button class="chip" id="alTabMind">ความคิด AI 🧠</button><button class="chip" id="alTabNote">สมุดทดลอง Claude</button><button class="chip" id="alBig" title="ขยายแผงนี้">⤢</button></h3>
+        <div class="log" id="alFeed"></div><div class="log hidden" id="alNote"></div>
+        <div class="hidden" id="alMind" style="display:flex;flex-direction:column;min-height:0;flex:1"><div class="scen" id="alMindCtl" style="margin-bottom:6px"></div><div class="note" id="alMindHead" style="margin-bottom:6px"></div><div class="log" id="alMindList"></div></div>
+        <div class="note" style="margin-top:4px">ข้อความสร้างจากตัวเลขจริงของการจำลองด้วยกฎที่ Claude เขียน (ไม่ใช่ AI คุยกันสด) · สมุดทดลอง = สิ่งที่ Claude ทดสอบจริง</div></div>
+    </div>
+    <aside class="side" style="overflow:auto">
+      <div class="card"><h3><span class="live"></span>LEADERBOARD<span class="sp" style="flex:1"></span><select class="sel" id="alSort" title="เรียงอันดับ"><option value="calmar">Calmar</option><option value="darwin">ความเสี่ยงเท่ากัน (VaR 6.5%)</option><option value="money">กำไรเป็นเงิน</option></select></h3><div id="alBoard"></div><div class="note" style="margin-top:6px">Calmar = ผลตอบแทนต่อปี ÷ drawdown สูงสุด · @VaR6.5 = ถ้าปรับให้ทุกตัวเสี่ยงเท่ากันแบบ Darwinex จะได้กี่ %/ปี</div></div>
+      <div class="card"><h3>OBSERVERS · คนดู</h3><div id="alObs"></div></div>
     </aside>
   </section>
 
@@ -358,7 +425,7 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
 </main>
 
 <script>
-/* ================= NEST ENGINE v3 =================
+/* ================= NEST ENGINE v4 =================
    procedural multi-block market generator + bar-by-bar rule engine (no look-ahead)
    Rules:
      Wave 1 = MA50 x above MA200 · Wave 2 = MA50 curls down · Nest = (i) fails under W1 high + (ii) higher low
@@ -449,12 +516,19 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
   const TYPES = Object.keys(TEMPLATES);
 
   function build(blocks, rng) {
-    const A = []; let t = 0; const metas = [];
+    const A = []; let t = 0; const metas = []; const VB = rng.r(0.82, 1.28);
     const push = (dt, p, sg) => { t += Math.max(1, Math.round(dt)); A.push([t, p, sg]); return t; };
     const last = () => A[A.length - 1][1];
     blocks.forEach((type, bi) => {
-      const vm = rng.r(1.25, 1.6); const P = (dt, p, sg) => push(dt, p, sg * vm);
+      const vm = rng.r(1.25, 1.6) * VB; const P = (dt, p, sg) => push(dt, p, sg * vm);
       const meta = { type, bi };
+      // ----- filler regime between blocks (chop / bear leg / slow grind) -----
+      if (bi > 0 && rng.u() < 0.55) {
+        const fk = rng.u(), base = last();
+        if (fk < 0.35) { const k = rng.i(2, 4); for (let j = 0; j < k; j++) { P(rng.r(12, 26), base * rng.r(1.06, 1.16), 0.013); P(rng.r(12, 26), base * rng.r(0.86, 0.95), 0.014); } meta.filler = "chop"; }
+        else if (fk < 0.7) { P(rng.r(25, 45), base * rng.r(0.8, 0.9), 0.015); P(rng.r(8, 15), last() * rng.r(1.06, 1.12), 0.014); P(rng.r(25, 50), base * rng.r(0.55, 0.75), 0.016); meta.filler = "bear"; }
+        else { P(rng.r(60, 120), base * rng.r(1.12, 1.35), 0.008); P(rng.r(15, 25), last() * rng.r(0.85, 0.92), 0.013); meta.filler = "grind"; }
+      }
       let B, L;
       // ----- prefix: decline & base (resets MAs) -----
       if (type === "basehead") {
@@ -622,7 +696,9 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
       const m = { o, h, l, c, v, N, blocks, seed, metas, rngPP: rng.u() };
       indicators(m);
       if (!validate(m, metas)) continue;
-      m.attempt = attempt; return m;
+      const SC = Math.exp(rng.r(Math.log(0.06), Math.log(4.5)));
+      for (let i = 0; i < N; i++) { o[i] *= SC; h[i] *= SC; l[i] *= SC; c[i] *= SC; }
+      indicators(m); m.attempt = attempt; m.world = "normal"; return m;
     }
     return null;
   }
@@ -693,7 +769,7 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
     const E = (i, type, extra) => { const e = Object.assign({ i, type, cyc: S.cycle }, extra || {}); ev.push(e); return e; };
     const fresh = (cycle, cum) => ({ stage: {}, st: "WAIT_GC", cycle, cum, gc: -1, curl: -1, w1hI: -1, W1H: NaN, W1L: NaN, w1lI: -1, w2I: -1, W2: NaN,
       zzDir: 0, zzExt: NaN, zzExtI: -1, iI: -1, I: NaN, iiI: -1, II: NaN, under: false, recrossed: false, pos: null, TP: [NaN, NaN, NaN], TPbig: [NaN, NaN, NaN],
-      noNest: false, invalid: false, head: NaN, headI: -1, watchRun: false, runFired: false, nnB: NaN, savedFired: false, lastTrap: -99, entries: 0, reentry: false, realized: 0,
+      noNest: false, invalid: false, head: NaN, headI: -1, watchRun: false, runFired: false, nnB: NaN, savedFired: false, lastTrap: -99, lastStale: -99, entries: 0, reentry: false, realized: 0,
       fv: null });
     S = fresh(1, 0);
     const dn3 = (i) => m50[i] < m50[i - 3];
@@ -713,14 +789,15 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
     const histUpRecently = (i) => { if (!(hist[i] > 0)) return false; for (let j = i; j >= i - 15; j--) { if (hist[j] <= 0) return false; if (hist[j - 1] <= 0) return true; } return false; };
     const fractalLow = (j, w) => { for (let q = j - w; q <= j + w; q++) if (q !== j && l[q] < l[j]) return false; return true; };
 
-    const openPos = (i, via, sl0, lo, loI) => {
+    const openPos = (i, via, sl0, lo, loI, s0) => {
       const ppNow = pp[i] || pp[i - 1] || pp[i - 2];
       const units = ppNow ? 1 : 0.5, rUnit = c[i] - sl0;
-      const w1s = S.I - S.W2; S.TP = LV.map(k => S.II + k * w1s); S.TPbig = LV.map(k => S.W2 + k * (S.W1H - S.W1L));
+      const base0 = s0 !== undefined ? s0 : S.W2;
+      const w1s = S.I - base0; S.TP = LV.map(k => S.II + k * w1s); S.TPbig = LV.map(k => S.W2 + k * (S.W1H - S.W1L));
       S.pos = { entryI: i, e1: c[i], units, lots: [{ q: units, p: c[i] }], sl: sl0, rUnit, pp: ppNow, scaled: units >= 1, vcpDone: false, lifted: false, liftPending: false,
         tr: null, realized: 0, heat: false, T: newTracker(i), I: S.I, via };
-      S.entries++; S.stage.buy = i; S.st = "LONG";
-      E(i, "BUY", { price: c[i], units, pp: ppNow, sl: sl0, ii: lo, iiI: loI, I: S.I, TP: S.TP.slice(), TPbig: S.TPbig.slice(), W2: S.W2, via, reentry: S.entries > 1 });
+      S.entries++; S.stage.buy = i; S.st = "LONG"; S.watchRun = false;
+      E(i, "BUY", { price: c[i], units, pp: ppNow, sl: sl0, ii: lo, iiI: loI, I: S.I, iI: S.iI, TP: S.TP.slice(), TPbig: S.TPbig.slice(), W2: S.W2, s0: base0, reanchor: s0 !== undefined, via, reentry: S.entries > 1 });
     };
 
     for (let i = 200; i < N; i++) {
@@ -780,14 +857,28 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
                 else if (pp[i]) via = "pp";
                 else if (fvcp && c[i] > fvcp.pivot && v[i] >= 1.3 * vma[i]) via = "vcp";
               }
-              if (via) { S.iiI = loI; S.II = lo; openPos(i, via, sl0, lo, loI); }
+              if (via) {
+                const tp1 = lo + LV[0] * (S.I - S.W2);
+                if (c[i] < tp1) { S.iiI = loI; S.II = lo; openPos(i, via, sl0, lo, loI); }
+                else {
+                  // price is already above TP1 of this small 1-2 -> the entry must be its own new 1-2: (ii) -> H = new (i), pullback L = new (ii)
+                  let H = -1, hI = -1; for (let j = loI + 1; j < i; j++) if (h[j] > H) { H = h[j]; hI = j; }
+                  let L2 = 1e9, lI = -1; if (hI > 0) for (let j = hI + 1; j <= i; j++) if (l[j] < L2) { L2 = l[j]; lI = j; }
+                  const ok = hI > 0 && lI > hI && L2 > lo;
+                  const r2 = ok ? (H - L2) / (H - lo) : 0, sl2 = L2 * 0.99, tp1b = L2 + LV[0] * (H - lo);
+                  if (ok && r2 >= 0.618 && c[i] - sl2 >= 2 * atr[i] && c[i] < tp1b) {
+                    E(i, "REANCHOR", { oldI: S.I, oldII: lo, oldTP1: tp1, I: H, iI: hI, ii: L2, iiI: lI, s0: lo, retr: r2 });
+                    S.iI = hI; S.I = H; S.iiI = lI; S.II = L2; openPos(i, via, sl2, L2, lI, lo);
+                  } else if (i - S.lastStale > 15) { S.lastStale = i; E(i, "TRAP_STALE", { tp1, price: c[i], retr: r2, H, L: L2 }); }
+                }
+              }
               else if (hup && macd[i] > 0 && !validII && i - S.lastTrap > 20) { S.lastTrap = i; E(i, "TRAP_SHALLOW", { retr, lo, I: S.I }); }
             }
           }
         }
       }
       if (S.st === "NONEST" && !S.savedFired && c[i] < S.nnB * 0.8) { S.savedFired = true; E(i, "SAVED", { from: S.nnB, price: c[i] }); }
-      if (S.watchRun && !S.runFired && c[i] > S.W1H) { S.runFired = true; E(i, "RUN_WITHOUT_YOU", { price: c[i] }); }
+      if (S.watchRun && !S.runFired && S.st !== "LONG" && c[i] > S.W1H) { S.runFired = true; E(i, "RUN_WITHOUT_YOU", { price: c[i] }); }
       if (S.under && !S.recrossed && S.stage.buy && m50[i - 1] <= m200[i - 1] && m50[i] > m200[i]) { S.recrossed = true; E(i, "RECROSS"); }
       // ================= position =================
       if (S.st === "LONG" && S.pos && i > S.pos.entryI) {
@@ -871,9 +962,327 @@ main{position:relative;z-index:2;height:calc(100% - 58px)}
     m.N = m.c.length; indicators(m); m.run = runEngine(m); return m;
   }
 
-  const API = { makeRng, genMarket, genScenario, runEngine, fromOHLC, indicators, TEMPLATES, TYPES, STAGES, sma, ema };
+
+  // ---------- other worlds: regime-switching GARCH (harsh) and pure martingale (random) ----------
+  function tShock(rng) { let s = 0; for (let k = 0; k < 6; k++) { const z = rng.n(); s += z * z; } return rng.n() / Math.sqrt(s / 6) * Math.sqrt(4 / 6); }
+  const REG = {
+    bull:    { mu: 0.0013, vol: 0.018, d: [60, 200], vf: 1.0, name: "ขาขึ้น" },
+    grind:   { mu: 0.0007, vol: 0.012, d: [80, 220], vf: 0.8, name: "ค่อยๆ ขึ้น" },
+    chop:    { mu: 0, vol: 0.016, d: [60, 220], vf: 0.85, ou: 0.035, name: "ไซด์เวย์ฟันเลื่อย" },
+    base:    { mu: 0, vol: 0.010, d: [60, 160], vf: 0.65, ou: 0.05, name: "ฐานเงียบ" },
+    bear:    { mu: -0.0011, vol: 0.022, d: [50, 180], vf: 1.1, name: "ขาลง" },
+    bleed:   { mu: -0.0006, vol: 0.013, d: [80, 200], vf: 0.8, name: "ไหลลงช้าๆ" },
+    crash:   { mu: -0.012, vol: 0.036, d: [8, 26], vf: 2.0, name: "ร่วงแรง" },
+    rebound: { mu: 0.003, vol: 0.026, d: [20, 60], vf: 1.4, name: "เด้งแรง" },
+    blowoff: { mu: 0.0045, vol: 0.028, d: [15, 45], vf: 1.7, name: "พุ่งแรง" },
+  };
+  const NEXT = { bull: ["grind", "chop", "blowoff", "bear", "bull", "crash"], grind: ["bull", "chop", "bleed", "base"], chop: ["bull", "bear", "base", "crash", "chop"], base: ["bull", "grind", "chop", "bleed"],
+    bear: ["crash", "chop", "rebound", "bleed", "base"], bleed: ["bear", "base", "chop", "crash"], crash: ["rebound", "base", "chop", "bear"], rebound: ["bull", "chop", "bear", "grind"], blowoff: ["crash", "bear", "chop"] };
+  function genHarsh(seed, pure) {
+    const rng = makeRng((seed * 2654435761 + (pure ? 23 : 11)) >>> 0);
+    const N = rng.i(1300, 1750); let p = Math.exp(rng.r(Math.log(4), Math.log(450)));
+    const o = [], h = [], l = [], c = [], v = [], regs = [];
+    let reg = pure ? null : rng.pick(["chop", "base", "bull", "bear", "grind"]), left = 0, anchor = Math.log(p);
+    const volLevel = rng.r(0.9, 1.5); let hv = (0.018 * volLevel) ** 2, lvb = 0, lastE = 0;
+    for (let i = 0; i < N; i++) {
+      let R;
+      if (pure) R = { mu: 0, vol: 0.019, vf: 1 };
+      else {
+        if (left <= 0) { if (i > 0) reg = rng.pick(NEXT[reg]); const d = REG[reg].d; left = rng.i(d[0], d[1]); anchor = Math.log(p); regs.push([i, reg]); }
+        left--; R = REG[reg];
+      }
+      const tv = (R.vol * volLevel) ** 2;
+      hv = tv * 0.02 + 0.08 * lastE * lastE + 0.9 * hv;
+      const sd = Math.sqrt(hv), e = sd * tShock(rng); lastE = e;
+      let mu = R.mu; if (R.ou) mu -= R.ou * (Math.log(p) - anchor);
+      const gap = (i % 63 === 30 && rng.u() < 0.5) ? rng.n() * 0.045 : 0;
+      const prev = p, op = prev * Math.exp(gap + rng.n() * sd * 0.3);
+      p = prev * Math.exp(mu - (pure ? 0.5 * hv : 0) + e + gap);
+      const hi = Math.max(op, p) * Math.exp(Math.abs(rng.n()) * sd * 0.55), lo = Math.min(op, p) * Math.exp(-Math.abs(rng.n()) * sd * 0.55);
+      lvb = 0.96 * lvb + 0.25 * rng.n();
+      v.push(Math.exp(lvb + 0.3 * rng.n()) * (R.vf || 1) * (1 + 14 * Math.abs(Math.log(p / prev))));
+      o.push(op); h.push(hi); l.push(lo); c.push(p);
+    }
+    const m = { o, h, l, c, v, N, seed, world: pure ? "random" : "harsh", blocks: [pure ? "random" : "harsh"], regimes: regs.map(([i, k]) => ({ i, k, name: REG[k].name })) };
+    indicators(m); m.run = runEngine(m); m.tpl = pure ? "random" : "harsh"; return m;
+  }
+  function genWorld(world, seed, first) {
+    if (world === "harsh") return genHarsh(seed, false);
+    if (world === "random") return genHarsh(seed, true);
+    if (world === "mixed") { const r = makeRng(seed * 13 + 5); const u = r.u(); return u < 0.4 ? genScenario("random", seed) : u < 0.8 ? genHarsh(seed, false) : genHarsh(seed, true); }
+    return genScenario(first || "random", seed);
+  }
+  // ---------- money: R -> baht with risk-per-trade compounding ----------
+  function statsFromTrades(trades, opt) {
+    const cap = (opt && opt.capital) || 1e6, rpt = ((opt && opt.rpt) || 1) / 100, lin = opt && opt.linear;
+    let eq = cap, peak = cap, dd = 0, gp = 0, gl = 0, w = 0;
+    const out = trades.map(t => { const base = lin ? cap : eq, pnl = base * rpt * t.R; eq += pnl; peak = Math.max(peak, eq); dd = Math.max(dd, 1 - eq / peak); if (pnl > 0) gp += pnl; else gl -= pnl; if (t.R > 0.05) w++; return Object.assign({}, t, { pnl, eq }); });
+    return { trades: out, final: eq, pnl: eq - cap, retPct: (eq / cap - 1) * 100, pf: gl > 0 ? gp / gl : (gp > 0 ? Infinity : NaN), win: trades.length ? w / trades.length * 100 : NaN, maxDD: dd * 100, n: trades.length, gp, gl, R: trades.reduce((s, t) => s + t.R, 0) };
+  }
+  function tradesOf(m, run, upto) {
+    const N = m.c.length, last = upto === undefined ? N - 1 : upto, tr = []; let open = null;
+    for (const e of run.ev) {
+      if (e.i > last) break;
+      if (e.type === "BUY") open = { i0: e.i, entry: e.price, units: e.units };
+      else if (open && (e.type === "STOP" || e.type === "STOP_PROFIT" || e.type === "GAP_STOP" || e.type === "FLAT")) { tr.push({ i0: open.i0, i1: e.i, R: e.R }); open = null; }
+    }
+    const sN = run.snap[last];
+    if (open && sN && sN.st === "LONG") { const closed = tr.reduce((s, t) => s + t.R, 0); tr.push({ i0: open.i0, i1: last, R: sN.totR - closed, open: true }); }
+    return tr;
+  }
+  function account(m, run, opt, upto) { return statsFromTrades(tradesOf(m, run, upto), opt); }
+  // ---------- risk-adjusted stats (Calmar, Sharpe) + Darwinex-style normalisation to a monthly VaR target ----------
+  function riskStats(path, opt) {
+    const rpt = ((opt && opt.rpt) || 1) / 100, tgt = ((opt && opt.targetVaR) || 6.5) / 100, bpy = 252, n = path.length;
+    if (n < 30) return null;
+    const r = []; let prev = 1 + rpt * path[0];
+    for (let i = 1; i < n; i++) { const e = 1 + rpt * path[i]; r.push(prev > 0 ? e / prev - 1 : 0); prev = e; }
+    const mean = (a) => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length), sd = (a) => { const m = mean(a); return Math.sqrt(a.reduce((s, x) => s + (x - m) * (x - m), 0) / Math.max(1, a.length - 1)); };
+    const core = (rr) => { let e = 1, pk = 1, dd = 0; for (const x of rr) { e *= 1 + x; if (e > pk) pk = e; dd = Math.max(dd, 1 - e / pk); }
+      const yrs = rr.length / bpy, cagr = e > 0 ? Math.pow(e, 1 / Math.max(yrs, 1e-9)) - 1 : -1, s = sd(rr), dn = Math.sqrt(rr.reduce((q, x) => q + Math.min(0, x) ** 2, 0) / Math.max(1, rr.length));
+      return { ret: (e - 1) * 100, cagr: cagr * 100, dd: dd * 100, calmar: dd > 1e-9 ? cagr / dd : (cagr > 0 ? Infinity : NaN), sharpe: s > 0 ? mean(rr) / s * Math.sqrt(bpy) : NaN, sortino: dn > 0 ? mean(rr) / dn * Math.sqrt(bpy) : NaN }; };
+    const base = core(r);
+    // VaR from exposed bars only (like Darwinex: days the strategy was in the market), 21-bar months
+    const ex = r.filter(x => Math.abs(x) > 1e-12), mret = [];
+    for (let k = 0; k + 21 <= ex.length; k += 21) { let e = 1; for (let j = k; j < k + 21; j++) e *= 1 + ex[j]; mret.push(e - 1); }
+    let VaR = NaN, L = NaN, norm = null;
+    if (mret.length >= 3) { const mm = mean(mret), ss = sd(mret); VaR = Math.max(1.645 * ss - mm, 0.5 * 1.645 * ss, 1e-4); L = Math.min(20, tgt / VaR); norm = core(r.map(x => x * L)); }
+    return Object.assign(base, { VaR: VaR * 100, L, norm, months: mret.length, exposure: ex.length / Math.max(1, r.length) * 100 });
+  }
+  function sysPath(m, run, upto) { const t0 = 232, last = upto === undefined ? m.c.length - 1 : upto, p = []; for (let i = t0; i <= last; i++) p.push(run.snap[i] ? run.snap[i].totR : 0); return p; }
+  TEMPLATES.harsh = { name: "โลกโหด", th: "ตลาดแบบ regime จริง: ขึ้น/ลง/ไซด์เวย์/ร่วงแรง · ไม่มีทรงสำเร็จรูป", lesson: "ตลาดที่ไม่ได้ออกแบบมาให้ระบบชนะ — ทรง nest เกิดเองตามธรรมชาติ นานๆ ครั้ง และ SL คือสิ่งที่พาคุณรอดจากช่วงร่วงแรง" };
+  TEMPLATES.random = { name: "โลกสุ่มล้วน", th: "Random walk ไม่มี edge ให้ใคร", lesson: "ในโลกที่ไม่มี edge ไม่มีระบบไหนชนะได้ยั่งยืน — วินัยไม่ได้สร้างกำไร แต่ตัดหางความเสียหาย" };
+  const API = { makeRng, genMarket, genScenario, genHarsh, genWorld, runEngine, fromOHLC, indicators, account, tradesOf, statsFromTrades, riskStats, sysPath, TEMPLATES, TYPES, STAGES, REG, sma, ema };
   if (typeof module !== "undefined" && module.exports) module.exports = API; else root.NEST = API;
 })(typeof window !== "undefined" ? window : globalThis);
+
+/* ============================================================
+   AI LAB core — trader personas, multi-agent playback, observer "debate"
+   Every line an agent "says" is generated by rules from real simulation numbers.
+============================================================ */
+const LABCORE = (function () {
+  // ---------- decision model: every option is scored on traits; persona weights decide ----------
+  const TRAIT = { rule: "ตามกฎ", enter: "อยากซื้อ/เพิ่มไม้", cut: "อยากขาย", lockNow: "อยากกันกำไร/กันทุน", chase: "ไล่ SL", loosen: "ไม่อยากโดน SL", noSL: "ไม่เชื่อ SL", wait: "รอ/ไม่ทำอะไร", mid: "ทางสายกลาง", luck: "สุ่ม" };
+  const WHY = { enter: "อยากมีของ กลัวตกรถ", cut: "อยากขายให้จบ ไม่อยากเสี่ยงต่อ", lockNow: "อยากกันกำไรไว้ก่อน", chase: "อยากล็อกทุกขั้นที่ราคาขึ้น", loosen: "ยังไม่อยากยอมรับขาดทุน", noSL: "ไม่เชื่อว่า SL ช่วยอะไร", wait: "ขอรอดูก่อน", mid: "เลือกทางกลางที่ไม่ผิดกฎ", luck: "สุ่มล้วนๆ", rule: "กฎว่าอย่างนี้" };
+  function traits(o, ctx) {
+    const t = o.t, f = { rule: o.g === "ok" ? 1 : o.g === "acc" ? 0.3 : -1 };
+    let e = 0;
+    if (/^BUY 1\.5/.test(t)) e = 1.5; else if (/เข้า 2 ไม้/.test(t)) e = 2;
+    else if (/^BUY ¼/.test(t)) e = 0.25; else if (/ทยอยซื้อเฉลี่ย/.test(t)) e = 0.33;
+    else if (/^(BUY|เข้า|ไล่ซื้อ|ซื้อ)/.test(t)) e = /ครึ่ง|½/.test(t) ? 0.5 : 1;
+    else if (/^เติม ½/.test(t)) e = 0.5; else if (/^เติม(อีก 1 ไม้|เต็มไม้)/.test(t)) e = 1; else if (/ซื้อเพิ่ม/.test(t)) e = 0.5;
+    if (e) f.enter = e;
+    if (/ขายทั้งหมด|ขายตัดขาดทุนทั้งหมด|^ออกทั้งหมด/.test(t)) f.cut = 1.6; else if (/ขาย 1\/3 นี้|ขายเฉพาะ 1\/3/.test(t)) f.cut = 1; else if (/^ขาย 1\/3$/.test(t)) f.cut = 0.6; else if (/ขายครึ่ง|ขาย ½/.test(t)) f.cut = 0.8;
+    if (/ที่ทุน|กันหน้าทุน/.test(t)) f.lockNow = 1.2; else if (/ชิดใต้/.test(t)) f.lockNow = 1; else if (/ยก SL ครั้งเดียว/.test(t)) f.lockNow = 0.5; else if (/trailing เดียวกับไม้ TP1/.test(t)) f.lockNow = 0.8;
+    if (/ยกตาม pivot low ทุกอัน/.test(t)) f.chase = 1.3; else if (/ชิดใต้/.test(t)) f.chase = 1; else if (/trailing เดียวกับไม้ TP1/.test(t)) f.chase = 0.8;
+    if (/ขยับ SL ลง|ย้าย SL ลง/.test(t)) f.loosen = 1; else if (/ถือตาม SL ของผม/.test(t)) f.loosen = 0.8; else if (/ไม่สน trailing|ถือต่อโดยไม่ trail/.test(t)) f.loosen = 0.7; else if (/ใต้ low ของ Wave 2/.test(t)) f.loosen = 0.3;
+    if (/ไม่ตั้ง SL/.test(t) || (/ถือตาม SL ของผม/.test(t) && ctx.noSLNow)) f.noSL = 1;
+    if (/^WAIT|^NO TRADE|^รอ|ไม่เข้า|ยังไม่เติม|^คงไว้|ไม่ขยับ|^HOLD|^ถือต่อ ให้ SL/.test(t)) f.wait = 1;
+    if (o.g === "acc") f.mid = 1;
+    return f;
+  }
+  const PERSONAS = [
+    { k: "SENSEI", name: "SENSEI", th: "ทำตามระบบทุกข้อ", col: "#ffd166", say: ["ตามกฎ", "ระบบว่าไง ผมว่างั้น", "ไม่คิดเยอะ ทำตามแผน"],
+      W: (c) => ({ w: { rule: 10 }, note: c.lossStreak >= 2 ? "เพิ่งเสีย " + c.lossStreak + " ไม้ติด แต่ไม่สนไม้ก่อน" : "" }) },
+    { k: "CAUTIOUS", name: "ขี้ระวัง", th: "ชอบทางสายกลาง ≈ ลดความเสี่ยง", col: "#3ee7ff", say: ["ขอเล่นปลอดภัย", "ไม่ผิดกฎนะ แค่ระวัง", "ค่อยเป็นค่อยไป"],
+      W: (c) => ({ w: { rule: 2, mid: 2.5 + (c.lossStreak >= 2 ? 1 : 0), enter: -0.5, loosen: -2, noSL: -4 }, note: c.lossStreak >= 2 ? "เสียติดกัน → ระวังขึ้นอีก (สายกลาง +1)" : "" }) },
+    { k: "FOMO", name: "FOMO", th: "กลัวตกรถ ซื้อก่อนคิดทีหลัง", col: "#ff5fd2", say: ["ไม่รอแล้ว!", "ตกรถไม่ได้!", "ไปเลย!", "ของมันต้องมี"],
+      W: (c) => { const rv = c.lossStreak >= 2 ? 1.5 : 0, hot = c.winStreak >= 2 ? 1 : 0; return { w: { rule: 0.8, enter: 3.5 + rv + hot, cut: -2, wait: -1 }, note: rv ? "เพิ่งเสีย " + c.lossStreak + " ไม้ติด → อยากเอาคืน (อยากซื้อ +1.5)" : hot ? "ชนะติดกัน → มือขึ้น (อยากซื้อ +1)" : "" }; } },
+    { k: "PANIC", name: "ขายหมู", th: "ติดลบนิด กำไรหน่อย ก็ขาย", col: "#9b7bff", say: ["ไม่ไหวแล้ว", "เก็บก่อนดีกว่า", "กลัวร่วง"],
+      W: (c) => { const hurt = c.lossStreak >= 1 ? 1 : 0; return { w: { rule: 1, cut: (c.inLoss ? 3 : c.inProfit ? 2.5 : 1) + hurt, lockNow: 4, enter: -2, loosen: -2 }, note: (c.inLoss ? "ติดลบอยู่ → อยากขายมาก" : c.inProfit ? "มีกำไร → อยากเก็บ" : "") + (hurt ? " · ยังเจ็บจากไม้ก่อน (อยากขาย +1)" : "") }; } },
+    { k: "HOPE", name: "ดื้อ", th: "ไม่ยอมคัท ย้าย SL หนี", col: "#ff7a59", say: ["เดี๋ยวก็กลับมา", "ยังไม่ขายหรอก", "ขยับ SL อีกนิด"],
+      W: (c) => { const x = c.lossStreak >= 2 ? 1 : 0; return { w: { rule: 0.6, loosen: (c.inLoss ? 3 : 1.5) + x, cut: c.inLoss ? -2 : -1, lockNow: -1, noSL: 0.5 }, note: (c.inLoss ? "ติดลบ → ไม่อยากยอมรับ" : c.inProfit ? "มีกำไร → ไม่อยากขายของดี" : "") + (x ? " · เสียติดกันมาแล้ว ไม่อยากเสียอีก (+1)" : "") }; } },
+    { k: "SCALPER", name: "กินคำเล็ก", th: "ถึงเป้าขายทันที ไม่ trail", col: "#1fc9a8", say: ["กำไรคือกำไร", "เข้ากระเป๋าไว้ก่อน"],
+      W: (c) => ({ w: { rule: 2, cut: c.inProfit ? 3 : 0, lockNow: 1 }, note: c.inProfit ? "มีกำไร → อยากเก็บเข้ากระเป๋า" : "" }) },
+    { k: "CHASER", name: "ไล่ SL", th: "ยก SL ตามทุก pivot", col: "#4c8dff", say: ["ล็อกกำไรทุกขั้น", "ยก SL อีก", "ขยับชิดไว้ก่อน"],
+      W: (c) => ({ w: { rule: 1, chase: 4, lockNow: 1.5 }, note: "" }) },
+    { k: "NOSL", name: "ไม่ตั้ง SL", th: "หุ้นดีเดี๋ยวก็ขึ้น", col: "#ff5468", say: ["SL ทำไม", "ถือยาวไป", "ไม่ขายของดี"],
+      W: (c) => ({ w: { rule: 1, noSL: 5, loosen: 1 }, note: "" }) },
+    { k: "MONKEY", name: "ลิงกดสุ่ม", th: "สุ่มทุกคำตอบ (ตัวควบคุม)", col: "#8a95a6", say: ["จิ้มมั่ว", "สุ่มได้ข้อนี้", "หลับตากด"], random: true,
+      W: () => ({ w: { luck: 1 }, note: "" }) },
+  ];
+  function decide(P, d, ctx, rng) {
+    const { w, note } = P.W(ctx);
+    const scored = d.opts.map((o, j) => {
+      const f = P.random ? { luck: rng.u() * 4 } : traits(o, ctx), parts = {}; let tot = 0;
+      for (const k in f) if (w[k]) { const v = f[k] * w[k]; if (Math.abs(v) > 1e-9) { parts[k] = v; tot += v; } }
+      return { j, t: o.t, g: o.g, tot, parts };
+    });
+    let best = scored[0]; for (const x of scored) if (x.tot > best.tot + 1e-9) best = x;
+    return { o: d.opts[best.j], scored: scored.slice().sort((a, b) => b.tot - a.tot), note, best };
+  }
+  function lastStreaks(B) { let L = 0, Wn = 0; const T = B.tlog.filter(x => x.i1 >= 0); for (let k = T.length - 1; k >= 0; k--) { if (T[k].R < -0.05) { if (Wn) break; L++; } else if (T[k].R > 0.05) { if (L) break; Wn++; } else break; } return { L, W: Wn }; }
+  function planText(P, B, M, i) {
+    const S = M.run.snap[i] || {}, m = M.m, c = m.c[i], out = [];
+    if (B.pos) {
+      const P0 = B.pos, q = B.qty(), R1 = P0.rRef;
+      out.push(`ถือ ${q.toFixed(2)} ไม้ ทุน ${B.avg().toFixed(2)}`);
+      if (P0.sl > 1e-3) out.push(`SL ${P0.sl.toFixed(2)} (ห่าง ${((1 - P0.sl / c) * 100).toFixed(1)}%)`); else out.push("ไม่มี SL");
+      if (S.TP && isFinite(S.TP[0])) { const k = P0.tr ? P0.tr.findIndex(T => T.open && !T.mode) : 0; if (k >= 0 && S.TP[k] > c) out.push(`เป้าถัดไป TP${k + 1} ${S.TP[k].toFixed(2)} (อีก ${((S.TP[k] - c) / R1).toFixed(1)}R)`); }
+      if (P0.tr) { const tr = P0.tr.map((T, k) => T.mode === "trail" && T.open ? `TP${k + 1} trail ${T.trail.toFixed(2)}` : "").filter(Boolean); if (tr.length) out.push(tr.join(" · ")); }
+      if (!P0.scaled && q < 0.99 && !P0.tr) out.push("รอ Stoch RSI ตัดขึ้น 20 เพื่อเติม");
+      if (!P0.lifted && !P0.tr && P0.sl > 1e-3) out.push("จะยก SL ครั้งเดียวเมื่อพ้น (i) หรือเบรก VCP");
+    } else {
+      const st = S.st;
+      if (st === "WAIT_GC") out.push("รอ Wave 1: MA50 ตัดขึ้น MA200");
+      else if (st === "WAIT_CURL") out.push("รอ MA50 ม้วนลง = Wave 2");
+      else if (st === "WAVE2") out.push(`รอ nest: (i) ที่เด้งไม่ผ่านยอด W1 ${isFinite(S.W1H) ? S.W1H.toFixed(2) : ""}`);
+      else if (st === "NEST") { let lo = Infinity; for (let j = S.iI; j <= i; j++) lo = Math.min(lo, m.l[j]); const r = (S.I - lo) / (S.I - S.W2); out.push(`รอ (ii) ย่อ ≥ 61.8% (ตอนนี้ ${(r * 100).toFixed(0)}%) แล้วรอไกปืน`); }
+      else if (st === "LONG") out.push("ระบบถืออยู่แต่ผมไม่มี → รอ PP หรือเบรก VCP");
+      else out.push("รอรอบใหม่: MA50 กลับลงใต้ MA200");
+    }
+    const flav = { FOMO: B.pos ? "ถ้าย่อจะซื้อเพิ่ม" : "ถ้าไกปืนมาอีกจะเข้าเลย ไม่รอ nest", NOSL: "ถือไปเรื่อยๆ ไม่มีจุดหนี", CHASER: B.pos ? "ยก SL ทุก pivot ใหม่" : "", PANIC: B.pos ? "ติดลบอีกนิดจะขาย" : "", HOPE: B.pos ? "ถ้าลงก็ขยับ SL ลงได้" : "", SCALPER: B.pos ? "ถึงเป้าเมื่อไหร่ขายเลย" : "" }[P.k];
+    if (flav) out.push("(" + flav + ")");
+    return out.join(" · ");
+  }
+  const OBS = {
+    AUDITOR: { name: "ผู้ตรวจกฎ", col: "#3dff8f", th: "ตรวจทุกไม้ของระบบว่าทำตามกฎจริง" },
+    SKEPTIC: { name: "นักค้าน", col: "#ffb347", th: "ไม่เชื่ออะไรง่ายๆ ถามว่าชนะเพราะฝีมือหรือตลาด" },
+    RISK: { name: "คุมความเสี่ยง", col: "#c9d4e5", th: "ดู drawdown, PF, ความเสี่ยงจริง" },
+    CLAUDE: { name: "Claude", col: "#d97757", th: "สรุปสิ่งที่เจอในแต่ละรอบ" },
+  };
+  const hsh = (a, b) => { let x = (a * 2654435761 + b * 40503) >>> 0; x ^= x >>> 13; return x >>> 0; };
+
+  function play(M, P, D0, B0, NEST, ov) {
+    const D = Object.create(D0), B = Object.create(B0);
+    D.book = B; D.M = M; D.ppAsked = {}; D.hard = false; D.queue = []; D.qByEv = new Map();
+    B.reset(M.m, M.run); D.buildQueue();
+    const N = M.m.N, eqR = new Float32Array(N); let cur = 231, ok = 0, acc = 0, bad = 0, maxQ = 0; const dec = [];
+    const rng = NEST.makeRng((M.seed * 97 + 13 + P.k.length * 7) >>> 0);
+    const adv = (to) => { while (cur < to) { cur++; B.stepped = cur; B.step(cur); eqR[cur] = B.real + B.openR(cur); } };
+    for (const q of D.queue) {
+      adv(q.i); let d = null; try { d = D.build(q); } catch (err) { d = null; }
+      q.answered = true; if (!d) continue;
+      const oR = B.openR(q.i), st = lastStreaks(B);
+      const ctx = { inPos: !!B.pos, openR: oR, inLoss: !!B.pos && oR < -0.05, inProfit: !!B.pos && oR > 0.05, lossStreak: st.L, winStreak: st.W, noSLNow: !!B.pos && B.pos.sl <= 1e-3, qty: B.qty() };
+      const dm = decide(P, d, ctx, rng), sys = d.opts.find(x => x.g === "ok");
+      let o = dm.o;
+      if (ov && ov.i === q.i && ov.type === q.type) o = sys;
+      if (o.g === "ok") ok++; else if (o.g === "acc") acc++; else bad++;
+      const had = B.qty();
+      if (o.act) o.act();
+      maxQ = Math.max(maxQ, B.qty()); eqR[q.i] = B.real + B.openR(q.i);
+      if (!ov) dec.push({ i: q.i, type: q.type, g: o.g, t: o.t, sys: sys.t, why: d.why, q: d.q, facts: d.facts, dq: B.qty() - had, scored: dm.scored, note: dm.note, ctx, plan: planText(P, B, M, q.i) });
+    }
+    adv(N - 1);
+    return { eqR, trades: B.tradeList(N - 1), dec, ok, acc, bad, n: ok + acc + bad, maxQ };
+  }
+  // what if this agent had followed the system at exactly this one decision?
+  function counterfactual(M, P, D0, B0, NEST, dc) {
+    const r = play(M, P, D0, B0, NEST, { i: dc.i, type: dc.type });
+    return r.trades.reduce((s, t) => s + t.R, 0);
+  }
+  function reason(P, dc) {
+    const ch = dc.scored.find(x => x.t === dc.t) || dc.scored[0];
+    if (P.random) return "สุ่มล้วนๆ ไม่มีเหตุผล";
+    let top = null, tv = 0; for (const k in ch.parts) if (k !== "rule" && ch.parts[k] > tv) { tv = ch.parts[k]; top = k; }
+    const sysRow = dc.scored.find(x => x.g === "ok");
+    if (dc.g === "ok") return top && tv > 0 ? `ตรงกฎ และตรงนิสัย (${TRAIT[top]})` : "ตรงกฎ";
+    const lose = sysRow ? (ch.tot - sysRow.tot).toFixed(1) : "?";
+    const AVOID = { cut: "ไม่อยากขายของ", enter: "ไม่อยากเพิ่มความเสี่ยง", wait: "ทนรอไม่ไหว", lockNow: "ไม่อยากขยับ SL ขึ้น", chase: "ไม่อยากถูกเขย่า", loosen: "ไม่อยากขยาย SL", noSL: "ไม่อยากมี SL", mid: "ไม่ชอบทางกลาง" };
+    let why = top ? WHY[top] : null;
+    if (!why && sysRow) { let wk = null, wv = 0; for (const k in sysRow.parts) if (k !== "rule" && sysRow.parts[k] < wv) { wv = sysRow.parts[k]; wk = k; } why = wk ? `${AVOID[wk] || "ไม่ชอบทางของระบบ"} (ทางของระบบ = ${TRAIT[wk]} → นิสัยนี้ให้ ${wv.toFixed(1)})` : "ชั่งแล้วคะแนนสูงกว่า"; }
+    return `${why} — แรงจูงใจชนะกฎ ${lose} คะแนน`;
+  }
+
+  function voice(P, dc, seed) {
+    const s = P.say[hsh(seed, dc.i) % P.say.length];
+    if (P.k === "SENSEI") return `${s}: ${dc.t}`;
+    if (dc.g === "ok") return `เห็นด้วยกับระบบ: ${dc.t}`;
+    return `${dc.g === "bad" ? "✕" : "≈"} ${s} — ${dc.t}`;
+  }
+
+  // ---- build a whole round: K markets x all personas, plus observer messages ----
+  function round(opt, NEST, D0, B0) {
+    const K = opt.K || 8, world = opt.world || "normal", cap = opt.capital || 1e6, rpt = (opt.rpt || 1) / 100, sub = cap / K;
+    const mk = [];
+    for (let k = 0; k < K; k++) {
+      const seed = (opt.seed || 1) * 100 + k * 7 + 1;
+      const m = NEST.genWorld(world, seed); m.seedK = seed;
+      const M = { m, run: m.run, seed, t0: 232 };
+      const bh = m.c[m.N - 1] / m.c[232] - 1;
+      mk.push({ M, m, seed, world: m.world, bh, name: m.world === "normal" ? m.blocks.map(b => NEST.TEMPLATES[b].name).join(" → ") : (m.regimes || []).map(r => r.name).slice(0, 5).join(" → ") });
+    }
+    const maxN = Math.max(...mk.map(x => x.m.N));
+    const agents = PERSONAS.map(P => {
+      const res = mk.map(x => play(x.M, P, D0, B0, NEST));
+      const eq = new Float32Array(maxN), eqR = new Float32Array(maxN); const trades = [];
+      res.forEach((r, k) => { const N = mk[k].m.N; let lastV = 0; for (let i = 0; i < maxN; i++) { const v = i < 232 ? 0 : i < N ? r.eqR[i] : r.eqR[N - 1]; lastV = v; eq[i] += cap * rpt * v; eqR[i] += v; } r.trades.forEach(t => trades.push(Object.assign({ k, pnl: cap * rpt * t.R }, t))); });
+      for (let i = 0; i < maxN; i++) eq[i] += cap;
+      const dd = new Float32Array(maxN); let pk = cap; for (let i = 0; i < maxN; i++) { pk = Math.max(pk, eq[i]); dd[i] = 1 - eq[i] / pk; }
+      const tot = res.reduce((a, r) => ({ ok: a.ok + r.ok, acc: a.acc + r.acc, bad: a.bad + r.bad }), { ok: 0, acc: 0, bad: 0 });
+      trades.sort((a, b) => a.i1 - b.i1);
+      return { P, res, eq, eqR, dd, trades, tot, maxQ: Math.max(...res.map(r => r.maxQ)) };
+    });
+    const sysA = agents[0];
+    const msgs = [];
+    const say = (t, who, text, k, tag) => msgs.push({ t, who, text, k, tag: tag || "" });
+    const nm = (k) => `#${k + 1}`;
+    // ---- AUDITOR: checks every system decision point ----
+    mk.forEach((x, k) => {
+      const m = x.m;
+      m.run.ev.forEach(e => {
+        if (e.i < 232) return;
+        if (e.type === "BUY") {
+          const s0 = e.s0 !== undefined ? e.s0 : e.W2, retr = (e.I - e.ii) / (e.I - s0), dA = (e.price - e.sl) / m.atr[e.i], tp1R = (e.TP[0] - e.price) / (e.price - e.sl);
+          const okR = retr >= 0.618, okA = dA >= 2, okM = m.macd[e.i] > 0;
+          say(e.i, "AUDITOR", `ตรวจ BUY ${nm(k)} แท่ง ${e.i}: (ii) ย่อ ${(retr * 100).toFixed(0)}% ${okR ? "✓" : "✕"} · SL ห่าง ${dA.toFixed(1)} ATR ${okA ? "✓" : "✕"} · MACD ${okM ? "> 0 ✓" : "≤ 0 ✕"} · TP1 ห่าง ${tp1R.toFixed(1)}R${e.reanchor ? " · วัด 1-2 ชุดใหม่" : ""}`, k, okR && okA && okM ? "check" : "bug");
+          if (tp1R < 0.6) say(e.i, "AUDITOR", `ข้อสังเกต ${nm(k)}: TP1 ห่างแค่ ${tp1R.toFixed(2)}R — ไม้ที่เหลือจะถูกยก SL มากันทุนเร็ว (ทดสอบแล้ว: กันทุนตามกฎเดิมยังดีกว่าเลื่อนออกไป)`, k, "flag");
+        }
+        if (e.type === "REANCHOR") say(e.i, "AUDITOR", `${nm(k)} แท่ง ${e.i}: ราคาอยู่เหนือ TP1 ของ 1-2 เดิม (${e.oldTP1.toFixed(2)}) → วัด 1-2 ชุดใหม่: (i) ${e.I.toFixed(2)} (ii) ${e.ii.toFixed(2)} ย่อ ${(e.retr * 100).toFixed(0)}% → เป้าใหม่แยกขาด`, k, "fix");
+        if (e.type === "TRAP_STALE") say(e.i, "AUDITOR", `${nm(k)} แท่ง ${e.i}: ไกปืนมาแต่ราคาเหนือ TP1 เดิม และยังไม่มี 1-2 ชุดใหม่ที่ย่อ ≥ 61.8% → ระบบรอ (กฎใหม่)`, k, "fix");
+        if (e.type === "GAP_STOP") say(e.i, "RISK", `${nm(k)}: gap ทะลุ SL เสีย ${e.R.toFixed(2)}R — SL คุม gap ไม่ได้ ต้องคุมที่ขนาดไม้`, k, "flag");
+        if (e.type === "INVALID") say(e.i, "AUDITOR", `${nm(k)}: Wave 2 หลุดจุดเริ่ม Wave 1 → นับผิด ระบบไม่เทรด`, k, "check");
+        if (e.type === "NONEST_BREAKOUT") say(e.i, "AUDITOR", `${nm(k)}: ทะลุยอด Wave 1 โดยไม่มี nest → ระบบปล่อยผ่าน`, k, "check");
+      });
+    });
+    // ---- disagreements: several personas choose differently at the same decision ----
+    mk.forEach((x, k) => {
+      const byI = {};
+      agents.forEach(A => A.res[k].dec.forEach(dc => { (byI[dc.i + dc.type] = byI[dc.i + dc.type] || []).push({ A, dc }); }));
+      Object.values(byI).forEach(arr => {
+        const dis = arr.filter(o => o.dc.g !== "ok" && o.A.P.k !== "MONKEY");
+        if (dis.length >= 3) {
+          const s = arr.find(o => o.A.P.k === "SENSEI");
+          const txt = dis.slice(0, 3).map(o => `${o.A.P.name}: "${o.dc.t}" (${reason(o.A.P, o.dc).split(" — ")[0]})`).join(" · ");
+          say(arr[0].dc.i, "DEBATE", `เถียงกัน ${nm(k)} แท่ง ${arr[0].dc.i} — SENSEI: "${s ? s.dc.sys : arr[0].dc.sys}" vs ${txt}`, k, "debate");
+        }
+      });
+    });
+    // ---- big trade outcomes ----
+    agents.forEach(A => A.trades.forEach(t => {
+      if (A.P.k === "NOSL" && t.R < -2.5) say(t.i1, "RISK", `${A.P.name} เสีย ${t.R.toFixed(1)}R ในหุ้น ${nm(t.k)} ไม้เดียว (฿${Math.round(-t.pnl).toLocaleString()}) — ระบบในหุ้นเดียวกันเสียไม่เกิน ~1R`, t.k, "flag");
+      if (A.P.k === "FOMO" && t.R > 6) say(t.i1, "SKEPTIC", `FOMO ได้ ${t.R.toFixed(1)}R ในหุ้น ${nm(t.k)} — ถือใหญ่ 1.5–2.5 ไม้ กำไรมากเพราะเสี่ยงมาก ไม่ใช่เพราะอ่านขาด`, t.k, "skeptic");
+    }));
+    // ---- skeptic / risk checkpoints ----
+    const t0 = 232, T = maxN - 1, cps = [0.25, 0.5, 0.75].map(f => Math.round(t0 + (T - t0) * f));
+    const discOf = (A) => { const n = A.tot.ok + A.tot.acc + A.tot.bad; return n ? (A.tot.ok + A.tot.acc) / n : 1; };
+    cps.forEach(t => {
+      const lead = agents.slice().sort((a, b) => b.eq[t] - a.eq[t])[0], sysRet = (sysA.eq[t] / cap - 1) * 100, ret = (lead.eq[t] / cap - 1) * 100;
+      const upMk = mk.filter(x => x.m.c[Math.min(t, x.m.N - 1)] > x.m.c[232]).length;
+      if (lead.P.k !== "SENSEI" && discOf(lead) < 0.85) say(t, "SKEPTIC", `${lead.P.name} นำอยู่ ${ret >= 0 ? "+" : ""}${ret.toFixed(1)}% (ระบบ ${sysRet >= 0 ? "+" : ""}${sysRet.toFixed(1)}%) ทั้งที่ผิดกฎ ${(100 - discOf(lead) * 100).toFixed(0)}% ของคำถาม — ตอนนี้หุ้น ${upMk}/${K} ตัวสูงกว่าตอนเริ่ม ผมสงสัยว่าชนะเพราะตลาด ไม่ใช่ฝีมือ`, -1, "skeptic");
+      else if (lead.P.k === "SENSEI") say(t, "SKEPTIC", `ระบบนำอยู่ ${sysRet >= 0 ? "+" : ""}${sysRet.toFixed(1)}% — แต่อย่าเพิ่งเชื่อ ดู DD กับจำนวนไม้ก่อน (ปิดไปแล้ว ${sysA.trades.filter(x => x.i1 <= t).length} ไม้)`, -1, "skeptic");
+      else say(t, "SKEPTIC", `${lead.P.name} นำ ${ret.toFixed(1)}% — หุ้นขึ้น ${upMk}/${K} ตัว`, -1, "skeptic");
+      const worst = agents.slice().sort((a, b) => b.dd[t] - a.dd[t])[0];
+      if (worst.dd[t] > 0.04) say(t, "RISK", `${worst.P.name} drawdown ${(worst.dd[t] * 100).toFixed(1)}% จากจุดสูงสุด · ระบบ ${(sysA.dd[t] * 100).toFixed(1)}%`, -1, "risk");
+    });
+    // ---- end-of-round summary ----
+    const fin = agents.map(A => { const st = NEST.statsFromTrades(A.trades.map(t => ({ R: t.R, pnl: t.pnl })), { capital: sub, rpt: rpt * 100, linear: true }); const gp = A.trades.filter(t => t.pnl > 0).reduce((s, t) => s + t.pnl, 0), gl = -A.trades.filter(t => t.pnl < 0).reduce((s, t) => s + t.pnl, 0);
+      let pk = cap, dd = 0; for (let i = 0; i < maxN; i++) { pk = Math.max(pk, A.eq[i]); dd = Math.max(dd, 1 - A.eq[i] / pk); }
+      return { A, ret: (A.eq[maxN - 1] / cap - 1) * 100, pnl: A.eq[maxN - 1] - cap, pf: gl > 0 ? gp / gl : (gp > 0 ? Infinity : NaN), win: A.trades.length ? A.trades.filter(t => t.pnl > 0).length / A.trades.length * 100 : NaN, dd: dd * 100, n: A.trades.length, disc: discOf(A) * 100, st }; });
+    const bhAvg = mk.reduce((s, x) => s + x.bh, 0) / K * 100, upN = mk.filter(x => x.bh > 0).length;
+    const sorted = fin.slice().sort((a, b) => b.ret - a.ret), S = fin[0], nosl = fin.find(f => f.A.P.k === "NOSL"), fomo = fin.find(f => f.A.P.k === "FOMO");
+    const wname = { normal: "โลกปกติ (ทรงสำเร็จรูป)", harsh: "โลกโหด", random: "โลกสุ่มล้วน", mixed: "โลกผสม" }[world];
+    const pfTxt = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
+    say(T, "CLAUDE", `จบรอบ · ${wname} · หุ้น ${upN}/${K} ตัวจบสูงกว่าตอนเริ่ม (ซื้อถือเฉลี่ย ${bhAvg >= 0 ? "+" : ""}${bhAvg.toFixed(0)}%) · ที่ 1: ${sorted[0].A.P.name} ${sorted[0].ret >= 0 ? "+" : ""}${sorted[0].ret.toFixed(1)}% · ระบบ ${S.ret >= 0 ? "+" : ""}${S.ret.toFixed(1)}% PF ${pfTxt(S.pf)} DD ${S.dd.toFixed(1)}%`, -1, "summary");
+    if (nosl) say(T, "CLAUDE", nosl.ret > S.ret ? `ไม่ตั้ง SL ชนะระบบรอบนี้ (${nosl.ret.toFixed(1)}% vs ${S.ret.toFixed(1)}%) แต่ DD ${nosl.dd.toFixed(1)}% vs ${S.dd.toFixed(1)}% — ถ้าตลาดใจดี การไม่มี SL ดูเหมือนฉลาด จนกว่าจะเจอหุ้นที่ร่วงแล้วไม่กลับ` : `ไม่ตั้ง SL แพ้ระบบ (${nosl.ret.toFixed(1)}% vs ${S.ret.toFixed(1)}%) · DD ${nosl.dd.toFixed(1)}% — รอบนี้ SL คุ้มค่า`, -1, "summary");
+    if (fomo && fomo.ret > S.ret) say(T, "SKEPTIC", `FOMO ชนะระบบอีกแล้ว (${fomo.ret.toFixed(1)}% vs ${S.ret.toFixed(1)}%) — ขนาดไม้ใหญ่สุด ${agents.find(a => a.P.k === "FOMO").maxQ.toFixed(1)} เท่าของปกติ · DD ${fomo.dd.toFixed(1)}% · กำไรที่มาจากขนาดไม้ไม่ใช่ edge`, -1, "skeptic");
+    msgs.sort((a, b) => a.t - b.t);
+    return { mk, agents, msgs, maxN, fin, world, cap, rpt, sub, bhAvg, upN };
+  }
+  return { PERSONAS, OBS, TRAIT, play, round, voice, counterfactual, reason };
+})();
+if (typeof module !== "undefined" && module.exports) module.exports = LABCORE;
 
 </script>
 <script>
@@ -886,6 +1295,22 @@ const fmt = (x, d = 2) => (x === undefined || x === null || !isFinite(x)) ? "—
 const sgn = (x, d = 2) => (!isFinite(x) ? "—" : (x >= 0 ? "+" : "") + x.toFixed(d));
 const now = () => performance.now();
 let _FF = null; const FF = () => _FF || (_FF = getComputedStyle(document.body).fontFamily || "sans-serif");
+
+// ---------- account (money) ----------
+const ACCT = { capital: 1000000, rpt: 1 };
+try { Object.assign(ACCT, JSON.parse(localStorage.getItem("nest-acct") || "{}")); } catch (e) {}
+const fmtBal = (v) => "฿" + Math.round(v).toLocaleString("en-US");
+const fmtPnl = (v) => (!isFinite(v) ? "—" : (v >= 0 ? "+" : "−") + "฿" + Math.abs(Math.round(v)).toLocaleString("en-US"));
+function acctUI() {
+  const cap = $("#acCap"), rpt = $("#acRpt");
+  const sync = () => { $("#acCapO").textContent = fmtBal(ACCT.capital); $("#acRptO").textContent = ACCT.rpt + "%"; cap.value = ACCT.capital; rpt.value = ACCT.rpt; };
+  const save = () => { try { localStorage.setItem("nest-acct", JSON.stringify(ACCT)); } catch (e) {} if (Replay.m) { Replay.updatePanels(true); if (Replay.mode === "dojo") Dojo.paint(); } if (typeof AILab !== "undefined") { AILab.money(); AILab.lastBoard = 0; } };
+  cap.onchange = () => { ACCT.capital = Math.max(10000, +cap.value || 1e6); sync(); save(); };
+  rpt.oninput = () => { ACCT.rpt = +rpt.value; sync(); save(); };
+  $("#acctBtn").onclick = (e) => { e.stopPropagation(); $("#acctPop").classList.toggle("hidden"); };
+  document.addEventListener("click", (e) => { if (!$("#acctPop").contains(e.target) && e.target.id !== "acctBtn") $("#acctPop").classList.add("hidden"); });
+  sync();
+}
 
 // ---------- theme & palette ----------
 let PAL = {};
@@ -945,6 +1370,8 @@ const EVM = {
   HEAD_SUPPORT: { n: "⌂", c: "tgt", t: "WAVE 2 SITS ON THE OLD HEAD", th: (e) => `Wave 2 ยืนบนยอดของ 1-2 ชุดแรก (${fmt(e.head)}) — ทรงแบบ 868`, toast: true, snd: [494, 659] },
   DIP:       { n: "↘", c: "dip", t: "MA50 DIPS UNDER MA200", th: () => "MA50 มุดใต้ MA200 (ข้อมูลประกอบ ไม่ใช่เงื่อนไข)", toast: false, quiet: true },
   TRAP_NO_NEST: { n: "!", c: "mut", t: "SIGNAL · NO NEST YET", th: () => "histogram พลิกบวก + MACD > 0 แต่ยังไม่มี nest → รอ", toast: false },
+  TRAP_STALE: { n: "!", c: "mut", t: "SIGNAL · ABOVE OLD TP1", th: (e) => `ไกปืนมา แต่ราคา ${fmt(e.price)} อยู่เหนือ TP1 ของ 1-2 เดิม (${fmt(e.tp1)}) และยังไม่มี 1-2 ชุดใหม่ที่ย่อ ≥ 61.8% → รอ`, toast: false },
+  REANCHOR:  { n: "↻", c: "tgt", t: "NEW 1-2 · RE-MEASURED", th: (e) => `ราคาอยู่เหนือ TP1 ของ 1-2 เดิม (${fmt(e.oldTP1)}) → ไม้นี้เป็น 1-2 ชุดใหม่: (i) ${fmt(e.I)} · (ii) ${fmt(e.ii)} ย่อ ${(e.retr * 100).toFixed(0)}% → วัดเป้าใหม่แยกขาด`, toast: true, snd: [659, 784] },
   TRAP_SHALLOW: { n: "!", c: "mut", t: "SIGNAL · (ii) TOO SHALLOW", th: (e) => `histogram พลิกบวก แต่ (ii) ย่อแค่ ${(e.retr * 100).toFixed(0)}% ของขา (i) (ต้อง ≥ 61.8%) → รอ`, toast: false },
   NEST_BROKEN:  { n: "✕", c: "stop", t: "NEST BROKEN", th: () => "หลุด low ของ Wave 2 — nest พัง นับ Wave 2 ใหม่", toast: true, snd: [220] },
   INVALID:   { n: "✕", c: "stop", t: "WAVE 2 > 100% · COUNT INVALID", th: () => "Wave 2 ลงต่ำกว่าจุดเริ่ม Wave 1 → นับผิด · NO TRADE", toast: true, snd: [196, 165] },
@@ -1038,21 +1465,27 @@ const Replay = {
       b.title = s.k === "csv" ? "อัปโหลดไฟล์ CSV (time, open, high, low, close, volume) จาก TradingView ≥ 260 แท่ง" : s.k === "random" ? "สุ่มทุกอย่าง ไม่บอกชื่อทรง" : NEST.TEMPLATES[s.k].th + " · แล้วต่อด้วยตลาดสุ่มอีก 1–2 รอบ";
       b.onclick = () => this.load(s.k); box.appendChild(b);
     });
+    const ws = document.createElement("select"); ws.className = "sel"; ws.id = "worldSel"; ws.title = "เลือกโลก: ปกติ = ทรงสำเร็จรูปสำหรับฝึกกฎ · โหด = regime จริง · สุ่มล้วน = ไม่มี edge";
+    ws.innerHTML = `<option value="normal">โลก: ปกติ</option><option value="harsh">โลก: โหด</option><option value="random">โลก: สุ่มล้วน</option><option value="mixed">โลก: ผสม</option>`;
+    ws.onchange = () => { this.world = ws.value; this.load("random"); if (this.mode === "replay") { this.playing = true; this.syncPlay(); } };
+    box.insertBefore(ws, box.firstChild);
     const sp = document.createElement("span"); sp.className = "sp"; box.appendChild(sp);
     const id = document.createElement("span"); id.className = "mkt"; id.id = "mktId"; box.appendChild(id);
     const sh = document.createElement("button"); sh.className = "chip"; sh.textContent = "🔗"; sh.title = "คัดลอกลิงก์ตลาดนี้"; sh.onclick = () => this.shareURL(); box.appendChild(sh);
   },
+  world: "normal",
   load(k, seed) {
     if (k === "csv") { $("#csvFile").click(); return; }
     seed = seed || (1 + Math.floor(Math.random() * 999999));
+    if (k !== "random") { this.world = "normal"; const ws = $("#worldSel"); if (ws) ws.value = "normal"; }
     this.key = k; this.seed = seed; this.csvName = null;
-    const m = NEST.genScenario(k === "random" ? "random" : k, seed);
+    const m = k === "random" ? NEST.genWorld(this.world, seed) : NEST.genScenario(k, seed);
     this.tpl = m.tpl; this.setMarket(m);
     $("#mktId").textContent = `MARKET #${seed}${k === "random" ? " · ???" : ""}`;
   },
   loadCSV(m, name) { this.tpl = "csv"; this.key = "csv"; this.seed = 0; this.csvName = name; this.setMarket(m); $("#mktId").textContent = `${name} · ${m.N} bars`; },
   setMarket(m) {
-    this.m = m; this.run = m.run;
+    this.m = m; this.run = m.run; this.accCache = null;
     $$("#scen .chip").forEach(c => c.classList.toggle("on", c.dataset.k === this.key));
     this.t0 = 232; this.t = this.t0; this.fired = this.t0 - 1; this.firedSet = new Set(); this.parts = []; this.orbs = {}; this.panOff = 0; this.follow = true; this.span = 230;
     this.cam = null; this.ended = false;
@@ -1061,18 +1494,21 @@ const Replay = {
     if (this.mode === "dojo") Dojo.onLoad();
     this.writeHash(); this.dirty = true;
   },
-  blockNames() { return (this.m.blocks || []).map(b => NEST.TEMPLATES[b].name).join(" → "); },
-  writeHash() { if (this.key === "csv") return; try { history.replaceState(null, "", `#tab=${this.mode}&s=${this.key}&seed=${this.seed}`); } catch (e) {} },
+  blockNames() { const m = this.m; if (m.world && m.world !== "normal") return NEST.TEMPLATES[m.world].name + (m.regimes ? ": " + m.regimes.map(r => r.name).filter((x, j, a) => j === 0 || x !== a[j - 1]).slice(0, 7).join(" → ") : ""); return (m.blocks || []).map(b => (NEST.TEMPLATES[b] || { name: b }).name).join(" → "); },
+  writeHash() { if (this.key === "csv") return; try { history.replaceState(null, "", `#tab=${this.mode}&s=${this.key}&seed=${this.seed}&w=${this.world}`); } catch (e) {} },
   shareURL() {
-    const u = location.href.split("#")[0] + `#tab=${this.mode}&s=${this.key}&seed=${this.seed}`;
+    const u = location.href.split("#")[0] + `#tab=${this.mode}&s=${this.key}&seed=${this.seed}&w=${this.world}`;
     const done = () => this.showToast({ type: "_SHARE" });
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(u).then(done, () => prompt("คัดลอกลิงก์นี้", u)); else prompt("คัดลอกลิงก์นี้", u);
   },
   showEnd() {
     if (this.mode !== "replay" || this.ended) return; this.ended = true;
     const S = this.run.snap[this.m.N - 1]; const nB = this.run.ev.filter(e => e.type === "BUY").length;
-    if (this.tpl === "csv") { $("#ecT").textContent = `${this.csvName} · จบข้อมูล`; $("#ecP").textContent = `ผลรวมตามกฎทุก setup: ${sgn(S.totR)}R (${nB} ไม้)`; }
-    else { const T = NEST.TEMPLATES[this.tpl]; $("#ecT").textContent = `${sgn(S.totR)}R · ${nB} ไม้`; $("#ecP").innerHTML = `ตลาดนี้: <b>${this.blockNames()}</b><br>บทเรียนรอบแรก: ${T.lesson}`; $("#mktId").textContent = `MARKET #${this.seed}`; }
+    const A = NEST.account(this.m, this.run, ACCT), pfT = !isFinite(A.pf) ? (A.pf > 0 ? "∞" : "—") : A.pf.toFixed(2);
+    const RS = NEST.riskStats(NEST.sysPath(this.m, this.run), ACCT), f2 = (v, d) => RS && isFinite(v) ? v.toFixed(d) : "—";
+    const money = `${fmtPnl(A.pnl)} (${A.retPct >= 0 ? "+" : ""}${A.retPct.toFixed(1)}%)`, sub = `${sgn(S.totR)}R · ${nB} ไม้ · PF ${pfT} · ชนะ ${isFinite(A.win) ? A.win.toFixed(0) : "—"}% · CAGR ${f2(RS && RS.cagr, 1)}% · MaxDD ${f2(RS && RS.dd, 1)}% · Calmar ${f2(RS && RS.calmar, 2)}${RS && RS.norm ? ` · ปรับความเสี่ยงแบบ Darwinex (VaR 6.5%/เดือน) ${RS.norm.cagr >= 0 ? "+" : ""}${RS.norm.cagr.toFixed(1)}%/ปี DD ${RS.norm.dd.toFixed(0)}%` : ""} · ทุน ${fmtBal(ACCT.capital)} เสี่ยง ${ACCT.rpt}%/ไม้`;
+    if (this.tpl === "csv") { $("#ecT").textContent = `${this.csvName} · ${money}`; $("#ecP").textContent = `ผลรวมตามกฎทุก setup: ${sub}`; }
+    else { const T = NEST.TEMPLATES[this.tpl] || NEST.TEMPLATES.textbook; $("#ecT").textContent = money; $("#ecP").innerHTML = `${sub}<br>ตลาดนี้: <b>${this.blockNames()}</b><br>บทเรียน: ${T.lesson}`; $("#mktId").textContent = `MARKET #${this.seed}`; }
     $("#endcard").classList.add("show");
   },
   toggle() { if (this.mode === "dojo" && Dojo.waiting) return; if (Math.floor(this.t) >= this.m.N - 1) { if (this.mode === "dojo") return; this.seek(this.t0); } this.playing = !this.playing; this.syncPlay(); },
@@ -1123,6 +1559,7 @@ const Replay = {
       case "GC": case "DIP": case "RECROSS": case "CURL": return { bar: e.i, price: m.m50[e.i] };
       case "NEST_I": return { bar: e.at, price: e.price };
       case "HEAD_SUPPORT": return { bar: e.w2I, price: e.W2 };
+      case "REANCHOR": return { bar: e.iiI, price: e.ii };
       case "TP1_TRIG": case "TP2_TRIG": case "TP3_TRIG": return { bar: e.i, price: e.level };
       case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": case "FLAT": case "RUN_WITHOUT_YOU": return { bar: e.i, price: m.h[e.i] };
       default: return { bar: e.i, price: m.l[e.i] };
@@ -1178,8 +1615,8 @@ const Replay = {
     const { ctx, W, H } = fitCanvas(this.cv); if (W < 50) return;
     const m = this.m, G = this.G = this.layout(W, H), dojo = this.mode === "dojo";
     const cbar = Math.floor(this.t), frac = this.t - cbar, last = Math.max(0, cbar - 1);
-    const S = this.run.snap[last] || {};
-    const HH = this.hardHide();
+    const S = this.run.snap[(dojo && Dojo.waiting) ? Math.max(0, last - 1) : last] || {};
+    const HH = this.hardHide() || (dojo && Dojo.waiting && Dojo.cur && Dojo.cur.type === "READ");
     const pa = this.pulseAt ? (now() - this.pulseAt) / 1000 : 9, pulse = pa < 1.6 ? Math.sin(Math.min(1, pa / 1.6) * Math.PI) : 0;
     const span = this.span * (1 - 0.14 * pulse);
     let x1 = this.t + span * 0.2 + this.panOff, x0 = x1 - span;
@@ -1333,7 +1770,7 @@ const Replay = {
     ctx.fillText(this.tpl === "csv" ? (this.csvName || "CSV") : this.revealAll() ? `${this.blockNames()}  ·  รอบที่ ${S.cycle || 1}` : (this.key === "random" || dojo) ? `? ? ?  ·  รอบที่ ${S.cycle || 1}` : `${firstName} → ตลาดสุ่มต่อ  ·  รอบที่ ${S.cycle || 1}`, G.L + G.pw, ly); ctx.textAlign = "left";
     // volume
     const V = G.vol; let vmax = 0; for (let i = i0; i <= Math.min(i1, cbar); i++) vmax = Math.max(vmax, m.v[i]); vmax *= 1.15;
-    const addSet = new Set(this.run.ev.filter(e => e.type === "VCP_ADD").map(e => e.i));
+    const addSet = new Set(this.run.ev.filter(e => e.type === "VCP_ADD" && (!dojo || this.firedSet.has(e))).map(e => e.i));
     for (let i = i0; i <= Math.min(i1, cbar); i++) {
       let v = m.v[i]; if (i === cbar) v *= frac;
       let col = hexA(PAL.mut, PAL.light ? 0.35 : 0.3);
@@ -1396,7 +1833,7 @@ const Replay = {
     ctx.beginPath(); ctx.arc(X, cy, Math.max(0.1, R), 0, 7); if (e.type === "RECROSS") { ctx.strokeStyle = col; ctx.lineWidth = 2.2; ctx.stroke(); } else { ctx.fillStyle = g; ctx.fill(); }
     ctx.restore();
     if (e.type !== "RECROSS" && R > 6) { ctx.fillStyle = "#000"; ctx.font = "900 11px " + FF(); ctx.textAlign = "center"; ctx.fillText(M.n, X, cy + 4); ctx.textAlign = "left"; }
-    const short = { BUY: (e.reentry ? "RE-" : "") + (e.pp ? "BUY FULL" : "BUY HALF"), SCALE_IN: "SCALE-IN", VCP_ADD: "VCP +½", TP1_TRIG: "TP1 ▲", TP2_TRIG: "TP2 ▲", TP3_TRIG: "TP3 ▲", TP1_EXIT: "TP1 out", TP2_EXIT: "TP2 out", TP3_EXIT: "TP3 out", FLAT: "FLAT", STOP: "STOP", STOP_PROFIT: "SL hit", INVALID: "INVALID", NONEST_BREAKOUT: "NO NEST", NEST_BROKEN: "BROKEN", GAP_STOP: "GAP", SAVED: "SAVED", HEAD_SUPPORT: "ON HEAD", RUN_WITHOUT_YOU: "RAN" }[e.type];
+    const short = { BUY: (e.reentry ? "RE-" : "") + (e.pp ? "BUY FULL" : "BUY HALF"), SCALE_IN: "SCALE-IN", VCP_ADD: "VCP +½", TP1_TRIG: "TP1 ▲", TP2_TRIG: "TP2 ▲", TP3_TRIG: "TP3 ▲", TP1_EXIT: "TP1 out", TP2_EXIT: "TP2 out", TP3_EXIT: "TP3 out", FLAT: "FLAT", STOP: "STOP", STOP_PROFIT: "SL hit", INVALID: "INVALID", NONEST_BREAKOUT: "NO NEST", NEST_BROKEN: "BROKEN", GAP_STOP: "GAP", SAVED: "SAVED", HEAD_SUPPORT: "ON HEAD", RUN_WITHOUT_YOU: "RAN", REANCHOR: "NEW 1-2" }[e.type];
     if (short && age > 0.2) { ctx.fillStyle = col; ctx.font = "800 10px " + FF(); ctx.textAlign = "center"; ctx.fillText(short, X, above ? cy - R - 6 : cy + R + 13); ctx.textAlign = "left"; }
   },
   drawScrub() {
@@ -1454,7 +1891,12 @@ const Replay = {
     const st = S.st === "LONG" ? "LONG" : S.st === "DONE" ? "CLOSED" : S.noNest || S.invalid ? "NO TRADE" : "FLAT";
     const R = S.totR || 0, rc = R > 0 ? PAL.buy : R < 0 ? PAL.stop : PAL.mut;
     const trTxt = S.tr ? S.tr.map((T, j) => `<span style="color:${TPCOL[j]}">TP${j + 1}:${!T.armed ? "–" : T.open ? fmt(T.trail, 1) : "✓"}</span>`).join(" ") : (buy ? "ยังไม่ถึง TP1" : "—");
-    $("#pos").innerHTML = `<div class="big"><div class="R" style="color:${rc}">${sgn(R, 2)}R</div><div class="st" style="${st === "LONG" ? `color:${PAL.buy};border-color:${PAL.buy}` : st === "NO TRADE" ? `color:${PAL.stop};border-color:${PAL.stop}` : ""}">${st}</div><div class="st">รอบ ${S.cycle || 1}</div></div>
+    const AC = NEST.account(m, this.run, ACCT, last), pfT = !isFinite(AC.pf) ? (AC.pf > 0 ? "∞" : "—") : AC.pf.toFixed(2), mc = AC.pnl > 0 ? PAL.buy : AC.pnl < 0 ? PAL.stop : PAL.mut;
+    $("#pos").innerHTML = `<div class="big"><div class="R money" style="color:${mc}">${fmtPnl(AC.pnl)}</div><div class="st" style="color:${mc}">${AC.retPct >= 0 ? "+" : ""}${AC.retPct.toFixed(1)}%</div><div class="st" style="${st === "LONG" ? `color:${PAL.buy};border-color:${PAL.buy}` : st === "NO TRADE" ? `color:${PAL.stop};border-color:${PAL.stop}` : ""}">${st}</div><div class="st">รอบ ${S.cycle || 1}</div></div>
+      <div class="kv"><div class="k">R รวม</div><div class="v" style="color:${rc}">${sgn(R, 2)}R</div></div>
+      <div class="kv"><div class="k">PROFIT FACTOR</div><div class="v">${pfT}</div></div>
+      <div class="kv"><div class="k">DD · ไม้</div><div class="v">${AC.maxDD.toFixed(1)}% · ${AC.n}</div></div>
+      ${(() => { const rs = NEST.riskStats(NEST.sysPath(m, this.run, last), ACCT); const f = (v, d) => rs && isFinite(v) ? v.toFixed(d) : "—"; return `<div class="kv"><div class="k">CAGR · MaxDD</div><div class="v">${f(rs && rs.cagr, 1)}% · ${f(rs && rs.dd, 1)}%</div></div><div class="kv"><div class="k">CALMAR</div><div class="v">${f(rs && rs.calmar, 2)}</div></div><div class="kv"><div class="k">@VaR 6.5%/ด.</div><div class="v">${rs && rs.norm ? (rs.norm.cagr >= 0 ? "+" : "") + rs.norm.cagr.toFixed(0) + "%/ปี" : "—"}</div></div>`; })()}
       <div class="kv"><div class="k">SIZE</div><div class="v">${S.qty ? fmt(S.qty, 2) : "—"}</div></div>
       <div class="kv"><div class="k">AVG COST</div><div class="v">${fmt(S.avg)}</div></div>
       <div class="kv"><div class="k">SL${S.tr && S.tr[0] && S.tr[0].armed ? " · กันทุน" : S.lifted ? " · ยกแล้ว" : isFinite(S.sl) ? " · ใต้ (ii)" : ""}</div><div class="v" style="color:${PAL.stop}">${fmt(S.sl)}</div></div>
@@ -1467,7 +1909,7 @@ const Replay = {
 ============================================================ */
 const Book = {
   reset(m, run) {
-    this.m = m; this.pos = null; this.real = 0; this.marks = []; this.slHist = []; this.stepped = 231; this.trades = 0;
+    this.m = m; this.pos = null; this.real = 0; this.marks = []; this.slHist = []; this.stepped = 231; this.trades = 0; this.tlog = []; this.rpath = new Float32Array(m.N);
     this.noopLift = new Set(run.ev.filter(e => e.type === "SL_LIFT" && e.noop).map(e => e.i));
     this.exitBars = [0, 1, 2].map(k => new Set(run.ev.filter(e => e.type === "TP" + (k + 1) + "_EXIT").map(e => e.i)));
   },
@@ -1479,16 +1921,16 @@ const Book = {
     const p = this.m.c[i];
     if (this.pos) { this.add(i, q); return; }
     this.pos = Object.assign({ lots: [{ q, p }], sl, rRef: Math.max(rRef || p - sl, p * 0.01), tr: null, scaled: q >= 1, lifted: false, chase: false, restTrail: false, entryI: i }, opt || {}); this.trades++;
-    this.marks.push({ i, p, t: "B", q }); this.slHist.push([i, sl]);
+    this.marks.push({ i, p, t: "B", q }); this.slHist.push([i, sl]); this.tlog.push({ i0: i, r0: this.real, maxQ: q, i1: -1, R: NaN });
   },
-  add(i, q) { if (!this.pos) return; const p = this.m.c[i]; this.pos.lots.push({ q, p }); this.marks.push({ i, p, t: "A", q }); },
+  add(i, q) { if (!this.pos) return; const p = this.m.c[i]; this.pos.lots.push({ q, p }); this.marks.push({ i, p, t: "A", q }); const T = this.tlog[this.tlog.length - 1]; if (T) T.maxQ = Math.max(T.maxQ, this.qty()); },
   setSL(i, sl) { if (!this.pos || !isFinite(sl) || sl === this.pos.sl) return; this.pos.sl = sl; this.slHist.push([i, sl]); },
   liftSL(i, sl) { if (this.pos && isFinite(sl) && sl > this.pos.sl) this.setSL(i, sl); },
   sellQ(i, q, px) {
     if (!this.pos) return; const tot = this.qty(); q = Math.min(q, tot); if (q <= 1e-9) return;
     this.real += q * (px - this.avg()) / this.pos.rRef; const f = 1 - q / tot;
     this.pos.lots = this.pos.lots.map(x => ({ q: x.q * f, p: x.p })); this.marks.push({ i, p: px, t: "S", q });
-    if (this.qty() < 1e-9) { this.pos = null; this.slHist.push([i, NaN]); }
+    if (this.qty() < 1e-9) { this.pos = null; this.slHist.push([i, NaN]); const T = this.tlog[this.tlog.length - 1]; if (T && T.i1 < 0) { T.i1 = i; T.R = this.real - T.r0; } }
   },
   closeAll(i, px) { if (this.pos) this.sellQ(i, this.qty(), px); },
   ensureTr() { const P = this.pos; if (P && !P.tr) { const q3 = this.qty() / 3; P.tr = [0, 1, 2].map(() => ({ q: q3, mode: null, open: true, trail: NaN, hh: NaN })); } },
@@ -1511,14 +1953,16 @@ const Book = {
     });
     if (this.pos && P.restTrail && P.tr && P.tr[0].mode === "trail" && isFinite(P.tr[0].trail)) this.liftSL(i, P.tr[0].trail);
   },
-  stepTo(bar) { bar = Math.min(bar, this.m.N - 1); while (this.stepped < bar) { this.stepped++; this.step(this.stepped); } },
+  stepTo(bar) { bar = Math.min(bar, this.m.N - 1); while (this.stepped < bar) { this.stepped++; this.step(this.stepped); if (this.rpath) this.rpath[this.stepped] = this.real + this.openR(this.stepped); } },
+  pathTo(i) { const p = []; for (let j = 232; j <= i; j++) p.push(j <= this.stepped ? this.rpath[j] : this.real + this.openR(j)); return p; },
   openR(i) { return this.pos ? this.pos.lots.reduce((s, x) => s + x.q * (this.m.c[i] - x.p), 0) / this.pos.rRef : 0; },
   total(i) { return this.real + this.openR(i); },
+  tradeList(i) { return this.tlog.map(T => T.i1 >= 0 ? { i0: T.i0, i1: T.i1, R: T.R, maxQ: T.maxQ } : { i0: T.i0, i1: i, R: this.total(i) - T.r0, maxQ: T.maxQ, open: true }); },
 };
 
 const GRADE = { ok: { s: "✓", t: "ตรงระบบ", c: "buy" }, acc: { s: "≈", t: "ไม่ผิดกฎ", c: "gold" }, bad: { s: "✕", t: "ผิดกฎ", c: "stop" } };
 const Dojo = {
-  hard: false, waiting: false, queue: [], qByEv: new Map(), cur: null, timer: null, book: Book, ppAsked: {},
+  hard: false, waiting: false, queue: [], qByEv: new Map(), cur: null, timer: null, book: Book, ppAsked: {}, freq: "normal", rd: { ok: 0, t: 0 },
   mk: { ok: 0, acc: 0, t: 0, streak: 0, best: 0 }, ses: { ok: 0, acc: 0, t: 0, m: 0, you: 0, sys: 0 }, life: { total: 0, ok: 0, acc: 0, markets: 0, best: 0, you: 0, sys: 0 },
   loadLife() { try { Object.assign(this.life, JSON.parse(localStorage.getItem("nest-dojo4") || "{}")); } catch (err) {} },
   saveLife() { try { localStorage.setItem("nest-dojo4", JSON.stringify(this.life)); } catch (err) {} },
@@ -1529,17 +1973,95 @@ const Dojo = {
   },
   exit() { ["#bBack", "#bFwd", "#bNext", "#bRestart"].forEach(q => $(q).disabled = false); $("#brain").classList.remove("hidden"); $("#dojo").classList.add("hidden"); $("#dojoStart").classList.add("hidden"); this.waiting = false; clearInterval(this.timer); },
   onLoad() {
-    this.waiting = false; this.cur = null; this.mk = { ok: 0, acc: 0, t: 0, streak: 0, best: 0 }; this.ppAsked = {}; clearInterval(this.timer);
+    this.waiting = false; this.cur = null; this.mk = { ok: 0, acc: 0, t: 0, streak: 0, best: 0, real: { ok: 0, acc: 0, t: 0 }, fake: { ok: 0, acc: 0, t: 0 } }; this.rd = { ok: 0, t: 0 }; this.ppAsked = {}; clearInterval(this.timer);
     Book.reset(Replay.m, Replay.run); this.buildQueue(); this.done = false;
     $("#dqBody").innerHTML = "กด ▶ แล้วรอจุดตัดสินใจแรก… ตัดสินใจเองทุกไม้ ผลกำไรขาดทุนของคุณคิดจริงตามกราฟ<br><br>ให้คะแนน 3 ระดับ: <b style='color:var(--buy)'>✓ ตรงระบบ</b> · <b style='color:var(--gold)'>≈ ไม่ผิดกฎ</b> · <b style='color:var(--stop)'>✕ ผิดกฎ</b>"; this.paint();
   },
-  buildQueue() {
-    const ev = Replay.run.ev, Q = []; this.qByEv = new Map();
+  buildQueue() { if (this.M || this.legacy) return this.buildLegacy(); return this.buildCheckpoints(); },
+  buildCheckpoints() {
+    const Mx = Replay, m = Mx.m, run = Mx.run, ev = run.ev, N = m.N, Q = [], t0 = Mx.t0 || 232; this.qByEv = new Map();
+    const F = { key: { gap: 10, per: null, read: null }, normal: { gap: 6, per: [24, 34], read: [45, 60] }, dense: { gap: 2, per: [7, 11], read: [22, 30] } }[this.freq] || { gap: 6, per: [24, 34], read: [45, 60] };
+    const rng = NEST.makeRng((Mx.seed || 1) * 31 + 7);
+    const add = (i, type, e, extra) => { const q = Object.assign({ i, type, e, answered: false, seq: Q.length, prio: e ? 2 : 1 }, extra || {}); Q.push(q); if (e && !this.qByEv.has(e)) this.qByEv.set(e, q); return q; };
+    ev.forEach(e => {
+      if (e.i < t0) return;
+      switch (e.type) {
+        case "BUY": add(e.i, "ACT", e, { src: "BUY" }); add(e.i, "BUY_SL", null, { buy: e, prio: 2 }); break;
+        case "TRAP_NO_NEST": case "TRAP_SHALLOW": case "TRAP_STALE": case "INVALID": case "NONEST_BREAKOUT": case "SCALE_IN": case "VCP_ADD": case "HEAT": case "PP_DAY": add(e.i, "ACT", e, { src: e.type }); break;
+        case "SL_LIFT": if (e.why === "i" && !e.noop) add(e.i, "ACT", e, { src: "SL_LIFT" }); break;
+        case "TP2_TRIG": case "TP3_TRIG": case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": case "STOP": case "STOP_PROFIT": case "GAP_STOP": add(e.i, e.type, e); break;
+        case "TP1_TRIG": add(e.i, "TP1_TRIG", e); add(e.i, "TP1_REST", null, { tp: e, prio: 2 }); break;
+      }
+      if (/^(GC|CURL|NEST_I|NEST_BROKEN|INVALID|BUY|STOP|TP1_TRIG|FLAT|NONEST_BREAKOUT|CYCLE_RESET)$/.test(e.type)) { const j = e.i + rng.i(2, 10); if (j < N - 2) add(j, "READ", null, { src: "after " + e.type, prio: 0 }); }
+    });
+    // candidate signals — real or fake — found by looking only at the chart up to this bar
+    let lastBO = -99;
+    for (let i = t0 + 1; i < N - 1; i++) {
+      let hi20 = -Infinity, lo20 = Infinity; for (let j = i - 20; j < i; j++) { if (m.h[j] > hi20) hi20 = m.h[j]; if (m.l[j] < lo20) lo20 = m.l[j]; }
+      const hup = m.hist[i] > 0 && m.hist[i - 1] <= 0, mup = m.macd[i] > 0 && m.macd[i - 1] <= 0, bo = m.c[i] > hi20 && i - lastBO > 10;
+      if (bo) lastBO = i;
+      const bigRed = m.o[i] - m.c[i] > 1.5 * m.atr[i], bigGreen = m.c[i] - m.o[i] > 1.5 * m.atr[i], nlow = m.c[i] < lo20;
+      const tag = hup ? "hist" : mup ? "macd" : bo ? "breakout" : bigRed ? "bigred" : nlow ? "newlow" : m.pp[i] ? "pp" : bigGreen ? "biggreen" : null;
+      if (tag) add(i, "ACT", null, { src: "CAND", tag });
+    }
+    if (F.per) for (let i = t0 + rng.i(4, 12); i < N - 2; i += rng.i(F.per[0], F.per[1])) add(i, "ACT", null, { src: "PERIODIC" });
+    if (F.read) for (let i = t0 + rng.i(15, 30); i < N - 2; i += rng.i(F.read[0], F.read[1])) { const st = run.snap[i] && run.snap[i].st; if (st && st !== "WAIT_GC") add(i, "READ", null, { src: "PERIODIC", prio: 0 }); }
+    // de-duplicate: engine questions always stay; one extra question per bar; keep a gap between extra questions
+    Q.sort((a, b) => a.i - b.i || b.prio - a.prio || a.seq - b.seq);
+    const keep = []; let lastExtra = -99; const actAt = new Set();
+    for (const q of Q) {
+      if (q.prio === 2) { if (q.type === "ACT") { if (actAt.has(q.i + ":" + q.src)) continue; actAt.add(q.i + ":" + q.src); } keep.push(q); continue; }
+      if (keep.some(k => k.i === q.i)) continue;
+      if (q.i - lastExtra < F.gap || keep.some(k => Math.abs(k.i - q.i) < 2 && k.prio === 2)) continue;
+      keep.push(q); lastExtra = q.i;
+    }
+    keep.sort((a, b) => a.i - b.i || (a.type === "READ" ? -1 : 0) - (b.type === "READ" ? -1 : 0) || a.seq - b.seq);
+    this.queue = keep;
+  },
+  // ---------- helpers for checkpoint questions ----------
+  obsFacts(m, S, i) {
+    const c = m.c[i], f = [`MACD ${sgn(m.macd[i])}`, `histogram ${sgn(m.hist[i])} ${m.hist[i] >= m.hist[i - 1] ? "↑" : "↓"}`, `ราคา${c > m.m50[i] ? "เหนือ" : "ใต้"} MA50 · ${c > m.m200[i] ? "เหนือ" : "ใต้"} MA200`, `vol ${fmt(m.v[i] / m.vma[i], 1)}× avg${m.pp[i] ? " · PP" : ""}`];
+    if (isFinite(S.W1H) && /WAIT_CURL|WAVE2|NEST/.test(S.st || "")) f.push(`ห่างยอด W1 ${((c / S.W1H - 1) * 100).toFixed(1)}%`);
+    if (S.st === "NEST" && S.iI > 0) { let lo = Infinity; for (let j = S.iI; j <= i; j++) lo = Math.min(lo, m.l[j]); f.push(`(i) ${fmt(S.I)} · (ii) ตอนนี้ย่อ ${((S.I - lo) / (S.I - S.W2) * 100).toFixed(0)}%`); }
+    return f;
+  },
+  whyNot(m, S, i, evAt) {
+    const c = m.c[i], has = (t) => evAt.some(e => e.type === t);
+    if (has("INVALID")) return "Wave 2 ลงต่ำกว่าจุดเริ่ม Wave 1 → นับผิด ทรงจบ";
+    if (has("NONEST_BREAKOUT")) return "ทะลุยอด Wave 1 โดยไม่มี nest → ไม่ใช่ทรงของระบบ";
+    if (has("TRAP_STALE")) return "ราคาอยู่เหนือ TP1 ของ 1-2 เดิม และยังไม่มี 1-2 ชุดใหม่ที่ย่อ ≥ 61.8%";
+    const st = S.st;
+    if (st === "WAIT_GC") return "ยังไม่มี Wave 1 (MA50 ยังไม่ตัดขึ้น MA200) — สัญญาณนี้ไม่มีโครงสร้างรองรับ";
+    if (st === "WAIT_CURL") return "ยังอยู่ใน Wave 1 — ต้องรอ Wave 2 และ nest ก่อน";
+    if (st === "WAVE2") return `อยู่ใน Wave 2 แต่ยังไม่มี nest ((i) ที่เด้งแล้วล้มใต้ยอด W1 ${fmt(S.W1H)})`;
+    if (st === "NEST") {
+      const out = []; let lo = Infinity; for (let j = S.iI; j <= i; j++) lo = Math.min(lo, m.l[j]);
+      const retr = (S.I - lo) / (S.I - S.W2); if (retr < 0.618) out.push(`(ii) ย่อแค่ ${(retr * 100).toFixed(0)}% (ต้อง ≥ 61.8%)`);
+      if (!(m.macd[i] > 0)) out.push("MACD ยัง ≤ 0");
+      let hupR = false; if (m.hist[i] > 0) for (let j = i; j >= i - 15; j--) { if (m.hist[j] <= 0) break; if (m.hist[j - 1] <= 0) { hupR = true; break; } }
+      if (!hupR && !m.pp[i]) out.push("ยังไม่มีไกปืน (histogram ยังไม่พลิกบวก / ไม่มี PP)");
+      if (c - lo * 0.99 < 2 * m.atr[i]) out.push("SL ใต้ (ii) ใกล้กว่า 2 ATR");
+      if (c >= S.W1H) out.push("ราคาทะลุยอด W1 ไปแล้ว");
+      if (c >= lo + 1.618 * (S.I - S.W2)) out.push("ราคาอยู่เหนือ TP1 ของ 1-2 เดิม");
+      if (S.entries >= 2) out.push("เข้าครบ 2 ครั้งในรอบนี้แล้ว");
+      return out.length ? out.join(" · ") : "เงื่อนไขยังไม่ครบในแท่งนี้";
+    }
+    if (st === "LONG") return "ระบบถืออยู่ — ถ้าพลาดไม้แรก จุดเข้าได้มีแค่ PP หลัง (ii) หรือเบรกกรอบ VCP";
+    return "รอบนี้จบแล้วหรือทรงพัง — รอ MA50 กลับลงใต้ MA200 เพื่อเริ่มรอบใหม่";
+  },
+  RSTAGE: [["pre", "ยังไม่มี Wave 1 (MA50 ยังไม่ตัดขึ้น MA200)"], ["w1", "Wave 1 กำลังขึ้น"], ["w2", "Wave 2 กำลังย่อ — ยังไม่มี nest"], ["ni", "มี (i) แล้ว — (ii) ยังย่อไม่ถึง 61.8%"], ["nii", "(ii) ย่อครบ 61.8% แล้ว — รอไกปืน"], ["long", "อยู่ใน Wave 3 — ถือตามแผน รอเป้า"], ["end", "จบรอบ/ทรงพัง — รอรอบใหม่"]],
+  stageOf(m, S, i) {
+    const st = S.st; if (st === "WAIT_GC") return 0; if (st === "WAIT_CURL") return 1; if (st === "WAVE2") return 2;
+    if (st === "NEST") { let lo = Infinity; for (let j = S.iI; j <= i; j++) lo = Math.min(lo, m.l[j]); return (S.I - lo) / (S.I - S.W2) >= 0.618 ? 4 : 3; }
+    if (st === "LONG") return 5; return 6;
+  },
+  buildLegacy() {
+    const Mx = this.M || Replay, ev = Mx.run.ev, Q = [], t0 = Mx.t0 || 232; this.qByEv = new Map();
     const add = (i, type, e, extra) => { const q = Object.assign({ i, type, e, answered: false, seq: Q.length }, extra || {}); Q.push(q); if (e && !this.qByEv.has(e)) this.qByEv.set(e, q); return q; };
     ev.forEach(e => {
-      if (e.i < Replay.t0) return;
+      if (e.i < t0) return;
       switch (e.type) {
-        case "TRAP_NO_NEST": case "TRAP_SHALLOW": case "SCALE_IN": case "VCP_ADD": case "HEAT": case "STOP": case "STOP_PROFIT": case "GAP_STOP": case "INVALID": case "NONEST_BREAKOUT":
+        case "TRAP_NO_NEST": case "TRAP_SHALLOW": case "TRAP_STALE": case "SCALE_IN": case "VCP_ADD": case "HEAT": case "STOP": case "STOP_PROFIT": case "GAP_STOP": case "INVALID": case "NONEST_BREAKOUT":
         case "TP2_TRIG": case "TP3_TRIG": case "TP1_EXIT": case "TP2_EXIT": case "TP3_EXIT": case "PP_DAY": add(e.i, e.type, e); break;
         case "TP1_TRIG": add(e.i, "TP1_TRIG", e); add(e.i, "TP1_REST", null, { tp: e }); break;
         case "BUY": add(e.i, "BUY", e); add(e.i, "BUY_SL", null, { buy: e }); break;
@@ -1547,8 +2069,8 @@ const Dojo = {
       }
     });
     if (this.hard) {
-      const rng = NEST.makeRng(Replay.seed + 5);
-      for (let i = Replay.t0 + 30; i < Replay.m.N - 5; i += Math.round(rng.r(80, 130))) if (!Q.some(q => Math.abs(q.i - i) < 10)) add(i, "DECOY", null);
+      const rng = NEST.makeRng(Mx.seed + 5);
+      for (let i = t0 + 30; i < Mx.m.N - 5; i += Math.round(rng.r(80, 130))) if (!Q.some(q => Math.abs(q.i - i) < 10)) add(i, "DECOY", null);
     }
     Q.sort((a, b) => a.i - b.i || a.seq - b.seq); this.queue = Q;
   },
@@ -1557,10 +2079,55 @@ const Dojo = {
   isAnswered(e) { const q = this.qByEv.get(e); return !q || q.answered; },
   shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
   build(q) {
-    const m = Replay.m, e = q.e, i = q.i, B = Book, S = Replay.run.snap[i] || {}, P = B.pos, has = !!P;
+    const Mx = this.M || Replay, m = Mx.m, e = q.e, i = q.i, B = this.book || Book, S = Mx.run.snap[i] || {}, P = B.pos, has = !!P;
     const O = (t, g, act) => ({ t, g, act });
     const pct = (x) => (x * 100).toFixed(0) + "%";
     switch (q.type) {
+      case "READ": {
+        const k = this.stageOf(m, S, i), R = this.RSTAGE, pool = [k];
+        [k - 1, k + 1, k + 2, k - 2, 6, 0].forEach(j => { if (j >= 0 && j < R.length && !pool.includes(j) && pool.length < 4) pool.push(j); });
+        const expl = { 0: "MA50 ยังอยู่ใต้ MA200 — ยังไม่มี Wave 1 ตามนิยาม", 1: "MA50 ตัดขึ้น MA200 แล้ว และยังไม่ม้วนลง = Wave 1", 2: "MA50 ม้วนลงแล้ว = Wave 2 · ยังไม่มี (i) ที่เด้งแล้วล้มใต้ยอด W1", 3: "มี (i) แล้ว แต่ low หลัง (i) ยังย่อไม่ถึง 61.8% ของขา (i)", 4: "(ii) ย่อถึง 61.8% แล้ว — เหลือแค่ไกปืน histogram พลิกบวก + MACD > 0", 5: "ระบบถืออยู่ — จัดการตาม SL/TP", 6: "ทรงรอบนี้จบ/พังแล้ว รอ MA50 กลับลงใต้ MA200" }[k];
+        return { read: true, q: "อ่านทรง: ตอนนี้อยู่ช่วงไหนของระบบ?", facts: [],
+          opts: pool.map(j => O(R[j][1], j === k ? "ok" : (Math.abs(j - k) === 1 && k >= 2 && k <= 4 && j >= 2 && j <= 4) ? "acc" : "bad")), why: expl };
+      }
+      case "ACT": {
+        const evAt = Mx.run.ev.filter(x => x.i === i), c = m.c[i];
+        if (!has) {
+          if (q.src === "CAND" && /bigred|newlow/.test(q.tag) && this.freq !== "dense") return null;
+          if ((q.src === "PERIODIC" || q.src === "CAND") && !/WAIT_CURL|WAVE2|NEST|LONG/.test(S.st || "") && this.freq === "key") return null;
+          if (q.src === "PERIODIC" && S.st === "WAIT_GC") return null;
+          const buyE = evAt.find(x => x.type === "BUY"), vcpE = evAt.find(x => x.type === "VCP_ADD"), ppE = evAt.find(x => x.type === "PP_DAY");
+          let g = { w: "ok", f: "bad", h: "bad", b: "bad" }, sl = B.low20(i), R = c - sl, why, opt = null;
+          if (buyE) { const pp = buyE.pp; g = { w: "bad", f: pp ? "ok" : "bad", h: pp ? "acc" : "ok", b: "bad" }; sl = buyE.sl; R = buyE.price - buyE.sl;
+            why = `ระบบซื้อ: ${buyE.reanchor ? "1-2 ชุดใหม่ (ราคาเหนือ TP1 เดิม) · " : ""}(ii) ย่อ ≥ 61.8% · ไกปืน ${{ hist: "histogram พลิกบวก", pp: "Pocket Pivot", vcp: "เบรก VCP" }[buyE.via]} + MACD > 0 · SL ≥ 2 ATR · ${pp ? "มี PP → เต็มไม้" : "ไม่มี PP → ครึ่งไม้"}`; }
+          else if (S.st === "LONG" && (vcpE || (ppE && isFinite(S.II) && c - S.II * 0.99 >= 2 * m.atr[i]))) {
+            const pp = m.pp[i]; g = { w: "acc", f: pp ? "ok" : "bad", h: pp ? "acc" : "ok", b: "bad" }; sl = vcpE ? vcpE.lo * 0.99 : S.II * 0.99; R = c - sl; if (vcpE) opt = { lifted: true };
+            why = `ระบบถืออยู่ และแท่งนี้เป็นจุดเข้าได้แม้พลาดไม้แรก (${vcpE ? "เบรกกรอบ VCP" : "Pocket Pivot หลัง (ii)"}) · ขนาดตาม PP · SL ใต้ ${vcpE ? "low กรอบ VCP" : "(ii)"} · ไม่เข้าก็ไม่ผิดกฎ`; }
+          else why = "ยังไม่ใช่จุดซื้อ: " + this.whyNot(m, S, i, evAt);
+          return { q: "ไม่มีของ — แท่งนี้ทำอะไร?", facts: this.obsFacts(m, S, i),
+            opts: [O("WAIT — ยังไม่เข้า", g.w), O("BUY เต็มไม้", g.f, () => B.open(i, 1, sl, R, opt)), O("BUY ครึ่งไม้", g.h, () => B.open(i, 0.5, sl, R, opt)), O("BUY 1.5 ไม้", g.b, () => B.open(i, 1.5, sl, R, opt))], why };
+        }
+        if (q.src === "CAND" && /hist|macd|pp/.test(q.tag) && this.freq !== "dense") return null;
+        const sc = evAt.find(x => x.type === "SCALE_IN"), vc = evAt.find(x => x.type === "VCP_ADD"), li = evAt.find(x => x.type === "SL_LIFT" && x.why === "i" && !x.noop), he = evAt.find(x => x.type === "HEAT");
+        let g = { hold: "ok", s3: "bad", all: "bad", lift: "bad", add: "bad" }, why = "", liftTo = NaN;
+        let pv = NaN; for (let j = i - 3; j > (P.entryI || 0); j--) { if (B.fractalLow(j)) { pv = m.l[j] * 0.99; break; } }
+        if (li && !P.lifted && !P.tr) { g = { hold: "acc", s3: "bad", all: "bad", lift: "ok", add: "bad" }; liftTo = li.sl; why = "ปิดเหนือยอด (i) → ยก SL ครั้งเดียวไปใต้ pivot low ล่าสุด แล้วแช่ไว้จนถึง TP1 · ไม่ขยับเลยก็ไม่ผิดกฎ"; }
+        else if (vc && !P.tr && !P.vcpDone) { g = { hold: "acc", s3: "bad", all: "bad", lift: P.lifted ? "bad" : "acc", add: "ok" }; liftTo = vc.lo * 0.99; why = `เบรกกรอบ VCP พร้อม volume → เติม ½${P.lifted ? "" : " + ยก SL ครั้งเดียวใต้ low กรอบ"}`; }
+        else if (sc && !P.scaled && !P.tr) { g = { hold: "acc", s3: "bad", all: "bad", lift: "bad", add: "ok" }; why = "ไม้แรกครึ่งไม้ · Stoch RSI ตัดขึ้น 20 + MACD > 0 → เติม ½ ให้เต็มไม้"; }
+        else if (he) { g = { hold: "ok", s3: "acc", all: "bad", lift: "bad", add: "bad" }; why = "ติดลบแต่ยังเหนือ SL — แผนยังไม่เปลี่ยน (ลดไม้ไม่ผิดกฎ แต่ไม่ใช่ระบบ)"; }
+        else why = P.tr ? "หลัง TP1: ไม้ที่เหลือใช้ SL กันทุน แต่ละ 1/3 ออกตาม trailing ของตัวเอง — ไม่มีอะไรต้องทำแท่งนี้" : (P.lifted ? "ยก SL ไปแล้ว 1 ครั้ง — แช่ไว้จนถึง TP1 · ไม่มีเงื่อนไขเติม/ขาย ณ แท่งนี้" : "ยังไม่ถึงจังหวะยก SL (รอปิดเหนือ (i) หรือเบรก VCP) · ไม่มีเงื่อนไขเติม/ขาย ณ แท่งนี้");
+        const doLift = () => { const to = isFinite(liftTo) ? liftTo : pv; if (isFinite(to)) B.liftSL(i, to); if (B.pos) B.pos.lifted = true; };
+        const doAdd = () => { B.add(i, 0.5); if (!B.pos) return; if (sc) B.pos.scaled = true; if (vc) { B.pos.vcpDone = true; if (!B.pos.lifted && vc.lo * 0.99 > B.pos.sl) { B.setSL(i, vc.lo * 0.99); B.pos.lifted = true; } } };
+        return { q: "ถืออยู่ — แท่งนี้ทำอะไร?", facts: this.obsFacts(m, S, i).concat([`ถือ ${fmt(B.qty(), 2)} · ${sgn(B.openR(i))}R · SL ${P.sl > 1e-3 ? fmt(P.sl) : "ไม่มี"}`]),
+          opts: [O("HOLD ตามแผน", g.hold), O("ขาย 1/3", g.s3, () => B.sellQ(i, B.qty() / 3, c)), O("ขายทั้งหมด", g.all, () => B.closeAll(i, c)), O("ยก SL ขึ้นใต้ pivot low ล่าสุด", g.lift, doLift), O("เติม ½", g.add, doAdd)], why };
+      }
+      case "TRAP_STALE": {
+        if (has) return null; const ck = "t" + e.cyc; if ((this.ppAsked[ck] || 0) >= 2) return null; this.ppAsked[ck] = (this.ppAsked[ck] || 0) + 1;
+        return { q: "ไกปืนมา (histogram / PP) + MACD > 0 แต่ราคาอยู่เหนือ TP1 ของ 1-2 เดิมแล้ว — ทำอะไร?",
+          facts: [`ราคา ${fmt(e.price)}`, `TP1 ของ 1-2 เดิม ${fmt(e.tp1)}`, e.retr > 0 ? `1-2 ชุดใหม่ย่อแค่ ${pct(e.retr)}` : "ยังไม่มี 1-2 ชุดใหม่"],
+          opts: [O("WAIT — ต้องเป็น 1-2 ชุดใหม่ที่ย่อ ≥ 61.8% ก่อน แล้ววัดเป้าใหม่", "ok"), O("BUY ตามเป้าเดิม", "bad", () => B.open(i, 1, S.II ? S.II * 0.99 : B.low20(i))), O("BUY ครึ่งไม้", "bad", () => B.open(i, 0.5, B.low20(i))), O("BUY แล้วถือเป็น 'ถึง TP1 แล้ว' ทันที", "bad", () => B.open(i, 1, B.low20(i)))],
+          why: "เข้าเหนือ TP1 เดิม = ไม้นั้นต้องเป็น wave 1-2 ของตัวเอง วัดเป้าแยกขาด · ถ้ายังไม่มี 1-2 ใหม่ที่ย่อ ≥ 61.8% ให้รอ" };
+      }
       case "TRAP_NO_NEST": case "TRAP_SHALLOW": {
         if (has) return null; const sh = q.type === "TRAP_SHALLOW", ck = "t" + e.cyc; if ((this.ppAsked[ck] || 0) >= 2) return null; this.ppAsked[ck] = (this.ppAsked[ck] || 0) + 1;
         return { q: "histogram พลิกบวก + MACD > 0 — ทำอะไร?",
@@ -1570,10 +2137,10 @@ const Dojo = {
       }
       case "BUY": {
         if (has) return null;
-        const retr = (e.I - e.ii) / (e.I - e.W2), R = e.price - e.sl;
+        const retr = (e.I - e.ii) / (e.I - (e.s0 !== undefined ? e.s0 : e.W2)), R = e.price - e.sl;
         const via = { hist: "histogram พลิกบวก", pp: "Pocket Pivot", vcp: "เบรกกรอบ VCP" }[e.via];
         return { q: `${e.reentry ? "หลังโดน SL เกิด (ii) ใหม่ · " : ""}${via} + MACD > 0 — ทำอะไร?`,
-          facts: [`(ii) ย่อ ${pct(retr)} ของขา (i)`, `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`, `MACD ${sgn(m.macd[i])}`, e.pp ? "PP ใน 3 แท่ง: มี" : "PP ใน 3 แท่ง: ไม่มี"],
+          facts: [e.reanchor ? `1-2 ชุดใหม่ (วัดใหม่เพราะราคาเหนือ TP1 เดิม) · ย่อ ${pct(retr)}` : `(ii) ย่อ ${pct(retr)} ของขา (i)`, `SL ใต้ (ii) ห่าง ${fmt(R / m.atr[i], 1)} ATR`, `MACD ${sgn(m.macd[i])}`, e.pp ? "PP ใน 3 แท่ง: มี" : "PP ใน 3 แท่ง: ไม่มี"],
           opts: [O("BUY เต็มไม้", e.pp ? "ok" : "bad", () => B.open(i, 1, e.sl, R)), O("BUY ครึ่งไม้", e.pp ? "acc" : "ok", () => B.open(i, 0.5, e.sl, R)), O("WAIT ต่อ", "bad"), O("BUY 1.5 ไม้ — มั่นใจ", "bad", () => B.open(i, 1.5, e.sl, R))],
           why: e.pp ? "ครบ: (ii) ≥ 61.8% · SL ≥ 2 ATR · ไกปืน + MACD > 0 · มี PP → เต็มไม้ (ครึ่งไม้ไม่ผิดกฎ แค่เล็กกว่าระบบ)" : "ครบทุกเงื่อนไข แต่ไม่มี PP → ครึ่งไม้ แล้วค่อยเติมตอน Stoch RSI ตัดขึ้น 20" };
       }
@@ -1685,10 +2252,12 @@ const Dojo = {
   answer(q, d, j) {
     if (q.answered) return; clearInterval(this.timer);
     const choice = d.opts[j], g = choice ? choice.g : "bad"; q.answered = true;
+    if (d.read) { this.rd.t++; if (g === "ok") this.rd.ok++; } else {
     this.mk.t++; if (g === "ok") this.mk.ok++; if (g === "acc") this.mk.acc++;
-    if (g !== "bad") { this.mk.streak++; this.mk.best = Math.max(this.mk.best, this.mk.streak); } else this.mk.streak = 0;
+    { const sysO = d.opts.find(o => o.g === "ok"), waitO = d.opts.find(o => /^(WAIT|HOLD)/.test(o.t)), bk = sysO && /^(WAIT|HOLD)/.test(sysO.t) ? "fake" : (waitO && waitO.g !== "bad" ? "opt" : "real"), K = this.mk[bk] || (this.mk[bk] = { ok: 0, acc: 0, t: 0 }); K.t++; if (g === "ok") K.ok++; if (g === "acc") K.acc++; }
+    if (g !== "bad") { this.mk.streak++; this.mk.best = Math.max(this.mk.best, this.mk.streak); } else this.mk.streak = 0; }
     Sound.tone(g === "ok" ? [784, 1047] : g === "acc" ? [659, 784] : [220, 185], 0.22, g === "bad" ? "sawtooth" : "sine", g === "bad" ? 0.03 : 0.05);
-    this.life.total = (this.life.total || 0) + 1; if (g === "ok") this.life.ok = (this.life.ok || 0) + 1; if (g === "acc") this.life.acc = (this.life.acc || 0) + 1; this.saveLife();
+    if (!d.read) this.life.total = (this.life.total || 0) + 1; if (!d.read && g === "ok") this.life.ok = (this.life.ok || 0) + 1; if (!d.read && g === "acc") this.life.acc = (this.life.acc || 0) + 1; this.saveLife();
     if (choice && choice.act) choice.act(); else if (!choice && d.timeout) d.timeout();
     $$("#dqBody .opt").forEach((b, k) => {
       b.disabled = true; const G = GRADE[d.opts[k].g], tg = b.querySelector(".gtag");
@@ -1709,7 +2278,11 @@ const Dojo = {
       Replay.playing = true; Replay.syncPlay(); $("#dqBody").innerHTML = "กำลังเล่น… รอจุดตัดสินใจถัดไป";
     };
   },
-  pcts() { const t = this.mk.t; return { disc: t ? Math.round((this.mk.ok + this.mk.acc) / t * 100) : 100, exact: t ? Math.round(this.mk.ok / t * 100) : 100 }; },
+  pcts() {
+    const R = this.mk.real || { t: 0 }, F = this.mk.fake || { t: 0 }, rate = (K, a) => K.t ? (K.ok + (a ? K.acc : 0)) / K.t : null;
+    const bal = (a) => { const x = rate(R, a), y = rate(F, a); return x === null && y === null ? 1 : x === null ? y : y === null ? x : (x + y) / 2; };
+    return { disc: Math.round(bal(true) * 100), exact: Math.round(bal(false) * 100), real: R, fake: F };
+  },
   finish() {
     if (this.done) return; this.done = true;
     const N = Replay.m.N, sys = Replay.run.snap[N - 1].totR; Book.stepTo(N - 1); const you = Book.total(N - 1);
@@ -1717,9 +2290,18 @@ const Dojo = {
     const grade = disc >= 95 && exact >= 80 ? "SENSEI" : disc >= 90 ? "DISCIPLINED" : disc >= 70 ? "ALMOST" : "หลุดกฎบ่อย";
     this.ses.m++; this.ses.ok += this.mk.ok; this.ses.acc += this.mk.acc; this.ses.t += this.mk.t; this.ses.you += you; this.ses.sys += sys;
     this.life.markets = (this.life.markets || 0) + 1; this.life.you = (this.life.you || 0) + you; this.life.sys = (this.life.sys || 0) + sys; if (this.mk.t >= 5) this.life.best = Math.max(this.life.best || 0, disc); this.saveLife();
-    const T = NEST.TEMPLATES[Replay.tpl]; const col = (v) => v > 0 ? PAL.buy : v < 0 ? PAL.stop : PAL.mut;
+    const T = NEST.TEMPLATES[Replay.tpl] || NEST.TEMPLATES.textbook; const col = (v) => v > 0 ? PAL.buy : v < 0 ? PAL.stop : PAL.mut;
+    const yA = NEST.statsFromTrades(Book.tradeList(N - 1), ACCT), sA = NEST.account(Replay.m, Replay.run, ACCT);
+    const pfT = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
+    const myMax = Math.max(0, ...Book.tlog.map(x => x.maxQ)), sysMax = Math.max(0, ...Replay.run.snap.filter(Boolean).map(x => x.qty || 0));
     $("#dqBody").innerHTML = `<h4>จบตลาด · ${Replay.blockNames()}</h4>
-      <div class="score" style="margin:10px 0"><div><div class="v" style="color:${col(you)}">${sgn(you)}R</div><div class="k">คุณ</div></div><div><div class="v" style="color:${col(sys)}">${sgn(sys)}R</div><div class="k">ระบบ</div></div><div><div class="v">${disc}%</div><div class="k">DISCIPLINE</div></div></div>
+      <div class="score" style="margin:10px 0"><div><div class="v" style="color:${col(yA.pnl)};font-size:20px">${fmtPnl(yA.pnl)}</div><div class="k">คุณ ${yA.retPct >= 0 ? "+" : ""}${yA.retPct.toFixed(1)}%</div></div><div><div class="v" style="color:${col(sA.pnl)};font-size:20px">${fmtPnl(sA.pnl)}</div><div class="k">ระบบ ${sA.retPct >= 0 ? "+" : ""}${sA.retPct.toFixed(1)}%</div></div><div><div class="v">${disc}%</div><div class="k">DISCIPLINE</div></div></div>
+      ${(() => { const yR = NEST.riskStats(Book.pathTo(N - 1), ACCT) || {}, sR = NEST.riskStats(NEST.sysPath(Replay.m, Replay.run), ACCT) || {}, f = (v, d) => isFinite(v) ? v.toFixed(d) : "—", nv = (x) => x && x.norm ? (x.norm.cagr >= 0 ? "+" : "") + x.norm.cagr.toFixed(1) + "%/ปี · DD " + x.norm.dd.toFixed(0) + "%" : "ข้อมูลช่วงถือไม่พอ";
+        return `<table class="mini"><tr><th></th><th>R</th><th>PF</th><th>ชนะ</th><th>CAGR</th><th>MaxDD</th><th>Calmar</th><th>Sharpe</th></tr>
+        <tr><td>คุณ</td><td>${sgn(you)}</td><td>${pfT(yA.pf)}</td><td>${isFinite(yA.win) ? yA.win.toFixed(0) + "%" : "—"}</td><td>${f(yR.cagr, 1)}%</td><td>${f(yR.dd, 1)}%</td><td>${f(yR.calmar, 2)}</td><td>${f(yR.sharpe, 2)}</td></tr>
+        <tr><td>ระบบ</td><td>${sgn(sys)}</td><td>${pfT(sA.pf)}</td><td>${isFinite(sA.win) ? sA.win.toFixed(0) + "%" : "—"}</td><td>${f(sR.cagr, 1)}%</td><td>${f(sR.dd, 1)}%</td><td>${f(sR.calmar, 2)}</td><td>${f(sR.sharpe, 2)}</td></tr></table>
+        <div class="note">ปรับความเสี่ยงแบบ Darwinex (VaR 6.5%/เดือน): คุณ ${nv(yR)} · ระบบ ${nv(sR)}${this.rd.t ? ` · อ่านทรงถูก ${this.rd.ok}/${this.rd.t}` : ""}</div>`; })()}
+      ${myMax > sysMax + 0.01 ? `<div class="fb" style="color:${PAL.gold}">ขนาดไม้ใหญ่สุดของคุณ ${fmt(myMax, 1)} เท่า (ระบบ ${fmt(sysMax, 1)}) — ถ้าได้มากกว่าระบบ ส่วนหนึ่งมาจากการเสี่ยงมากกว่า ไม่ใช่ฝีมือ</div>` : ""}
       <div class="fb">ระดับ <b style="color:${PAL.gold}">${grade}</b> · <b style="color:${PAL.buy}">✓ ${this.mk.ok}</b> · <b style="color:${PAL.gold}">≈ ${this.mk.acc}</b> · <b style="color:${PAL.stop}">✕ ${bad}</b> จาก ${this.mk.t} คำถาม · ตรงระบบ ${exact}% · streak ไม่ผิดกฎสูงสุด ${this.mk.best} · คุณเข้า ${Book.trades} ไม้</div>
       <div class="fb"><b>บทเรียนรอบแรก:</b> ${T.lesson}</div>
       <div class="note" style="margin-top:8px">ตลาดจำลอง · ผลขึ้นกับกราฟสุ่มแต่ละรอบ ไม่ใช่ผลเทรดจริง</div>
@@ -1731,13 +2313,14 @@ const Dojo = {
     const i = Math.max(0, Math.floor(Replay.t) - 1), you = Book.total(i), col = you > 0 ? PAL.buy : you < 0 ? PAL.stop : PAL.mut;
     const { disc } = this.pcts();
     $("#dCorrect").textContent = `${this.mk.ok}/${this.mk.t}`;
-    $("#dAcc").textContent = `≈ ${this.mk.acc} · ✕ ${this.mk.t - this.mk.ok - this.mk.acc}`;
+    const PR = this.pcts(); $("#dAcc").textContent = `จุดจริง ${PR.real.t ? PR.real.ok + PR.real.acc : 0}/${PR.real.t || 0} · จุดหลอก/รอ ${PR.fake.t ? PR.fake.ok + PR.fake.acc : 0}/${PR.fake.t || 0}${this.rd.t ? ` · อ่านทรง ${this.rd.ok}/${this.rd.t}` : ""}`;
     $("#dPct").textContent = this.mk.t ? disc + "%" : "—";
     $("#dPct").style.color = !this.mk.t ? PAL.mut : disc >= 90 ? PAL.buy : disc >= 70 ? PAL.gold : PAL.stop;
-    $("#dYouR").textContent = sgn(you) + "R"; $("#dYouR").style.color = col;
+    const yA = NEST.statsFromTrades(Book.tradeList(i), ACCT);
+    $("#dYouR").innerHTML = `${fmtPnl(yA.pnl)}<div style="font-size:11px;font-weight:700;margin-top:2px">${yA.retPct >= 0 ? "+" : ""}${yA.retPct.toFixed(1)}% · ${sgn(you)}R</div>`; $("#dYouR").style.color = col;
     const P = Book.pos;
     $("#dPos").textContent = P ? `ถือ ${fmt(Book.qty(), 2)} · ทุน ${fmt(Book.avg())} · SL ${P.sl > 1e-3 ? fmt(P.sl) : "ไม่มี"}${P.lifted && !P.tr ? " (ยกแล้ว)" : ""}${P.chase ? " (ไล่ pivot)" : ""}` + (P.tr ? " · " + P.tr.map((T, k) => `TP${k + 1}:${!T.open ? "✓" : T.mode === "trail" ? fmt(T.trail, 1) : T.mode === "hold" ? "hold" : "–"}`).join(" ") : "") : "ไม่มี position";
-    $("#dSys").textContent = this.done ? `SYSTEM: ${sgn(Replay.run.snap[Replay.m.N - 1].totR)}R` : "SYSTEM P&L: เฉลยตอนจบตลาด";
+    if (this.done) { const sA = NEST.account(Replay.m, Replay.run, ACCT); $("#dSys").textContent = `SYSTEM: ${fmtPnl(sA.pnl)} (${sA.retPct >= 0 ? "+" : ""}${sA.retPct.toFixed(1)}% · ${sgn(sA.R)}R)`; } else $("#dSys").textContent = "SYSTEM P&L: เฉลยตอนจบตลาด";
     const L = this.life, S2 = this.ses, sd = S2.t ? Math.round((S2.ok + S2.acc) / S2.t * 100) : 0;
     $("#dLife").textContent = (S2.m ? `วันนี้ ${S2.m} ตลาด · discipline ${sd}% · คุณ ${sgn(S2.you)}R vs ระบบ ${sgn(S2.sys)}R · ` : "") + (L.total ? `สะสม ${L.markets || 0} ตลาด · discipline ${Math.round(((L.ok || 0) + (L.acc || 0)) / L.total * 100)}% · ดีที่สุด ${L.best || 0}%` : "ยังไม่มีสถิติสะสม");
   },
@@ -1755,6 +2338,7 @@ const Dojo = {
 };
 
 $("#dojoGo").onclick = () => { $("#dojoStart").classList.add("hidden"); Replay.playing = true; Replay.syncPlay(); };
+$("#dFreq").onchange = (e) => { Dojo.freq = e.target.value; if (Replay.mode === "dojo") { Replay.load("random"); $("#dojoStart").classList.remove("hidden"); } };
 $("#hardT").onclick = () => { Dojo.hard = !Dojo.hard; $("#hardT").classList.toggle("on", Dojo.hard); if (Replay.mode === "dojo") { Replay.load("random"); $("#dojoStart").classList.remove("hidden"); } };
 $("#aboutBtn").onclick = () => $("#about").classList.remove("hidden");
 $("#aboutClose").onclick = () => $("#about").classList.add("hidden");
@@ -2020,6 +2604,314 @@ const BG = {
 };
 
 /* ============================================================
+   AI LAB — watch AI traders play the same markets in a pseudo-3D world
+============================================================ */
+const NOTEBOOK = [
+  { h: "1 · ระบบแอบเห็นอนาคตไหม?", q: "ถ้า engine ใช้ข้อมูลแท่งถัดไปโดยไม่รู้ตัว ผลทุกอย่างจะสวยเกินจริง", m: "ตัดข้อมูลตลาดทิ้งครึ่งทางแล้วรันใหม่ เทียบ event ทุกตัวก่อนจุดตัด · 180 ครั้ง", r: "ตรงกัน 180/180 → ไม่มี look-ahead", a: "ผ่าน", c: "buy" },
+  { h: "2 · ระบบทำตามกฎตัวเองจริงไหม?", q: "กฎเยอะ อาจมีบางไม้หลุดเงื่อนไข", m: "ผู้ตรวจกฎเช็คทุกไม้ 600 ไม้: (ii) ≥ 61.8% · SL ≥ 2 ATR · MACD > 0 · SL ไม่เคยลด · ยกก่อน TP1 ≤ 1 ครั้ง · ขนาด ≤ 1.5", r: "ผ่านทุกข้อ แต่เจอ 4 ไม้ที่ซื้อตอนราคาอยู่เหนือ TP1 แล้ว → แท่งถัดไปถือว่าถึง TP1 → กันทุน → โดน SL ได้ ~0R", a: "แก้ตามกฎของคุณ (ข้อ 8)", c: "gold" },
+  { h: "3 · ใครชนะ?", q: "ถ้าระบบดีจริง SENSEI ควรชนะคนผิดกฎ", m: "ให้ 10 บุคลิกเล่นตลาดชุดเดียวกัน 500 ตลาด (~70,000 การตัดสินใจ · ชุดทดสอบรอบแรก)", r: "FOMO ได้ 3,394R · ไม่ตั้ง SL 2,640R · SENSEI 2,093R — คนผิดกฎชนะ", a: "ผิดปกติ → ต้องหาสาเหตุ", c: "stop" },
+  { h: "4 · โลกจำลองใจดีเกินไปไหม?", q: "ถ้าตลาดขึ้นเกือบตลอด ใครถือของมากก็ชนะ", m: "วัดตลาด 500 ชุด · ให้ 'ลิง' สุ่มจุดซื้อ 20,000 ครั้ง · วัด autocorrelation", r: "86% ของตลาดจบสูงกว่าเริ่ม ค่ากลาง ×1.8 · ลิงได้ +0.30R/ไม้ · ผลตอบแทนวันต่อวันสัมพันธ์กัน +0.185 (หุ้นจริง ≈ 0)", a: "ยืนยัน: โลกปกติเป็นโลกฝึกกฎ ไม่ใช่ backtest → สร้างโลกโหด (ข้อ 10)", c: "stop" },
+  { h: "5 · ถ้าโลกไม่มี edge เลยล่ะ?", q: "วินัยสร้างกำไรได้เองไหม", m: "random walk แบบ martingale + ความผันผวนเป็นช่วงๆ 600 ตลาด", r: "ระบบ +0.07R/ไม้ (ไม่ต่างจาก 0 อย่างมีนัย) · ไม่ตั้ง SL ≈ 0 แต่ตลาดแย่สุด −9.2R (ระบบ −3.1R) · FOMO −66R", a: "วินัยไม่ได้สร้าง edge แต่ตัดหางความเสียหาย", c: "gold" },
+  { h: "6 · กฎข้อไหนสำคัญจริง?", q: "ถ้าผิดทีละข้อ ข้อไหนทำให้เงินหายมากสุด", m: "36 แบบ: ทำตามระบบทุกข้อ ยกเว้น 1 ข้อ · 500 ตลาด", r: "สำคัญมาก: ขายหมดที่ TP1 −898R · ใช้ trailing ไม้ TP1 กับไม้ที่เหลือ −752R · ข้าม BUY −583R · ไม่ออกตาม trailing −513R · ไล่ SL ทุก pivot −418R ‖ แทบไม่ต่าง: กันทุน vs คง SL ที่ TP1 · ยก SL ครั้งเดียว vs ไม่ยก · SL ใต้ (ii) vs ใต้ W2", a: "ข้อมูลสำหรับคุณตัดสินใจ — ไม่ได้แก้กฎ", c: "vdu" },
+  { h: "7 · บั๊ก 'IT RAN WITHOUT YOU'", q: "ข้อความขึ้นผิดจังหวะไหม", m: "ผู้ตรวจเช็คว่า event แต่ละแบบเกิดตอนสถานะถูกต้อง", r: "25/187 ครั้งขึ้นทั้งที่ยังถือไม้เข้าใหม่อยู่", a: "แก้แล้ว → เหลือ 0", c: "buy" },
+  { h: "8 · ซื้อเหนือ TP1 → วัด 1-2 ใหม่ (กฎของคุณ)", q: "ถ้าจุดซื้ออยู่เหนือ TP1 เดิม ไม้นั้นต้องเป็น 1-2 ของตัวเอง", m: "ตอนไกปืนมา ถ้าราคา ≥ TP1 เดิม: ขา 1 ใหม่ = (ii) → ยอดใหม่ · ขา 2 ใหม่ = จุดย่อ · ต้องย่อ ≥ 61.8% · SL ≥ 2 ATR · วัดเป้าจากขานี้แยกขาด · ถ้าไม่ผ่าน = รอ", r: "รันใหม่ 500 ตลาด: ซื้อเหนือ TP1 เหลือ 0 · วัดใหม่แล้วเข้า 2 ครั้ง · รอเพราะยังไม่มี 1-2 ใหม่ 5 ครั้ง", a: "แก้แล้ว", c: "buy" },
+  { h: "9 · TP1 ใกล้ทุนเกินไป → กันทุนเร็วไปไหม?", q: "บางไม้ TP1 ห่างแค่ 0.2–0.5R ถึงเร็ว แล้วโดนเขย่าที่ทุน", m: "เทียบ 3 แบบ: กฎเดิม · กันทุนเฉพาะเมื่อ TP1 ≥ 1R · ไม่กันทุนเลย · ทุกโลก", r: "ปกติ 2.29/2.29/2.25R · โหด −0.01/−0.03/−0.02R · สุ่ม +0.02/+0.01/−0.01R ต่อไม้", a: "กฎเดิมดีสุดเล็กน้อย → ไม่แก้", c: "vdu" },
+  { h: "10 · โลกโหด", q: "ระบบทำได้แค่ไหนในตลาดที่ไม่ได้ออกแบบมาให้ชนะ", m: "ตลาดแบบ regime (ขึ้น/ค่อยๆ ขึ้น/ไซด์เวย์/ฐาน/ลง/ไหล/ร่วงแรง/เด้ง/พุ่ง) + ความผันผวนเป็นช่วง + gap งบ · สถิติใกล้หุ้นจริง: autocorr ≈ 0 · vol clustering 0.19 · kurtosis ~14 · 47% จบสูงกว่าเริ่ม", r: "ระบบ ≈ 0 (−0.07 ถึง +0.06R/ไม้ แล้วแต่ชุด) · TP1 ถึง 38% ของไม้ (โลกปกติ 55%) · TP1 ห่างจากจุดซื้อค่ากลางแค่ 1.3R (โลกปกติ 2.5R) · 39% ของไม้เกิดในช่วงไซด์เวย์ เฉลี่ย −0.30R ชนะแค่ 13% · ไม้ในช่วงขาขึ้น +0.57R", a: "ไซด์เวย์คือศัตรูของระบบ", c: "stop" },
+  { h: "11 · กรองด้วย MA200 ขาขึ้นช่วยไหม?", q: "ถ้ากรองได้ว่าตอนไหนไซด์เวย์ ก็เลี่ยงได้", m: "แยกไม้ตาม MA200 ชี้ขึ้น/ลง ตอนเข้า · 400 ตลาดต่อโลก", r: "โลกโหด: MA200 ขึ้น −0.02R vs ลง +0.13R · โลกสุ่ม +0.02 vs −0.06R", a: "ไม่ช่วย — ยังไม่เจอตัวกรองง่ายๆ ที่รู้ล่วงหน้าว่าจะไซด์เวย์", c: "gold" },
+  { h: "12 · สนามรวม: 12 รอบ × 3 โลก (พอร์ต 8 หุ้น · เสี่ยง 1%/ไม้)", q: "ภาพรวมทุกบุคลิกในทุกโลก (หลังเปลี่ยนเป็นโมเดลคะแนน ข้อ 15)", m: "เฉลี่ยผลตอบแทนต่อรอบ (รอบละ ~5–6 ปีจำลอง)", r: "ปกติ: SENSEI +43% (DD 5%) · FOMO +49% (DD 37%) · ไม่ตั้ง SL +49% · ดื้อ +34% (DD 28%) ‖ โหด: SENSEI −1.6% · FOMO −6.1% (DD 23%) · ดื้อ +4.3% แต่แย่สุด −12% · ลิง −1.3% (DD 14%) ‖ สุ่ม: SENSEI +1.6% · FOMO −10.7% (DD 24%) · ลิง −3.4%", a: "ระบบ DD ต่ำในทุกโลก · ในโลกไม่มี edge FOMO เจ็บหนักสุด", c: "vdu" },
+  { h: "13 · ผู้ตรวจกฎผิดเอง", q: "ผู้ตรวจรายงานว่ามี 1 ไม้ในโลกโหดที่ (ii) ย่อแค่ 61.5% — ผิดกฎ?", m: "เปิดดู event จริงของไม้นั้น", r: "เป็นไม้ที่วัด 1-2 ใหม่ (ข้อ 8) ซึ่งย่อ 61.8% พอดี — สคริปต์ตรวจของ Claude ใช้ฐานคำนวณผิด (ใช้ low ของ Wave 2 แทนจุดเริ่มขาใหม่)", a: "engine ถูก · แก้ความเข้าใจ ไม่แก้โค้ด", c: "mut" },
+  { h: "15 · ให้ AI 'คิด' จริง ไม่ใช่ท่องสคริปต์", q: "ถ้า AI ตอบตามสคริปต์ ความคิดที่โชว์ก็ปลอม", m: "เปลี่ยนเป็นโมเดลคะแนน: ทุกตัวเลือกมีลักษณะ (ตามกฎ · อยากซื้อ · อยากขาย · กันทุน · ไล่ SL · ไม่อยากโดน SL · ไม่เชื่อ SL · รอ · ทางกลาง) × น้ำหนักตามนิสัย + อารมณ์จากไม้ก่อนหน้า (เสียติดกัน → FOMO อยากเอาคืน · ขายหมูกลัวขึ้น · ดื้อยิ่งไม่ยอม) → ตัวเลือกคะแนนสูงสุดชนะ", r: "ตารางคะแนนในแท็บ 'ความคิด AI' คือคะแนนจริงที่ใช้ตัดสินใจ · FOMO ดุขึ้นกว่าเวอร์ชันสคริปต์ · ดื้อ ไม่ยอมขายตอน trailing ชน", a: "เปิดดูได้ทีละตัว", c: "gold" },
+  { h: "16 · แหกกฎแล้วคุ้มไหม? (เฉลยทีละจุด)", q: "ตอน AI เห็นต่างจากระบบ มันคิดถูกกี่ครั้ง", m: "ทุกครั้งที่ AI เลือกต่างจากระบบ เล่นหุ้นนั้นซ้ำโดยให้ทำตามระบบเฉพาะจุดนั้น แล้วเทียบผล · 60 ตลาดต่อโลก", r: "ส่วนใหญ่เสียมากกว่าได้: FOMO เสีย 50–65% ของครั้ง · ดื้อ 49–60% · ลิง 37–53% · ไม่ตั้ง SL ในโลกโหดรวม −140R ‖ แต่ผลรวม R ของ FOMO/ดื้อในบางโลกเป็นบวก เพราะครั้งที่ถือต่อแล้วได้ มักได้ก้อนใหญ่ — ในโลกสุ่มนี่คือดวง ไม่ใช่ edge ‖ ขายหมูในโลกโหด: ขายเร็วช่วย 53% ของครั้ง แต่รวมยังติดลบ", a: "แพ้บ่อยแต่ชนะก้อนใหญ่ = หลอกตาง่าย", c: "stop" },
+  { h: "17 · ปรับความเสี่ยงให้เท่ากัน (Calmar + แบบ Darwinex)", q: "FOMO กำไรเยอะสุด เพราะเก่งหรือเพราะเสี่ยงมาก?", m: "คิด Calmar (CAGR ÷ MaxDD) และปรับทุกตัวให้เสี่ยงเท่ากันแบบ Darwinex (VaR 95% รายเดือน = 6.5% คิดจากช่วงที่ถือของ) แล้วดูผลตอบแทนต่อปี · 12 รอบ × 3 โลก", r: "โลกปกติ: กำไรดิบ FOMO +49% (ที่ 1) แต่ Calmar 0.16 · ที่ความเสี่ยงเท่ากัน FOMO +6%/ปี (ท้ายสุด) · SENSEI Calmar 1.74 → +24%/ปี · ขี้ระวัง +28%/ปี (ที่ 1) · ไล่ SL Calmar สูงสุด 2.07 ‖ โลกโหด/สุ่ม: ทุกตัว Calmar ≈ 0 · FOMO แย่สุดในโลกสุ่ม −3.9%/ปี ‖ ที่ VaR เท่ากัน FOMO/ดื้อยังมี DD 33% (คนอื่น 12–20%) = หางอ้วนที่ VaR มองไม่เห็น", a: "กำไรดิบหลอกตา — ดูต่อหน่วยความเสี่ยง", c: "vdu" },
+  { h: "18 · ออกแบบคำถาม Dojo ใหม่ตามที่คุณติ", q: "คำถามโผล่เฉพาะตอนระบบทำอะไร = บอกใบ้ · ไม่ถามก่อนกราฟวิ่ง · จุดหลอกหายไปเยอะ", m: "ถามตลอดทาง: ทุกจุดที่ระบบทำจริง + จุดหลอกที่ดูจากกราฟอย่างเดียว (histogram พลิก · MACD ตัด 0 · ทะลุ high 20 วัน · PP · แท่งแดง/เขียวยาว · หลุด low) + ถามเป็นระยะ + ให้อ่านทรง · หน้าตาคำถามเหมือนกันหมด · ซ่อนเส้น TP/ป้ายทรงของแท่งที่กำลังถาม · คะแนนแยกจุดจริง/จุดหลอก", r: "ปกติ ~95 คำถามต่อตลาด (จุดสำคัญ ~45 · ถี่ ~240) · คนที่กด WAIT ตลอดได้ discipline แค่ ~50% (เดิมจะได้ ~95%) · ตอบตรงระบบทุกข้อยังได้ผลเท่าระบบทุกตลาด (ทดสอบ 90 ตลาด 3 ความถี่)", a: "แก้แล้ว", c: "buy" },
+  { h: "19 · ลองใช้กราฟหุ้นจริง", q: "อยากให้โลกจำลองมาจากกราฟจริง", m: "ลองดึงข้อมูลราคาย้อนหลังจากเว็บสาธารณะ 1 ครั้ง", r: "ได้หน้าว่าง (อาจเป็นไฟล์ดาวน์โหลด) → หยุด ไม่ได้ใช้ข้อมูลจริง", a: "ใช้โลกโหดที่ปรับสถิติให้ใกล้ตลาดจริงแทน · ใช้ CSV ของคุณเองในโหมด Replay ได้", c: "mut" },
+];
+
+const AILab = {
+  world: "mixed", K: 8, speed: 1, playing: false, view: "3d", rd: null, roundNo: 0, t: 232,
+  yaw: 0.55, pitch: 0.42, dist: 3.6, tv: { yaw: 0.55, pitch: 0.42 }, auto: true, autoNext: true, fed: 0, bubbles: [], flashes: [], cum: {}, sel: -1, drag: null, busy: false, lastBoard: 0, decPtr: null, feedMode: "feed", sortBy: "calmar", follow: 2, mindBad: false, mindN: 0, pend: [], tally: null,
+  init() {
+    const ctl = $("#alCtl");
+    const W = [["normal", "โลกปกติ"], ["harsh", "โลกโหด"], ["random", "สุ่มล้วน"], ["mixed", "ผสม 3 โลก"]];
+    ctl.innerHTML = W.map(([k, t]) => `<button class="chip${k === this.world ? " on" : ""}" data-w="${k}"><span class="dot" style="--c:${this.wcol(k)}"></span>${t}</button>`).join("") +
+      `<select class="sel" id="alK" title="จำนวนหุ้นต่อรอบ"><option value="4">4 หุ้น</option><option value="8" selected>8 หุ้น</option><option value="12">12 หุ้น</option></select>
+      <select class="sel" id="alSpd"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="10">10×</option></select>
+      <button class="chip" id="alPlay">❚❚</button><button class="chip" id="alNew">รอบใหม่ ⟳</button>
+      <span class="sp"></span>
+      <button class="chip on" data-v="3d">3D</button><button class="chip" data-v="top">มองลงมา</button><button class="chip" data-v="2d">2D</button>`;
+    ctl.querySelectorAll("[data-w]").forEach(b => b.onclick = () => { this.world = b.dataset.w; ctl.querySelectorAll("[data-w]").forEach(x => x.classList.toggle("on", x === b)); this.newRound(); });
+    ctl.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { this.view = b.dataset.v; ctl.querySelectorAll("[data-v]").forEach(x => x.classList.toggle("on", x === b)); if (this.view === "3d") this.tv = { yaw: 0.55, pitch: 0.42 }; if (this.view === "top") this.tv = { yaw: 0.0, pitch: 1.18 }; });
+    $("#alK").onchange = (e) => { this.K = +e.target.value; this.newRound(); };
+    $("#alSpd").onchange = (e) => { this.speed = +e.target.value; };
+    $("#alPlay").onclick = () => { this.playing = !this.playing; $("#alPlay").textContent = this.playing ? "❚❚" : "▶"; };
+    $("#alNew").onclick = () => this.newRound();
+    $("#alTabFeed").onclick = () => this.setFeed("feed"); $("#alTabNote").onclick = () => this.setFeed("note"); $("#alTabMind").onclick = () => this.setFeed("mind");
+    $("#alBig").onclick = () => { $(".labl").classList.toggle("big"); $("#alBig").classList.toggle("on"); };
+    $("#alMindCtl").innerHTML = LABCORE.PERSONAS.map((P, a) => `<button class="chip" data-a="${a}"><span class="dot" style="--c:${P.col}"></span>${P.name}</button>`).join("") + `<span class="sp"></span><label class="toggle" id="alBadT" style="margin-top:0"><span class="sw"></span>เฉพาะตอนเห็นต่าง/แหกกฎ</label>`;
+    $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.onclick = () => this.setFollow(+b.dataset.a));
+    $("#alBadT").onclick = () => { this.mindBad = !this.mindBad; $("#alBadT").classList.toggle("on", this.mindBad); this.setFollow(this.follow); };
+    $("#alSort").onchange = (e) => { this.sortBy = e.target.value; this.lastBoard = 0; };
+    $("#alBoard").addEventListener("click", (e) => { const r = e.target.closest("[data-a]"); if (r) { this.setFollow(+r.dataset.a); this.setFeed("mind"); } });
+    $("#alSumNext").onclick = () => { $("#alSum").classList.add("hidden"); this.newRound(); };
+    $("#alSumNote").onclick = () => { $("#alSum").classList.add("hidden"); this.setFeed("note"); };
+    $("#alOpen").onclick = () => this.openInReplay();
+    const cv = $("#al3d"); cv.style.touchAction = "none";
+    cv.addEventListener("pointerdown", (e) => { this.drag = { x: e.clientX, y: e.clientY, yaw: this.tv.yaw, pitch: this.tv.pitch, moved: false }; });
+    window.addEventListener("pointermove", (e) => { if (!this.drag) return; const dx = e.clientX - this.drag.x, dy = e.clientY - this.drag.y; if (Math.abs(dx) + Math.abs(dy) > 4) this.drag.moved = true; this.auto = false; this.tv.yaw = this.drag.yaw + dx * 0.006; this.tv.pitch = clamp(this.drag.pitch + dy * 0.005, -0.1, 1.45); });
+    window.addEventListener("pointerup", (e) => { if (this.drag && !this.drag.moved && e.target === cv) this.pick(e); this.drag = null; });
+    cv.addEventListener("wheel", (e) => { e.preventDefault(); this.dist = clamp(this.dist * (e.deltaY > 0 ? 1.08 : 0.93), 1.6, 7); }, { passive: false });
+    $("#alNote").innerHTML = `<div class="note" style="margin-bottom:8px">บันทึกสิ่งที่ Claude ทดลองจริงระหว่างหาปัญหาของไฟล์นี้ — สมมติฐาน → วิธีทดสอบ → ผล → สิ่งที่ทำ</div>` + NOTEBOOK.map(n => `<div class="nb" style="--nc:var(--${n.c})"><div class="nbh">${n.h}<span class="nba">${n.a}</span></div><div class="nbr"><b>สงสัย</b> ${n.q}</div><div class="nbr"><b>ทดสอบ</b> ${n.m}</div><div class="nbr"><b>ผล</b> ${n.r}</div></div>`).join("");
+    $("#alObs").innerHTML = Object.entries(LABCORE.OBS).map(([k, o]) => `<div class="obs" data-o="${k}"><div class="od" style="background:${o.col}"></div><div style="flex:1;min-width:0"><div class="on">${o.name} <small>${o.th}</small></div><div class="ot" id="obs_${k}">รอดูอยู่…</div></div></div>`).join("");
+  },
+  wcol(w) { return { normal: "var(--gold)", harsh: "var(--stop)", random: "var(--mut)", mixed: "var(--add)" }[w]; },
+  wcolP(w) { return { normal: PAL.gold, harsh: PAL.stop, random: PAL.mut, mixed: PAL.add }[w] || PAL.gold; },
+  setFeed(m) { this.feedMode = m; $("#alFeed").classList.toggle("hidden", m !== "feed"); $("#alNote").classList.toggle("hidden", m !== "note"); $("#alMind").classList.toggle("hidden", m !== "mind"); $("#alTabFeed").classList.toggle("on", m === "feed"); $("#alTabNote").classList.toggle("on", m === "note"); $("#alTabMind").classList.toggle("on", m === "mind"); },
+  QT: { TRAP_NO_NEST: "สัญญาณหลอก (ไม่มี nest)", TRAP_SHALLOW: "สัญญาณหลอก ((ii) ตื้น)", TRAP_STALE: "สัญญาณเหนือ TP1 เดิม", BUY: "จุดซื้อ", BUY_SL: "วาง SL", SCALE_IN: "เติมไม้", VCP_ADD: "เบรก VCP", SL_LIFT: "ยก SL", HEAT: "ติดลบระหว่างทาง", TP1_TRIG: "ถึง TP1", TP2_TRIG: "ถึง TP2", TP3_TRIG: "ถึง TP3", TP1_REST: "SL ของไม้ที่เหลือ", TP1_EXIT: "trailing TP1 ชน", TP2_EXIT: "trailing TP2 ชน", TP3_EXIT: "trailing TP3 ชน", STOP: "หลุด SL ระบบ", STOP_PROFIT: "หลุด SL ระบบ", GAP_STOP: "gap ทะลุ SL", INVALID: "Wave 2 เกิน 100%", NONEST_BREAKOUT: "ทะลุโดยไม่มี nest", PP_DAY: "Pocket Pivot", DECOY: "ระหว่างทาง" },
+  setFollow(a) {
+    this.follow = a; $("#alMindCtl").querySelectorAll("[data-a]").forEach(b => b.classList.toggle("on", +b.dataset.a === a));
+    $("#alMindList").innerHTML = ""; this.mindN = 0; this.pend = []; this.tally = { n: 0, ok: 0, acc: 0, bad: 0, help: 0, hurt: 0, helpR: 0, hurtR: 0, same: 0 };
+    if (!this.rd) return;
+    const past = this.rd.D.filter(D => D.a === a && D.dc.i <= this.t && (!this.mindBad || D.dc.g !== "ok"));
+    past.slice(-40).forEach(D => this.mindCard(D, true)); this.mindHead();
+  },
+  mindHead() {
+    const A = this.rd.agents[this.follow], T = this.tally, P = A.P;
+    $("#alMindHead").innerHTML = `<b style="color:${P.col}">${P.name}</b> <span class="note">${P.th}</span> · ตัดสินใจ ${T.n} ครั้ง: <b style="color:${PAL.buy}">✓ ${T.ok}</b> <b style="color:${PAL.gold}">≈ ${T.acc}</b> <b style="color:${PAL.stop}">✕ ${T.bad}</b>` + (T.help + T.hurt + T.same ? ` · เฉลยแล้ว: เห็นต่างแล้ว<b style="color:${PAL.buy}"> ได้ ${T.help} ครั้ง (+${T.helpR.toFixed(1)}R)</b> · <b style="color:${PAL.stop}">เสีย ${T.hurt} ครั้ง (${T.hurtR.toFixed(1)}R)</b> · ไม่ต่าง ${T.same}` : "");
+  },
+  mindCard(D, backfill) {
+    const rd = this.rd, A = rd.agents[D.a], P = A.P, dc = D.dc, x = rd.mk[D.k];
+    const T = this.tally; T.n++; T[dc.g]++;
+    const G = { ok: ["✓", "ตรงระบบ", PAL.buy], acc: ["≈", "เห็นต่าง แต่ไม่ผิดกฎ", PAL.gold], bad: ["✕", "แหกกฎ", PAL.stop] }[dc.g];
+    const lab = (k, v) => `<span class="tb" style="--tc:${v >= 0 ? PAL.buy : PAL.stop}">${LABCORE.TRAIT[k]} ${v >= 0 ? "+" : ""}${v.toFixed(1)}</span>`;
+    const rows = dc.scored.map(r => `<tr class="${r.t === dc.t ? "pick" : ""}${r.g === "ok" ? " sysr" : ""}"><td>${r.t === dc.t ? "▶ " : ""}${r.t}${r.g === "ok" ? ' <span class="note">(ระบบ)</span>' : ""}</td><td>${Object.entries(r.parts).map(([k, v]) => lab(k, v)).join(" ") || '<span class="note">—</span>'}</td><td class="tt">${r.tot.toFixed(1)}</td></tr>`).join("");
+    const ctx = dc.ctx, st = ctx.inPos ? `ถือ ${ctx.qty.toFixed(2)} ไม้ · ${ctx.openR >= 0 ? "+" : ""}${ctx.openR.toFixed(2)}R` : "ไม่มีของ";
+    const mood = ctx.lossStreak >= 2 ? `เพิ่งเสีย ${ctx.lossStreak} ไม้ติด` : ctx.winStreak >= 2 ? `ชนะ ${ctx.winStreak} ไม้ติด` : ctx.lossStreak === 1 ? "เพิ่งเสียไม้ล่าสุด" : "ปกติ";
+    const el = document.createElement("div"); el.className = "mc"; el.style.setProperty("--mc", G[2]);
+    el.innerHTML = `<div class="mch"><b style="color:${P.col}">${P.name}</b> · #${D.k + 1} แท่ง ${dc.i} · <b>${this.QT[dc.type] || dc.type}</b><span class="mood">อารมณ์: ${mood}</span></div>
+      <div class="mcr"><b>เห็น</b>${(dc.facts || []).map(f => f.replace(/คุณ/g, "ผม")).join(" · ")} · ${st}</div>
+      <div class="mcr"><b>กฎระบบ</b>${dc.sys}</div>
+      ${dc.note ? `<div class="mcr"><b>ในหัว</b>${dc.note}</div>` : ""}
+      <div class="mcr"><b>ชั่งใจ</b><span class="note">คะแนน = ลักษณะของตัวเลือก × น้ำหนักนิสัย · สูงสุดชนะ</span></div>
+      <table class="mct">${rows}</table>
+      <div class="mcr"><b>ตัดสินใจ</b><span style="color:${G[2]};font-weight:800">${G[0]} ${G[1]}</span> — "${dc.t}" · ${LABCORE.reason(P, dc)}</div>
+      <div class="mcr"><b>แผนต่อไป</b>${dc.plan}</div>
+      ${dc.g !== "ok" ? `<div class="mcr cf"><b>เฉลยภายหลัง</b><span class="cfv">รอให้ไม้นี้จบ…</span></div>` : ""}`;
+    const box = $("#alMindList"); box.appendChild(el); while (box.children.length > 60) box.removeChild(box.firstChild);
+    if (dc.g !== "ok") {
+      const own = A.res[D.k].trades, sysT = rd.agents[0].res[D.k].trades, inT = (tr) => tr.find(t => t.i0 <= dc.i && dc.i <= t.i1) || tr.find(t => t.i0 >= dc.i);
+      const t1 = inT(own), t2 = inT(sysT); let at = Math.max(t1 ? t1.i1 : 0, t2 ? t2.i1 : 0); if (!at) at = x.m.N - 1;
+      this.pend.push({ el, D, at: Math.min(at, x.m.N - 1) });
+    }
+    if (!backfill) box.scrollTop = box.scrollHeight;
+    this.mindN++;
+  },
+  revealPending(force) {
+    if (!this.pend.length) return; const keep = [];
+    for (const p of this.pend) {
+      if (!force && this.t < p.at) { keep.push(p); continue; }
+      const rd = this.rd, A = rd.agents[p.D.a], x = rd.mk[p.D.k];
+      const own = A.res[p.D.k].trades.reduce((s, t) => s + t.R, 0), cf = LABCORE.counterfactual(x.M, A.P, Dojo, Book, NEST, p.D.dc), dR = own - cf;
+      const T = this.tally, pnl = ACCT.capital * ACCT.rpt / 100 * dR;
+      if (dR > 0.05) { T.help++; T.helpR += dR; } else if (dR < -0.05) { T.hurt++; T.hurtR += dR; } else T.same++;
+      const v = p.el.querySelector(".cfv"); if (v) v.innerHTML = Math.abs(dR) <= 0.05 ? `ผลเท่ากับทำตามระบบตรงจุดนี้ — การเห็นต่างครั้งนี้ไม่เปลี่ยนผล` : `ถ้าตรงจุดนี้ทำตามระบบ หุ้นนี้จะได้ ${cf >= 0 ? "+" : ""}${cf.toFixed(2)}R · ที่ทำจริงได้ ${own >= 0 ? "+" : ""}${own.toFixed(2)}R → การ${p.D.dc.g === "bad" ? "แหกกฎ" : "เห็นต่าง"}ครั้งนี้ <b style="color:${dR > 0 ? PAL.buy : PAL.stop}">${dR > 0 ? "ได้เพิ่ม" : "เสียไป"} ${Math.abs(dR).toFixed(2)}R (${fmtPnl(pnl)})</b>`;
+    }
+    this.pend = keep; this.mindHead();
+  },
+  enter() { if (!this.rd && !this.busy) this.newRound(); },
+  newRound() {
+    if (this.busy) return; this.busy = true; this.playing = false; $("#alSum").classList.add("hidden");
+    $("#alInfo").textContent = "กำลังสร้างโลกและให้ AI เล่น…";
+    setTimeout(() => {
+      try {
+        this.roundNo++;
+        const seed = (this.roundNo * 7919 + { normal: 0, harsh: 101, random: 211, mixed: 307 }[this.world] + (this.baseSeed || (this.baseSeed = 1 + Math.floor(Math.random() * 9000)))) % 1000000;
+        this.rd = LABCORE.round({ K: this.K, world: this.world, seed, capital: ACCT.capital, rpt: ACCT.rpt }, NEST, Dojo, Book);
+        this.prep(); this.t = 232; this.fed = 0; this.bubbles = []; this.flashes = []; this.sel = -1; $("#alFeed").innerHTML = ""; $("#alSel").classList.add("hidden"); this.setFollow(this.follow);
+        Object.keys(LABCORE.OBS).forEach(k => { const el = $("#obs_" + k); if (el) el.textContent = "รอดูอยู่…"; });
+        this.playing = true; $("#alPlay").textContent = "❚❚"; this.finished = false;
+        this.addFeed({ who: "CLAUDE", text: `เริ่มรอบ ${this.roundNo}: ${this.rd.mk.length} หุ้น · ${{ normal: "โลกปกติ (ทรงสำเร็จรูป)", harsh: "โลกโหด", random: "โลกสุ่มล้วน", mixed: "ผสม 3 โลก" }[this.world]} · AI 9 ตัวเล่นหุ้นชุดเดียวกัน · พอร์ต ${fmtBal(ACCT.capital)} เสี่ยง ${ACCT.rpt}% ต่อไม้`, k: -1, t: 232 });
+      } catch (err) { console.error("AILab round error", err); $("#alInfo").textContent = "สร้างรอบไม่สำเร็จ: " + err.message; }
+      this.busy = false;
+    }, 40);
+  },
+  prep() {
+    const rd = this.rd;
+    rd.mk.forEach(x => {
+      const m = x.m; let lo = Infinity, hi = -Infinity; for (let i = 200; i < m.N; i++) { lo = Math.min(lo, m.l[i]); hi = Math.max(hi, m.h[i]); }
+      x.lo = Math.log(lo); x.hi = Math.log(hi); x.step = Math.max(1, Math.floor(m.N / 420));
+      x.sys = m.run.ev.filter(e => /^(BUY|STOP|STOP_PROFIT|GAP_STOP|FLAT|TP1_TRIG|TP2_TRIG|TP3_TRIG|REANCHOR)$/.test(e.type));
+    });
+    rd.agents.forEach((A, a) => { A.iv = A.res.map(r => r.trades.map(t => [t.i0, t.i1])); A.idx = a; });
+    // flatten decisions for bubbles
+    const D = []; rd.agents.forEach((A, a) => A.res.forEach((r, k) => r.dec.forEach(dc => D.push({ a, k, dc })))); D.sort((p, q) => p.dc.i - q.dc.i); rd.D = D; this.decPtr = 0;
+    this.money();
+  },
+  money() { const rd = this.rd; if (!rd) return; const cap = ACCT.capital, r = ACCT.rpt / 100; rd.agents.forEach(A => { A.eqM = new Float32Array(rd.maxN); let pk = cap; A.ddM = new Float32Array(rd.maxN); for (let i = 0; i < rd.maxN; i++) { A.eqM[i] = cap + cap * r * A.eqR[i]; pk = Math.max(pk, A.eqM[i]); A.ddM[i] = 1 - A.eqM[i] / pk; } }); },
+  addFeed(msg) {
+    const O = LABCORE.OBS[msg.who], who = O ? O.name : msg.who === "DEBATE" ? "เถียงกัน" : msg.who, col = O ? O.col : msg.who === "DEBATE" ? PAL.gold : PAL.txt;
+    const box = $("#alFeed"), d = document.createElement("div"); d.className = "li"; d.style.setProperty("--lc", col);
+    d.innerHTML = `<div class="b">${msg.k >= 0 ? "#" + (msg.k + 1) : "·"}</div><div class="m"><b style="color:${col}">${who}</b> ${msg.text}</div>`;
+    if (msg.k >= 0) { d.style.cursor = "pointer"; d.onclick = () => this.select(msg.k); }
+    box.appendChild(d); while (box.children.length > 220) box.removeChild(box.firstChild); box.scrollTop = box.scrollHeight;
+    if (O) { const el = $("#obs_" + msg.who); if (el) el.textContent = msg.text; }
+  },
+  frame(dt) {
+    if (!$("#v-ailab").classList.contains("on") || !this.rd) return;
+    const rd = this.rd;
+    if (this.playing && !this.finished) {
+      const prev = this.t; this.t = Math.min(rd.maxN - 1, this.t + 40 * this.speed * dt);
+      while (this.fed < rd.msgs.length && rd.msgs[this.fed].t <= this.t) { const mg = rd.msgs[this.fed++]; if (mg.tag === "check" && this.speed >= 4 && Math.random() < 0.6) continue; this.addFeed(mg); }
+      while (this.decPtr < rd.D.length && rd.D[this.decPtr].dc.i <= this.t) { const D = rd.D[this.decPtr]; this.spawn(D); if (D.a === this.follow && (!this.mindBad || D.dc.g !== "ok")) { this.mindCard(D); this.mindHead(); } this.decPtr++; }
+      this.revealPending(false);
+      if (this.t >= rd.maxN - 1) this.finish();
+    }
+    this.yaw = lerp(this.yaw, this.tv.yaw + (this.auto && this.view === "3d" ? Math.sin(now() / 9000) * 0.22 : 0), 0.08); this.pitch = lerp(this.pitch, this.tv.pitch, 0.08);
+    if (this.view === "2d") this.draw2d(dt); else this.draw3d(dt);
+    if (now() - this.lastBoard > 280) { this.lastBoard = now(); this.board(); }
+    $("#alInfo").textContent = `รอบ ${this.roundNo} · แท่ง ${Math.floor(this.t)}/${rd.maxN - 1} · ~ปีที่ ${((this.t - 232) / 252).toFixed(1)}`;
+  },
+  spawn(D) {
+    const A = this.rd.agents[D.a], dc = D.dc, pr = dc.g !== "ok" ? 2 : (A.P.k === "SENSEI" && /BUY|STOP|TP1_TRIG|VCP/.test(dc.type) ? 1 : 0);
+    if (dc.dq > 0.01 || dc.dq < -0.01) this.flashes.push({ k: D.k, i: dc.i, col: A.P.col, born: now(), up: dc.dq > 0 });
+    if (pr === 0 && D.a !== this.follow && Math.random() < 0.85) return;
+    this.bubbles.push({ k: D.k, i: dc.i, a: D.a, text: LABCORE.voice(A.P, dc, this.rd.mk[D.k].seed), born: now(), pr, g: dc.g });
+    if (this.bubbles.length > 7) { this.bubbles.sort((p, q) => (q.pr - p.pr) || (q.born - p.born)); this.bubbles.length = 7; }
+  },
+  finish() {
+    if (this.finished) return; this.finished = true; this.playing = false; $("#alPlay").textContent = "▶"; this.revealPending(true);
+    const rd = this.rd, cap = ACCT.capital;
+    const fin = rd.agents.map(A => { const T = A.trades.map(t => ({ R: t.R })), st = NEST.statsFromTrades(T, { capital: cap, rpt: ACCT.rpt, linear: true }); let dd = 0; for (let i = 0; i < rd.maxN; i++) dd = Math.max(dd, A.ddM[i]); const n = A.tot.ok + A.tot.acc + A.tot.bad; return { A, pnl: A.eqM[rd.maxN - 1] - cap, ret: (A.eqM[rd.maxN - 1] / cap - 1) * 100, pf: st.pf, win: st.win, dd: dd * 100, n: T.length, disc: n ? (A.tot.ok + A.tot.acc) / n * 100 : 100 }; }).sort((a, b) => b.pnl - a.pnl);
+    fin.forEach(f => { const c = this.cum[f.A.P.k] = this.cum[f.A.P.k] || { ret: 0, n: 0 }; c.ret += f.ret; c.n++; });
+    const pfT = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
+    fin.forEach(f => { f.rs = NEST.riskStats(Array.from(f.A.eqR.subarray(232, rd.maxN)), ACCT); }); fin.sort((a, b) => ((b.rs && isFinite(b.rs.calmar)) ? b.rs.calmar : -1e9) - ((a.rs && isFinite(a.rs.calmar)) ? a.rs.calmar : -1e9));
+    const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : (v === Infinity ? "∞" : "—");
+    $("#alSumT").innerHTML = `<tr><th></th><th>AI</th><th>กำไร/ขาดทุน</th><th>CAGR</th><th>MaxDD</th><th>Calmar</th><th>Sharpe</th><th>@VaR 6.5%</th><th>PF</th><th>กฎ</th></tr>` + fin.map((f, j) => `<tr><td>${j + 1}</td><td><span class="dot2" style="background:${f.A.P.col}"></span>${f.A.P.name}</td><td style="color:${f.pnl >= 0 ? PAL.buy : PAL.stop}">${fmtPnl(f.pnl)} (${f.ret >= 0 ? "+" : ""}${f.ret.toFixed(0)}%)</td><td>${f.rs ? f2(f.rs.cagr, 1) + "%" : "—"}</td><td>${f.rs ? f2(f.rs.dd, 1) + "%" : "—"}</td><td><b>${f.rs ? f2(f.rs.calmar, 2) : "—"}</b></td><td>${f.rs ? f2(f.rs.sharpe, 2) : "—"}</td><td>${f.rs && f.rs.norm ? (f.rs.norm.cagr >= 0 ? "+" : "") + f.rs.norm.cagr.toFixed(1) + "%/ปี · DD " + f.rs.norm.dd.toFixed(0) + "%" : "—"}</td><td>${pfT(f.pf)}</td><td>${f.disc.toFixed(0)}%</td></tr>`).join("") + `<tr><td colspan="10" class="note" style="font-family:inherit">เรียงตาม Calmar (CAGR ÷ MaxDD) · @VaR 6.5% = ปรับทุกตัวให้เสี่ยงเท่ากันแบบ Darwinex (VaR 95% รายเดือน 6.5% คิดจากช่วงที่ถือของ) แล้วดูผลตอบแทนต่อปี</td></tr>`;
+    const lines = rd.msgs.filter(m => m.tag === "summary" || (m.tag === "skeptic" && m.t >= rd.maxN - 1)).map(m => `<div class="fb"><b style="color:${LABCORE.OBS[m.who].col}">${LABCORE.OBS[m.who].name}</b> ${m.text}</div>`).join("");
+    $("#alSumL").innerHTML = lines + `<div class="note" style="margin-top:6px">หุ้น ${rd.upN}/${rd.mk.length} ตัวจบสูงกว่าตอนเริ่ม · ซื้อถือ 100% เฉลี่ย ${rd.bhAvg >= 0 ? "+" : ""}${rd.bhAvg.toFixed(0)}% ต่อหุ้น (ไม่ใช่การเสี่ยงแบบ 1%/ไม้ เทียบกันตรงๆ ไม่ได้)</div>`;
+    $("#alSum").classList.remove("hidden");
+    if (this.autoNext) { clearTimeout(this._an); this._an = setTimeout(() => { if (this.finished && $("#v-ailab").classList.contains("on") && !$("#alSum").classList.contains("hidden") && this.autoNext) { $("#alSum").classList.add("hidden"); this.newRound(); } }, 14000); }
+  },
+  board() {
+    const rd = this.rd, t = Math.floor(this.t), cap = ACCT.capital;
+    const rows = rd.agents.map(A => { const eq = A.eqM[t], cl = A.trades.filter(x => x.i1 <= t && !(x.open && x.i1 >= t)); const gp = cl.filter(x => x.R > 0).reduce((s, x) => s + x.R, 0), gl = -cl.filter(x => x.R < 0).reduce((s, x) => s + x.R, 0);
+      let dd = 0; for (let i = 232; i <= t; i++) dd = Math.max(dd, A.ddM[i]); const openN = A.iv.reduce((s, iv) => s + iv.filter(([a, b]) => a <= t && t <= b).length, 0);
+      const decs = A.res.reduce((s, r) => s.concat(r.dec.filter(d => d.i <= t)), []), ok = decs.filter(d => d.g !== "bad").length;
+      const rs = t - 232 >= 60 ? NEST.riskStats(Array.from(A.eqR.subarray(232, t + 1)), ACCT) : null;
+      return { A, eq, pnl: eq - cap, ret: (eq / cap - 1) * 100, pf: gl > 0 ? gp / gl : (gp > 0 ? Infinity : NaN), dd: dd * 100, openN, disc: decs.length ? ok / decs.length * 100 : 100, n: cl.length, rs }; });
+    const key = (r) => this.sortBy === "money" ? r.eq : this.sortBy === "darwin" ? (r.rs && r.rs.norm ? r.rs.norm.cagr : -1e9) : (r.rs && isFinite(r.rs.calmar) ? r.rs.calmar : (r.rs && r.rs.calmar === Infinity ? 1e9 : -1e9));
+    rows.sort((a, b) => key(b) - key(a));
+    const f2 = (v, d) => isFinite(v) ? v.toFixed(d) : (v === Infinity ? "∞" : "—");
+    const pfT = (v) => !isFinite(v) ? (v > 0 ? "∞" : "—") : v.toFixed(2);
+    $("#alBoard").innerHTML = rows.map((r, j) => { const c = this.cum[r.A.P.k];
+      return `<div class="agrow" data-a="${r.A.idx}" title="คลิกเพื่อดูความคิดของ ${r.A.P.name}" style="cursor:pointer${r.A.idx === this.follow ? `;background:${hexA(r.A.P.col, 0.08)}` : ""}"><div class="rk">${j + 1}</div><span class="dot2" style="background:${r.A.P.col};box-shadow:0 0 8px ${r.A.P.col}"></span><div class="an"><b>${r.A.P.name}</b>${r.openN ? ` <span class="opn">ถือ ${r.openN}</span>` : ""}<small>${r.A.P.th}</small></div><div class="av"><b style="color:${r.pnl >= 0 ? PAL.buy : PAL.stop}">${fmtPnl(r.pnl)}</b><small>${r.ret >= 0 ? "+" : ""}${r.ret.toFixed(1)}% · DD ${r.dd.toFixed(1)}% · Calmar ${r.rs ? f2(r.rs.calmar, 2) : "—"} · @VaR6.5 ${r.rs && r.rs.norm ? (r.rs.norm.cagr >= 0 ? "+" : "") + r.rs.norm.cagr.toFixed(0) + "%/ปี" : "—"}</small><small>PF ${pfT(r.pf)} · Sharpe ${r.rs ? f2(r.rs.sharpe, 2) : "—"} · กฎ ${r.disc.toFixed(0)}%${c ? ` · สะสม ${c.n} รอบ ${c.ret / c.n >= 0 ? "+" : ""}${(c.ret / c.n).toFixed(1)}%/รอบ` : ""}</small></div></div>`; }).join("");
+  },
+  // ---------- 3D ----------
+  proj(x, y, z, P) {
+    const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw), cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
+    const x1 = x * cy + z * sy, z1 = -x * sy + z * cy; const y2 = y * cp - z1 * sp, z2 = y * sp + z1 * cp;
+    const s = P.F / (this.dist + z2); return { x: P.cx + x1 * s, y: P.cy - y2 * s, s, z: z2 };
+  },
+  layerZ(k) { const K = this.rd.mk.length, sp = K > 8 ? 0.24 : 0.32; return (k - (K - 1) / 2) * sp; },
+  X(i) { return (i - 232) / (this.rd.maxN - 232) * 2.4 - 1.2; },
+  Yp(x, p) { return (Math.log(p) - x.lo) / Math.max(1e-6, x.hi - x.lo) * 0.62; },
+  draw3d(dt) {
+    const { ctx, W, H } = fitCanvas($("#al3d")); ctx.clearRect(0, 0, W, H);
+    const rd = this.rd, P = { cx: W / 2, cy: H * 0.64, F: Math.min(W * 0.62, H) * 1.18 }, t = this.t;
+    const grd = ctx.createRadialGradient(W / 2, H * 0.55, 10, W / 2, H * 0.55, Math.max(W, H) * 0.7); grd.addColorStop(0, hexA(PAL.ma50, PAL.light ? 0.05 : 0.08)); grd.addColorStop(1, "transparent"); ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+    const order = rd.mk.map((x, k) => ({ k, z: this.proj(0, 0.3, this.layerZ(k), P).z })).sort((a, b) => b.z - a.z);
+    const X0 = this.X(232), X1 = this.X(rd.maxN - 1);
+    // floor grid
+    ctx.strokeStyle = hexA(PAL.mut, 0.08); ctx.lineWidth = 1;
+    for (let g = 0; g <= 10; g++) { const xx = X0 + (X1 - X0) * g / 10, a = this.proj(xx, 0, this.layerZ(0) - 0.2, P), b = this.proj(xx, 0, this.layerZ(rd.mk.length - 1) + 0.2, P); ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    const labelQ = [];
+    for (const { k } of order) {
+      const x = rd.mk[k], m = x.m, z = this.layerZ(k), wc = this.wcolP(x.world), sel = this.sel === k;
+      const c1 = this.proj(X0, 0, z, P), c2 = this.proj(X1, 0, z, P), c3 = this.proj(X1, 0.66, z, P), c4 = this.proj(X0, 0.66, z, P);
+      ctx.fillStyle = hexA(wc, sel ? 0.13 : PAL.light ? 0.05 : 0.045); ctx.strokeStyle = hexA(wc, sel ? 0.9 : 0.28); ctx.lineWidth = sel ? 2 : 1;
+      ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.lineTo(c3.x, c3.y); ctx.lineTo(c4.x, c4.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+      // future (faint) and revealed (bright) price
+      const end = Math.min(m.N - 1, Math.floor(t));
+      ctx.strokeStyle = hexA(PAL.mut, 0.1); ctx.lineWidth = 1; ctx.beginPath();
+      for (let i = 232; i < m.N; i += x.step * 2) { const p = this.proj(this.X(i), this.Yp(x, m.c[i]), z, P); i === 232 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); } ctx.stroke();
+      ctx.strokeStyle = sel ? PAL.txt : hexA(PAL.txt, 0.78); ctx.lineWidth = sel ? 1.8 : 1.3; ctx.beginPath();
+      for (let i = 232; i <= end; i += x.step) { const p = this.proj(this.X(i), this.Yp(x, m.c[i]), z, P); i === 232 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y); }
+      const pe = this.proj(this.X(end), this.Yp(x, m.c[end]), z, P); ctx.lineTo(pe.x, pe.y); ctx.stroke();
+      // system markers
+      for (const e of x.sys) { if (e.i > t) break; const p = this.proj(this.X(e.i), this.Yp(x, m.c[e.i]), z, P); const col = e.type === "BUY" ? PAL.buy : /STOP/.test(e.type) ? PAL.stop : e.type === "REANCHOR" ? PAL.tgt : e.type === "FLAT" ? PAL.buy : TPCOL[+e.type[2] - 1] || PAL.tgt; ctx.fillStyle = col; const r = Math.max(1.8, p.s * 0.012); ctx.beginPath(); if (e.type === "BUY") { ctx.moveTo(p.x, p.y - r * 2); ctx.lineTo(p.x - r * 1.4, p.y + r); ctx.lineTo(p.x + r * 1.4, p.y + r); } else ctx.arc(p.x, p.y, r, 0, 7); ctx.fill(); }
+      // agents in position
+      rd.agents.forEach((A, a) => { if (t > m.N - 1) return; const iv = A.iv[k]; if (!iv.some(([i0, i1]) => i0 <= t && t <= i1)) return; const ti = Math.floor(t); const dz = (a - 4) * 0.012; const p = this.proj(this.X(ti), this.Yp(x, m.c[ti]) + 0.02 + a * 0.006, z + dz, P); const r = Math.max(2.2, p.s * 0.016);
+        ctx.save(); if (!PAL.light) { ctx.shadowColor = A.P.col; ctx.shadowBlur = 10; } ctx.fillStyle = A.P.col; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fill(); ctx.restore(); });
+      labelQ.push({ k, p: this.proj(X0, 0.7, z, P), x });
+    }
+    // time plane
+    const tx = this.X(Math.min(t, rd.maxN - 1)), zA = this.layerZ(0) - 0.2, zB = this.layerZ(rd.mk.length - 1) + 0.2;
+    const q1 = this.proj(tx, 0, zA, P), q2 = this.proj(tx, 0, zB, P), q3 = this.proj(tx, 0.72, zB, P), q4 = this.proj(tx, 0.72, zA, P);
+    ctx.fillStyle = hexA(PAL.gold, PAL.light ? 0.08 : 0.07); ctx.strokeStyle = hexA(PAL.gold, 0.6); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(q1.x, q1.y); ctx.lineTo(q2.x, q2.y); ctx.lineTo(q3.x, q3.y); ctx.lineTo(q4.x, q4.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // flashes
+    const tn = now(); this.flashes = this.flashes.filter(f => tn - f.born < 1100);
+    for (const f of this.flashes) { const x = rd.mk[f.k]; const p = this.proj(this.X(f.i), this.Yp(x, x.m.c[Math.min(f.i, x.m.N - 1)]), this.layerZ(f.k), P); const age = (tn - f.born) / 1100; ctx.strokeStyle = hexA(f.up ? PAL.buy : PAL.tgt, 0.8 * (1 - age)); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(p.x, p.y, 4 + age * 26, 0, 7); ctx.stroke(); }
+    // layer labels
+    ctx.font = "700 11px " + FF();
+    labelQ.forEach(({ k, p, x }) => { const t2 = `#${k + 1} ${{ normal: "ปกติ", harsh: "โหด", random: "สุ่ม" }[x.world] || ""}`; ctx.fillStyle = hexA(this.wcolP(x.world), 0.95); ctx.fillText(t2, p.x - 6 - ctx.measureText(t2).width, p.y + 4); });
+    this.drawBubbles(ctx, W, H, (b) => { const x = rd.mk[b.k]; const i = Math.min(b.i, x.m.N - 1); return this.proj(this.X(i), this.Yp(x, x.m.c[i]) + 0.03, this.layerZ(b.k), P); });
+    this._P = P;
+  },
+  drawBubbles(ctx, W, H, pos) {
+    const tn = now(); this.bubbles = this.bubbles.filter(b => tn - b.born < 3400 / Math.sqrt(Math.max(1, this.speed)));
+    const items = this.bubbles.map(b => ({ b, p: pos(b) })).sort((a, c) => a.p.y - c.p.y);
+    ctx.font = "600 11.5px " + FF(); let lastY = -1e9; const placed = [];
+    for (const it of items) {
+      const A = this.rd.agents[it.b.a], txt = it.b.text.length > 64 ? it.b.text.slice(0, 62) + "…" : it.b.text, w = Math.min(360, ctx.measureText(txt).width + 18 + ctx.measureText(A.P.name).width), h = 22;
+      let bx = it.p.x + 14, by = it.p.y - 34; if (bx + w > W - 6) bx = it.p.x - w - 14; if (by < lastY + h + 4) by = lastY + h + 4; if (by + h > H - 4) continue; lastY = by;
+      const age = (tn - it.b.born) / 3400, al = age < 0.1 ? age / 0.1 : 1 - Math.max(0, (age - 0.75) / 0.25);
+      ctx.globalAlpha = clamp(al, 0, 1);
+      ctx.strokeStyle = hexA(A.P.col, 0.7); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(it.p.x, it.p.y); ctx.lineTo(bx < it.p.x ? bx + w : bx, by + h / 2); ctx.stroke();
+      ctx.fillStyle = hexA(PAL.light ? "#ffffff" : "#0c1119", 0.92); Replay.rr(ctx, bx, by, w, h, 8); ctx.fill(); ctx.strokeStyle = it.b.g === "bad" ? hexA(PAL.stop, 0.9) : it.b.g === "acc" ? hexA(PAL.gold, 0.8) : hexA(A.P.col, 0.6); ctx.stroke();
+      ctx.fillStyle = A.P.col; ctx.font = "800 11px " + FF(); ctx.fillText(A.P.name, bx + 8, by + 15); const nw = ctx.measureText(A.P.name).width;
+      ctx.fillStyle = PAL.txt; ctx.font = "600 11.5px " + FF(); ctx.fillText(txt, bx + 14 + nw, by + 15);
+      ctx.globalAlpha = 1;
+    }
+  },
+  draw2d(dt) {
+    const { ctx, W, H } = fitCanvas($("#al3d")); ctx.clearRect(0, 0, W, H);
+    const rd = this.rd, K = rd.mk.length, cols = K <= 4 ? 2 : K <= 8 ? 4 : 4, rows = Math.ceil(K / cols), gw = W / cols, gh = H / rows, t = this.t;
+    this._cells = [];
+    rd.mk.forEach((x, k) => {
+      const m = x.m, cx0 = (k % cols) * gw + 8, cy0 = Math.floor(k / cols) * gh + 8, w = gw - 16, h = gh - 16, sel = this.sel === k;
+      this._cells.push([cx0, cy0, w, h]);
+      ctx.fillStyle = hexA(this.wcolP(x.world), sel ? 0.12 : 0.05); ctx.strokeStyle = hexA(this.wcolP(x.world), sel ? 0.9 : 0.3); Replay.rr(ctx, cx0, cy0, w, h, 10); ctx.fill(); ctx.stroke();
+      const XX = (i) => cx0 + 6 + (i - 232) / (rd.maxN - 232) * (w - 12), YY = (p) => cy0 + h - 8 - (Math.log(p) - x.lo) / Math.max(1e-6, x.hi - x.lo) * (h - 30);
+      const end = Math.min(m.N - 1, Math.floor(t));
+      ctx.strokeStyle = hexA(PAL.mut, 0.15); ctx.beginPath(); for (let i = 232; i < m.N; i += x.step) i === 232 ? ctx.moveTo(XX(i), YY(m.c[i])) : ctx.lineTo(XX(i), YY(m.c[i])); ctx.stroke();
+      ctx.strokeStyle = PAL.txt; ctx.lineWidth = 1.2; ctx.beginPath(); for (let i = 232; i <= end; i += Math.max(1, x.step >> 1)) i === 232 ? ctx.moveTo(XX(i), YY(m.c[i])) : ctx.lineTo(XX(i), YY(m.c[i])); ctx.stroke();
+      for (const e of x.sys) { if (e.i > t) break; ctx.fillStyle = e.type === "BUY" ? PAL.buy : /STOP/.test(e.type) ? PAL.stop : PAL.tgt; ctx.beginPath(); ctx.arc(XX(e.i), YY(m.c[e.i]), 2.6, 0, 7); ctx.fill(); }
+      rd.agents.forEach((A, a) => { const ti = Math.floor(t); if (ti > m.N - 1) return; if (!A.iv[k].some(([i0, i1]) => i0 <= ti && ti <= i1)) return; ctx.fillStyle = A.P.col; ctx.beginPath(); ctx.arc(XX(ti) + 4 + (a % 3) * 5, YY(m.c[ti]) - 6 - Math.floor(a / 3) * 5, 2.4, 0, 7); ctx.fill(); });
+      ctx.fillStyle = this.wcolP(x.world); ctx.font = "800 11px " + FF(); ctx.fillText(`#${k + 1}`, cx0 + 8, cy0 + 16); ctx.fillStyle = PAL.mut; ctx.font = "600 10px " + FF(); ctx.fillText(x.name.slice(0, 46), cx0 + 32, cy0 + 16);
+      ctx.fillStyle = hexA(PAL.gold, 0.7); ctx.fillRect(XX(Math.min(t, rd.maxN - 1)), cy0 + 22, 1.5, h - 28);
+    });
+    this.drawBubbles(ctx, W, H, (b) => { const x = rd.mk[b.k], [cx0, cy0, w, h] = this._cells[b.k], i = Math.min(b.i, x.m.N - 1); return { x: cx0 + 6 + (i - 232) / (rd.maxN - 232) * (w - 12), y: cy0 + h - 8 - (Math.log(x.m.c[i]) - x.lo) / Math.max(1e-6, x.hi - x.lo) * (h - 30) }; });
+  },
+  pick(e) {
+    const r = $("#al3d").getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, rd = this.rd; if (!rd) return;
+    if (this.view === "2d" && this._cells) { const k = this._cells.findIndex(([x, y, w, h]) => mx >= x && mx <= x + w && my >= y && my <= y + h); if (k >= 0) this.select(k); return; }
+    const P = this._P; if (!P) return; let best = -1, bd = 1e9;
+    rd.mk.forEach((x, k) => { const z = this.layerZ(k); for (let i = 232; i < x.m.N; i += 30) { const p = this.proj(this.X(i), this.Yp(x, x.m.c[i]), z, P), d = Math.hypot(p.x - mx, p.y - my); if (d < bd) { bd = d; best = k; } } });
+    if (best >= 0 && bd < 40) this.select(best);
+  },
+  select(k) {
+    const x = this.rd.mk[k]; this.sel = k;
+    const S = this.rd.agents[0], sysR = S.res[k].trades.reduce((s, t) => s + t.R, 0);
+    $("#alSelT").innerHTML = `<b style="color:${this.wcolP(x.world)}">#${k + 1} · ${{ normal: "โลกปกติ", harsh: "โลกโหด", random: "โลกสุ่ม" }[x.world]}</b> · ${x.name} · ซื้อถือ ${x.bh >= 0 ? "+" : ""}${(x.bh * 100).toFixed(0)}% · ระบบ ${sgn(sysR)}R (${fmtPnl(ACCT.capital * ACCT.rpt / 100 * sysR)})`;
+    $("#alSel").classList.remove("hidden");
+  },
+  openInReplay() {
+    if (this.sel < 0) return; const x = this.rd.mk[this.sel];
+    Replay.world = x.world; Replay.key = "random"; Replay.seed = x.seed; Replay.csvName = null; Replay.tpl = x.m.tpl;
+    $("#worldSel").value = x.world; setTab("replay"); Replay.setMarket(x.m); $("#mktId").textContent = `MARKET #${x.seed} · จาก AI LAB`;
+  },
+};
+
+/* ============================================================
    TABS + LOOP
 ============================================================ */
 let TAB = "replay";
@@ -2034,6 +2926,7 @@ function setTab(t) {
   } else $("#v-" + t).classList.add("on");
   if (t === "lab" && !Lab.res) Lab.run(); else if (t === "lab") Lab.redraw();
   if (t === "grader") Grader.render();
+  if (t === "ailab") AILab.enter();
   if (t !== "replay" && t !== "dojo") { try { history.replaceState(null, "", "#tab=" + t); } catch (e) {} } else Replay.writeHash();
   Replay.dirty = true;
 }
@@ -2044,15 +2937,16 @@ function loop() {
   try {
     BG.frame(dt);
     if ($("#v-chart").classList.contains("on")) Replay.frame(dt);
-    Lab.frame(); Fractal.frame(dt); Grader.frame(dt);
+    Lab.frame(); Fractal.frame(dt); Grader.frame(dt); AILab.frame(dt);
   } catch (err) { console.error("frame error", err); }
   requestAnimationFrame(loop);
 }
 function boot() {
-  Replay.init(); Lab.init(); Fractal.init(); Grader.init(); BG.init();
+  Replay.init(); Lab.init(); Fractal.init(); Grader.init(); BG.init(); AILab.init(); acctUI();
   const H = Object.fromEntries(location.hash.replace(/^#/, "").split("&").filter(Boolean).map(kv => kv.split("=")));
   let sKey = (H.s || "textbook").replace(/^r:.*/, "random"); const seedH = +H.seed || 7;
   if (!NEST.TEMPLATES[sKey] && sKey !== "random") sKey = "textbook";
+  if (H.w && ["normal", "harsh", "random", "mixed"].includes(H.w) && sKey === "random") { Replay.world = H.w; $("#worldSel").value = H.w; }
   Replay.load(sKey, seedH);
   if (H.tab && H.tab !== "replay") setTimeout(() => setTab(H.tab), 50);
   window.addEventListener("resize", () => { Replay.dirty = true; });
