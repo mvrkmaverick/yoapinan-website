@@ -1101,7 +1101,7 @@ const LABCORE = (function () {
   const TRAIT = { rule: "ตามกฎ", enter: "อยากซื้อ/เพิ่มไม้", cut: "อยากขาย", lockNow: "อยากกันกำไร/กันทุน", chase: "ไล่ SL", loosen: "ไม่อยากโดน SL", noSL: "ไม่เชื่อ SL", wait: "รอ/ไม่ทำอะไร", mid: "ทางสายกลาง", luck: "สุ่ม" };
   const WHY = { enter: "อยากมีของ กลัวตกรถ", cut: "อยากขายให้จบ ไม่อยากเสี่ยงต่อ", lockNow: "อยากกันกำไรไว้ก่อน", chase: "อยากล็อกทุกขั้นที่ราคาขึ้น", loosen: "ยังไม่อยากยอมรับขาดทุน", noSL: "ไม่เชื่อว่า SL ช่วยอะไร", wait: "ขอรอดูก่อน", mid: "เลือกทางกลางที่ไม่ผิดกฎ", luck: "สุ่มล้วนๆ", rule: "กฎว่าอย่างนี้" };
   function traits(o, ctx) {
-    const t = o.t, f = { rule: o.g === "ok" ? 1 : o.g === "acc" ? 0.3 : -1 };
+    const t = o.t, f = { rule: o.g === "ok" ? (o.sys ? 1.01 : 1) : o.g === "acc" ? 0.3 : -1 };
     let e = 0;
     if (/^BUY 1\.5/.test(t)) e = 1.5; else if (/เข้า 2 ไม้/.test(t)) e = 2;
     else if (/^BUY ¼/.test(t)) e = 0.25; else if (/ทยอยซื้อเฉลี่ย/.test(t)) e = 0.33;
@@ -1193,10 +1193,10 @@ const LABCORE = (function () {
       q.answered = true; if (!d) continue;
       const oR = B.openR(q.i), st = lastStreaks(B);
       const ctx = { inPos: !!B.pos, openR: oR, inLoss: !!B.pos && oR < -0.05, inProfit: !!B.pos && oR > 0.05, lossStreak: st.L, winStreak: st.W, noSLNow: !!B.pos && B.pos.sl <= 1e-3, qty: B.qty() };
-      const dm = decide(P, d, ctx, rng), sys = d.opts.find(x => x.g === "ok");
+      const dm = decide(P, d, ctx, rng), sys = d.opts.find(x => x.sys) || d.opts.find(x => x.g === "ok");
       let o = dm.o;
       let pol = false;
-      if (P.pol && P.pol[q.type]) { const o2 = d.opts.find(x => P.pol[q.type].test(x.t)); if (o2 && o2 !== sys) { o = o2; pol = true; } }
+      if (P.pol && P.pol[q.type]) { const pr = P.pol[q.type], o2 = pr === "SYS" ? sys : d.opts.find(x => pr.test(x.t)); if (o2) { o = o2; pol = o2 !== sys; } }
       if (ov && ov.i === q.i && ov.type === q.type) { o = sys; pol = false; }
       if (pol || o.g === "ok") ok++; else if (o.g === "acc") acc++; else bad++;
       const had = B.qty();
@@ -2171,7 +2171,7 @@ const Dojo = {
   shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; },
   build(q) {
     const Mx = this.M || Replay, m = Mx.m, e = q.e, i = q.i, B = this.book || Book, S = Mx.run.snap[i] || {}, P = B.pos, has = !!P;
-    const O = (t, g, act) => ({ t, g, act });
+    const O = (t, g, act, sys) => ({ t, g, act, sys: !!sys });
     const pct = (x) => (x * 100).toFixed(0) + "%";
     switch (q.type) {
       case "READ": {
@@ -2192,25 +2192,27 @@ const Dojo = {
           if (buyE) { const pp = buyE.units >= 1; g = { w: "bad", f: pp ? "ok" : "bad", h: pp ? "acc" : "ok", b: "bad" }; sl = buyE.sl; R = buyE.price - buyE.sl;
             why = `ระบบซื้อ: ${buyE.reanchor ? "1-2 ชุดใหม่ (ราคาเหนือ TP1 เดิม) · " : ""}(ii) ย่อ ≥ 61.8% · ไกปืน ${{ hist: "histogram พลิกบวก", pp: "Pocket Pivot", vcp: "เบรก VCP" }[buyE.via]} + MACD > 0 · SL ≥ 2 ATR · ${NEST.getRules() === "noadd" ? "กฎปรับ → ลงครบขนาดที่จุดเข้า ไม่เติมทีหลัง" : pp ? "มี PP → เต็มไม้" : "ไม่มี PP → ครึ่งไม้"}`; }
           else if (S.st === "LONG" && (vcpE || (ppE && isFinite(S.II) && c - S.II * 0.99 >= 2 * m.atr[i]))) {
-            const pp = !vcpE && (m.pp[i] || NEST.getRules() === "noadd"); g = { w: "acc", f: pp ? "ok" : "bad", h: pp ? "acc" : "ok", b: "bad" }; sl = vcpE ? vcpE.lo * 0.99 : S.II * 0.99; R = c - sl; if (vcpE) opt = { lifted: true };
-            why = `ระบบถืออยู่ และแท่งนี้เป็นจุดเข้าได้แม้พลาดไม้แรก (${vcpE ? "เบรกกรอบ VCP" : "Pocket Pivot หลัง (ii)"}) · ${vcpE ? "ไม้ VCP เสี่ยง ½ RPT" : "ขนาดตาม PP"} · SL ใต้ ${vcpE ? "low กรอบ VCP" : "(ii)"} · ไม่เข้าก็ไม่ผิดกฎ`; }
+            const pp = !vcpE && (m.pp[i] || NEST.getRules() === "noadd"); g = vcpE ? { w: "acc", f: "ok", h: "ok", b: "bad" } : { w: "acc", f: pp ? "ok" : "bad", h: pp ? "acc" : "ok", b: "bad" }; sl = vcpE ? vcpE.lo * 0.99 : S.II * 0.99; R = c - sl; if (vcpE) opt = { lifted: true };
+            why = `ระบบถืออยู่ และแท่งนี้เป็นจุดเข้าได้แม้พลาดไม้แรก (${vcpE ? "เบรกกรอบ VCP" : "Pocket Pivot หลัง (ii)"}) · ${vcpE ? "ซื้อ ½ หรือเต็ม RPT = ตามระบบ (SENSEI)" : "ขนาดตาม PP"} · SL ใต้ ${vcpE ? "low กรอบ VCP" : "(ii)"} · ${vcpE ? "ไม่เข้า = แบบขี้ระวัง (≈ ไม่ผิดกฎ)" : "ไม่เข้าก็ไม่ผิดกฎ"}`; }
           else why = "ยังไม่ใช่จุดซื้อ: " + this.whyNot(m, S, i, evAt);
           return { q: "ไม่มีของ — แท่งนี้ทำอะไร?", facts: this.obsFacts(m, S, i),
-            opts: [O("WAIT — ยังไม่เข้า", g.w), O("BUY เต็มไม้", g.f, () => B.open(i, 1, sl, R, opt)), O("BUY ครึ่งไม้", g.h, () => B.open(i, 0.5, sl, R, opt)), O("BUY 1.5 ไม้", g.b, () => B.open(i, 1.5, sl, R, opt))], why };
+            opts: [O("WAIT — ยังไม่เข้า", g.w), O("BUY เต็มไม้", g.f, () => B.open(i, 1, sl, R, opt), g.f === "ok" && !vcpE), O("BUY ครึ่งไม้", g.h, () => B.open(i, 0.5, sl, R, opt), g.h === "ok" && (vcpE || g.f !== "ok")), O("BUY 1.5 ไม้", g.b, () => B.open(i, 1.5, sl, R, opt))], why };
         }
         if (q.src === "CAND" && /hist|macd|pp/.test(q.tag) && this.freq !== "dense") return null;
         const sc = evAt.find(x => x.type === "SCALE_IN"), vc = evAt.find(x => x.type === "VCP_ADD"), li = evAt.find(x => x.type === "SL_LIFT" && x.why === "i" && !x.noop), he = evAt.find(x => x.type === "HEAT");
-        let g = { hold: "ok", s3: "bad", all: "bad", lift: "bad", add: "bad" }, why = "", liftTo = NaN;
+        let g = { hold: "ok", s3: "bad", all: "bad", lift: "bad", add: "bad", addF: "bad" }, why = "", liftTo = NaN;
         let pv = NaN; for (let j = i - 3; j > (P.entryI || 0); j--) { if (B.fractalLow(j)) { pv = m.l[j] * 0.99; break; } }
         if (li && !P.lifted && !P.tr) { g = { hold: "acc", s3: "bad", all: "bad", lift: "ok", add: "bad" }; liftTo = li.sl; why = "ปิดเหนือยอด (i) → ยก SL ครั้งเดียวไปใต้ pivot low ล่าสุด แล้วแช่ไว้จนถึง TP1 · ไม่ขยับเลยก็ไม่ผิดกฎ"; }
-        else if (vc && !P.tr && !P.vcpDone) { g = { hold: "acc", s3: "bad", all: "bad", lift: P.lifted ? "bad" : "acc", add: "ok" }; liftTo = vc.lo * 0.99; why = `เบรกกรอบ VCP พร้อม volume → ซื้อไม้ VCP เพิ่ม: เสี่ยง ½ ของ RPT · SL ของไม้นี้ใต้ low กรอบ${P.lifted ? "" : " · ไม้แรกยก SL ครั้งเดียวมาใต้ low กรอบด้วย"}`; }
+        else if (vc && !P.tr && !P.vcpDone) { g = { hold: "acc", s3: "bad", all: "bad", lift: P.lifted ? "bad" : "acc", add: "ok", addF: "ok" }; liftTo = vc.lo * 0.99; why = `เบรกกรอบ VCP พร้อม volume → ซื้อไม้ VCP (SL ของไม้นี้ใต้ low กรอบ): ½ RPT = ระบบ · เต็ม RPT ก็นับตามระบบ (SENSEI) · ไม่ซื้อ = แบบขี้ระวัง (≈ ไม่ผิดกฎ)${P.lifted ? "" : " · ไม้แรกยก SL ครั้งเดียวมาใต้ low กรอบด้วย"}`; }
         else if (sc && !P.scaled && !P.tr) { g = { hold: "acc", s3: "bad", all: "bad", lift: "bad", add: "ok" }; why = "ไม้แรกครึ่งไม้ · Stoch RSI ตัดขึ้น 20 + MACD > 0 → เติม ½ ให้เต็มไม้"; }
         else if (he) { g = { hold: "ok", s3: "acc", all: "bad", lift: "bad", add: "bad" }; why = "ติดลบแต่ยังเหนือ SL — แผนยังไม่เปลี่ยน (ลดไม้ไม่ผิดกฎ แต่ไม่ใช่ระบบ)"; }
         else why = P.tr ? "หลัง TP1: ไม้ที่เหลือใช้ SL กันทุน แต่ละ 1/3 ออกตาม trailing ของตัวเอง — ไม่มีอะไรต้องทำแท่งนี้" : (P.lifted ? "ยก SL ไปแล้ว 1 ครั้ง — แช่ไว้จนถึง TP1 · ไม่มีเงื่อนไขเติม/ขาย ณ แท่งนี้" : "ยังไม่ถึงจังหวะยก SL (รอปิดเหนือ (i) หรือเบรก VCP) · ไม่มีเงื่อนไขเติม/ขาย ณ แท่งนี้");
+        if (!g.addF) g.addF = "bad";
         const doLift = () => { const to = isFinite(liftTo) ? liftTo : pv; if (isFinite(to)) B.liftSL(i, to); if (B.pos) B.pos.lifted = true; };
         const doAdd = () => { const doSc = sc && !P.scaled && !P.tr, doV = vc && !P.tr && !P.vcpDone; if (doSc || !doV) B.add(i, 0.5); if (doV && B.pos) { const slv = vc.lo * 0.99; B.add(i, Math.min(1, 0.5 * B.pos.rRef / Math.max(1e-9, c - slv)), slv); } if (!B.pos) return; if (sc) B.pos.scaled = true; if (vc) { B.pos.vcpDone = true; if (!B.pos.lifted && vc.lo * 0.99 > B.pos.sl) { B.setSL(i, vc.lo * 0.99); B.pos.lifted = true; } } };
+        const doAddF = () => { if (vc && !P.tr && !P.vcpDone && B.pos) { const slv = vc.lo * 0.99; B.add(i, Math.min(2, B.pos.rRef / Math.max(1e-9, c - slv)), slv); B.pos.vcpDone = true; if (!B.pos.lifted && slv > B.pos.sl) { B.setSL(i, slv); B.pos.lifted = true; } } else { B.add(i, 1); if (B.pos && sc) B.pos.scaled = true; } };
         return { q: "ถืออยู่ — แท่งนี้ทำอะไร?", facts: this.obsFacts(m, S, i).concat([`ถือ ${fmt(B.qty(), 2)} · ${sgn(B.openR(i))}R · SL ${P.sl > 1e-3 ? fmt(P.sl) : "ไม่มี"}`]),
-          opts: [O("HOLD ตามแผน", g.hold), O("ขาย 1/3", g.s3, () => B.sellQ(i, B.qty() / 3, c)), O("ขายทั้งหมด", g.all, () => B.closeAll(i, c)), O("ยก SL ขึ้นใต้ pivot low ล่าสุด", g.lift, doLift), O("เติมไม้ตามกฎ (½ ไม้ / ไม้ VCP)", g.add, doAdd)], why };
+          opts: [O("HOLD ตามแผน", g.hold), O("ขาย 1/3", g.s3, () => B.sellQ(i, B.qty() / 3, c)), O("ขายทั้งหมด", g.all, () => B.closeAll(i, c)), O("ยก SL ขึ้นใต้ pivot low ล่าสุด", g.lift, doLift), O("ซื้อเพิ่ม ½ (เติมตามกฎ / ไม้ VCP ½ RPT)", g.add, doAdd, g.add === "ok"), O("ซื้อเพิ่มเต็มไม้ (ไม้ VCP เต็ม RPT)", g.addF, doAddF)], why };
       }
       case "TRAP_STALE": {
         if (has) return null; const ck = "t" + e.cyc; if ((this.ppAsked[ck] || 0) >= 2) return null; this.ppAsked[ck] = (this.ppAsked[ck] || 0) + 1;
@@ -2253,13 +2255,13 @@ const Dojo = {
           if (P.tr) return null;
           const lift = () => { if (B.pos && !B.pos.lifted && e.lo * 0.99 > B.pos.sl) { B.setSL(i, e.lo * 0.99); B.pos.lifted = true; } };
           return { q: "ราคาเบรกกรอบ VCP (pivot) พร้อม volume — ทำอะไร?", facts: facts.concat([P.lifted ? "SL คุณยกไปแล้ว 1 ครั้ง" : "SL คุณยังไม่เคยยก"]),
-            opts: [O(P.lifted ? "ซื้อไม้ VCP · เสี่ยง ½ RPT · SL ไม้นี้ใต้ low กรอบ" : "ซื้อไม้ VCP · เสี่ยง ½ RPT · SL ไม้นี้ใต้ low กรอบ + ไม้แรกยก SL มาใต้กรอบ", "ok", () => { const slv = e.lo * 0.99; B.add(i, Math.min(1, 0.5 * B.pos.rRef / Math.max(1e-9, m.c[i] - slv)), slv); lift(); }), O("รอให้ทะลุยอด Wave 1 ก่อนค่อยเติม", "acc"), O("เติมเต็มไม้", "bad", () => { B.add(i, 1); lift(); }), O("ขาย ½ ที่แนวต้าน", "bad", () => B.sellQ(i, B.qty() / 2, m.c[i]))],
-            why: "เบรกกรอบ VCP = ไม้ใหม่ของมันเอง: เสี่ยง ½ ของ RPT ไม้แรก · SL ใต้ low กรอบ (ขนาดคำนวณจากระยะ SL นี้) · ไม้แรกยก SL ครั้งเดียวถ้ายังไม่เคยยก · ไม่ซื้อก็ไม่ผิดกฎ" };
+            opts: [O(P.lifted ? "ซื้อไม้ VCP · เสี่ยง ½ RPT · SL ไม้นี้ใต้ low กรอบ" : "ซื้อไม้ VCP · เสี่ยง ½ RPT · SL ไม้นี้ใต้ low กรอบ + ไม้แรกยก SL มาใต้กรอบ", "ok", () => { const slv = e.lo * 0.99; B.add(i, Math.min(1, 0.5 * B.pos.rRef / Math.max(1e-9, m.c[i] - slv)), slv); lift(); }, true), O("รอให้ทะลุยอด Wave 1 ก่อนค่อยเติม", "acc"), O("ซื้อไม้ VCP เต็ม RPT · SL ไม้นี้ใต้ low กรอบ", "ok", () => { const slv = e.lo * 0.99; B.add(i, Math.min(2, B.pos.rRef / Math.max(1e-9, m.c[i] - slv)), slv); lift(); }), O("ขาย ½ ที่แนวต้าน", "bad", () => B.sellQ(i, B.qty() / 2, m.c[i]))],
+            why: "เบรกกรอบ VCP = ไม้ใหม่ของมันเอง: SL ใต้ low กรอบ · ½ RPT = ระบบ · เต็ม RPT ก็นับตามระบบ (SENSEI) · ไม่ซื้อ = แบบขี้ระวัง (≈ ไม่ผิดกฎ)" };
         }
         const pp = m.pp[i] || NEST.getRules() === "noadd", sl = e.lo * 0.99, R = m.c[i] - sl;
         return { q: "คุณไม่มีของ · ราคาเบรกกรอบ VCP พร้อม volume — ทำอะไร?", facts: facts.concat([pp ? "PP แท่งนี้: มี" : "PP แท่งนี้: ไม่มี"]),
-          opts: [O("เข้า ½ RPT · SL ใต้ low กรอบ VCP", "ok", () => B.open(i, 0.5, sl, R, { lifted: true })), O("ไม่เข้า รอ setup ถัดไป", "acc"), O("เข้า 2 ไม้ชดเชยที่พลาด", "bad", () => B.open(i, 2, sl, R, { lifted: true })), O("เข้าเต็มไม้ ไม่ตั้ง SL", "bad", () => B.open(i, 1, 1e-6, R))],
-          why: "เบรก VCP เป็นจุดเข้าได้แม้พลาดไม้แรก — ไม้ VCP เสี่ยง ½ ของ RPT · SL ใต้ low กรอบ" };
+          opts: [O("เข้า ½ RPT · SL ใต้ low กรอบ VCP", "ok", () => B.open(i, 0.5, sl, R, { lifted: true }), true), O("เข้าเต็ม RPT · SL ใต้ low กรอบ VCP", "ok", () => B.open(i, 1, sl, R, { lifted: true })), O("ไม่เข้า รอ setup ถัดไป", "acc"), O("เข้า 2 ไม้ชดเชยที่พลาด", "bad", () => B.open(i, 2, sl, R, { lifted: true })), O("เข้าเต็มไม้ ไม่ตั้ง SL", "bad", () => B.open(i, 1, 1e-6, R))],
+          why: "เบรก VCP เป็นจุดเข้าได้แม้พลาดไม้แรก — ½ หรือเต็ม RPT = ตามระบบ · SL ใต้ low กรอบ · ไม่เข้า = แบบขี้ระวัง" };
       }
       case "SL_LIFT": {
         if (!has || P.lifted || P.tr) return null;
@@ -2334,7 +2336,7 @@ const Dojo = {
     this.hist = this.hist || []; this.hist.push(snap); if (this.hist.length > 400) this.hist.shift(); this.curD = d; this.syncUR();
     this.waiting = true; Replay.playing = false; Replay.syncPlay(); Replay.t = q.i + 1;
     Sound.tone([440, 554], 0.2, "triangle", 0.05);
-    d.opts = this.shuffle(d.opts); this.__lastOk = d.opts.findIndex(o => o.g === "ok"); this.__lastAcc = d.opts.findIndex(o => o.g === "acc");
+    d.opts = this.shuffle(d.opts); this.__lastOk = d.opts.findIndex(o => o.sys); if (this.__lastOk < 0) this.__lastOk = d.opts.findIndex(o => o.g === "ok"); this.__lastAcc = d.opts.findIndex(o => o.g === "acc");
     const facts = this.hard ? "" : `<div class="facts">${d.facts.map(f => `<span class="fact">${f}</span>`).join("")}</div>`;
     $("#dqBody").innerHTML = `<h4>${d.q}</h4>${facts}<div class="opts">${d.opts.map((o, j) => `<button class="opt" data-j="${j}"><span>${o.t}</span><span class="gtag"></span></button>`).join("")}</div><div class="fb" id="dfb"></div>${this.hard ? '<div class="note" id="dTimer" style="margin-top:8px"></div>' : ""}${this.lastFb ? `<div class="dlast">ข้อที่แล้ว · ${this.lastFb}</div>` : ""}`;
     $$("#dqBody .opt").forEach(b => b.onclick = () => this.answer(q, d, +b.dataset.j));
@@ -2348,7 +2350,7 @@ const Dojo = {
     { const top = this.hist && this.hist[this.hist.length - 1]; if (top && top.q === q) top.choice = choice ? choice.t : null; if (!this.redoing) this.redoS = []; }
     if (d.read) { this.rd.t++; if (g === "ok") this.rd.ok++; } else {
     this.mk.t++; if (g === "ok") this.mk.ok++; if (g === "acc") this.mk.acc++;
-    { const sysO = d.opts.find(o => o.g === "ok"), waitO = d.opts.find(o => /^(WAIT|HOLD)/.test(o.t)), bk = sysO && /^(WAIT|HOLD)/.test(sysO.t) ? "fake" : (waitO && waitO.g !== "bad" ? "opt" : "real"), K = this.mk[bk] || (this.mk[bk] = { ok: 0, acc: 0, t: 0 }); K.t++; if (g === "ok") K.ok++; if (g === "acc") K.acc++; }
+    { const sysO = d.opts.find(o => o.sys) || d.opts.find(o => o.g === "ok"), waitO = d.opts.find(o => /^(WAIT|HOLD)/.test(o.t)), bk = sysO && /^(WAIT|HOLD)/.test(sysO.t) ? "fake" : (waitO && waitO.g !== "bad" ? "opt" : "real"), K = this.mk[bk] || (this.mk[bk] = { ok: 0, acc: 0, t: 0 }); K.t++; if (g === "ok") K.ok++; if (g === "acc") K.acc++; }
     if (g !== "bad") { this.mk.streak++; this.mk.best = Math.max(this.mk.best, this.mk.streak); } else this.mk.streak = 0; }
     Sound.tone(g === "ok" ? [784, 1047] : g === "acc" ? [659, 784] : [220, 185], 0.22, g === "bad" ? "sawtooth" : "sine", g === "bad" ? 0.03 : 0.05);
     if (!d.read) this.life.total = (this.life.total || 0) + 1; if (!d.read && g === "ok") this.life.ok = (this.life.ok || 0) + 1; if (!d.read && g === "acc") this.life.acc = (this.life.acc || 0) + 1; this.saveLife();
@@ -2359,7 +2361,7 @@ const Dojo = {
       if (tg && (d.opts[k].g !== "bad" || k === j)) tg.textContent = G.s + " " + G.t;
       if (k === j) b.classList.add("mine");
     });
-    const sysT = d.opts.find(o => o.g === "ok").t, G = GRADE[g];
+    const sysT = (d.opts.find(o => o.sys) || d.opts.find(o => o.g === "ok")).t, G = GRADE[g];
     const head = j < 0 ? `<b style="color:${PAL.stop}">⏱ หมดเวลา = ✕</b>` : `<b style="color:${PAL[G.c]}">${G.s} ${G.t}</b>`;
     const pendingSame = this.queue.some(x => !x.answered && x.i === q.i);
     const fbHtml = `${head}${g === "ok" ? "" : ` · ระบบ: <b>${sysT}</b>`} · คุณเลือก: ${choice ? choice.t : "—"}<br>${d.why}`;
