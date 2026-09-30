@@ -882,7 +882,7 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
               const fvcp = validII ? swingStep(S.fv.T, i) : null;
               const sl0 = lo * 0.99, distOK = c[i] - sl0 >= 2 * atr[i];
               let via = null;
-              if (validII && macd[i] > 0 && c[i] < S.W1H && distOK && S.entries < 2) {
+              if (validII && macd[i] > 0 && c[i] < S.W1H && distOK && S.entries < 2 && !(S.reI >= 0 && i - S.reI <= 3)) {
                 if (histUpRecently(i)) via = "hist";
                 else if (pp[i]) via = "pp";
                 else if (fvcp && c[i] > fvcp.pivot && v[i] >= 1.3 * vma[i]) via = "vcp";
@@ -926,7 +926,11 @@ details.rnd{border:1px solid var(--line2);border-radius:10px;padding:6px 10px;ma
           S.realized += P.realized;
           if (typ !== "STOP_PROFIT") {
             S.watchRun = true;
-            if (S.entries < 2) { S.st = "WAVE2"; S.iI = -1; S.I = NaN; S.zzDir = -1; S.zzExt = l[i]; S.zzExtI = i; S.fv = null; delete S.stage.buy; delete S.stage.nest_i; S.pos = null; }
+            if (S.entries < 2) {
+              // (i) stays valid while price holds above the start of (i) (= W2): (ii) may simply extend lower → wait for a new trigger on the same (i)
+              if (isFinite(S.I) && S.iI >= 0 && l[i] > S.W2) { S.st = "NEST"; S.fv = null; S.reI = i; delete S.stage.buy; S.pos = null; }
+              else { S.st = "WAVE2"; S.iI = -1; S.I = NaN; S.zzDir = -1; S.zzExt = l[i]; S.zzExtI = i; S.fv = null; delete S.stage.buy; delete S.stage.nest_i; S.pos = null; }
+            }
             else { S.st = "DONE"; }
           } else S.st = "DONE";
         } else {
@@ -2764,6 +2768,7 @@ const NOTEBOOK = [
   { h: "21 · แก้ตัวเอง: SL ใต้ Wave 2 ไม่ได้ช่วย", q: "เคยสรุปว่า SL กว้างใต้ Wave 2 ช่วยนิดหน่อย", m: "พบว่าเทสเดิมไม่ได้ถือตาม SL ใหม่จริง (ออกที่ SL ระบบ) และพอร์ตคิดความเสี่ยงจาก SL เดิม → แก้ให้คิดความเสี่ยงจาก SL จริง แล้วเทสใหม่", r: "ไม้ที่โดน SL ใต้ (ii) ~80% ลงต่อถึง low Wave 2 · รอดกลับมากำไรแค่ ~10% · ที่ความเสี่ยงเท่ากัน SL กว้างแย่กว่า (ชนะแค่ 2–3/12) → SL ใต้ (ii) ทำหน้าที่ถูกแล้ว · ไม่ตั้ง SL / ขี้ระวัง ที่เคยดูดี ส่วนหนึ่งมาจากการคิดความเสี่ยงผิด (แก้แล้ว)", a: "แก้การคิดความเสี่ยง", c: "stop" },
   { h: "22 · แก้ตัวเอง: โมเดลขนาดไม้ผิด → ถอด SENSEI+", q: "ผลลงครบที่จุดเข้า ไม่เติม ชนะ 12/12 จริงไหม", m: "คุณชี้ว่าระบบจริงคิดขนาดจาก RPT 1% ต่อไม้ (ถือ 8–20% แล้วแต่ระยะ SL) และไม้ VCP เป็นไม้ใหม่ เสี่ยง ½ RPT มี SL ของมันเองใต้ฐาน VCP → แก้ engine + Dojo ให้ไม้ VCP มี SL/ขนาดของตัวเอง ตั้งค่าเริ่มต้นเป็นเสี่ยง % คงที่ แล้วเทสใหม่ 2 ชุดกราฟ × 4 โลก", r: "ข้อได้เปรียบ 12/12 หายไป — มันมาจากโมเดลแบ่งเงินต่อหุ้นที่ผมตั้งเอง ไม่ใช่ edge · ลงครบ/ไม่เติม ดีขึ้นในโลกปกติ แต่แย่ลงในโลกโหด/สุ่ม · จึงถอด SENSEI+ และตัวเลือกกฎปรับใน Dojo · ระบบเดิมยังเป็นตัวหลัก", a: "ถอด SENSEI+", c: "stop" },
   { h: "23 · ทำไม CAGR ต่ำ / ใช้เงินน้อย", q: "ทุก AI เล่นครบ 50 หุ้นอยู่แล้ว แต่ใช้เงินแค่ ~40% และ CAGR ~10%", m: "นับสัญญาณ: 50 หุ้น × 6.7 ปี ได้ setup แค่ ~100 ไม้ (หุ้นละ ~2 ไม้) ถือไม้ละ ~80 แท่ง → เฉลี่ยมีของพร้อมกันแค่ ~5 ตัว · และ open risk เดิมนับความเสี่ยงตอนเข้าค้างไว้ทั้งไม้ แม้ยก SL มากันทุนแล้ว", r: "แก้ open risk ให้วัดจาก SL ปัจจุบัน (กันทุนแล้ว = 0) และใช้เงินจากมูลค่าจริงรายแท่ง · เพิ่มตัวเลือก 100/200 หุ้น — 200 หุ้น RPT 1% ระบบใช้เงิน ~70% CAGR ~28% DD ~10% (โลกผสม จำลอง)", a: "open risk แบบสด + 200 หุ้น", c: "buy" },
+  { h: "24 · หุ้นจริง 1797: (ii) ขยายต่อได้หลังโดน SL", q: "คุณนับ i-ii = ม.ค. 2026 (17.59) → ก.พ. (33.00) → ส.ค. (19.39) แต่ระบบทิ้ง (i) หลังโดน SL เดือน พ.ค. แล้วรอ (i) ใหม่", m: "แก้กฎ: หลังโดน SL ถ้าราคายังไม่หลุดจุดเริ่ม (i) (= low W2) → (i) เดิมยังใช้ได้ (ii) ลงลึกต่อได้ รอไกปืนเข้าใหม่ (ยังจำกัด 2 ไม้ต่อรอบ) · เทสพอร์ต 200 หุ้น", r: "ผลรวมพอๆ เดิม (ผสม Calmar 2.46→2.72 · โหด CAGR −1.6→−3.3%) · 1797: ไม้ 2 เข้า 21 ก.ค. @23.26 SL 19.52 โดน 21 ส.ค. (low 19.39) → ครบ 2 ไม้ ปิดรอบ", a: "(i) เดิมใช้ต่อได้", c: "gold" },
 ];
 
 const AILab = {
